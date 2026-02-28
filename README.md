@@ -2,6 +2,59 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Prerequisites
+
+Before running the application, ensure you have:
+
+1. Node.js 18+ installed
+2. PostgreSQL database running
+3. Environment variables configured (copy `.env.example` to `.env` and fill in values)
+
+### Database Setup
+
+1. Run database migrations:
+
+```bash
+npm run db:migrate
+```
+
+2. Seed the database with sample data:
+
+```bash
+npm run db:seed
+```
+
+The seed script populates your database with sample data for development and testing. It is idempotent and safe to run multiple times.
+
+#### What Gets Created
+
+The seed script creates:
+- **4 Users**: 1 admin and 3 customer accounts
+- **11 Categories**: 3-level category hierarchy (Electronics, Clothing, Home & Garden)
+- **10 Products**: Sample products across different categories
+- **Product Images**: 2-3 images per product (using placeholder images)
+- **Inventory**: Stock levels for all products (20-120 units each)
+- **3 User Addresses**: Default shipping addresses for customers
+- **3 Orders**: Sample orders in different states (delivered, shipped, processing)
+- **5 Reviews**: Product reviews with ratings
+
+#### Test User Credentials
+
+Use these credentials to log in and test different user roles:
+
+**Admin Account:**
+- Email: `admin@zivara.com`
+- Password: `password123`
+- Access: Full admin dashboard, user management, order management, product management
+
+**Customer Accounts:**
+- Email: `john.doe@example.com` / Password: `password123`
+- Email: `jane.smith@example.com` / Password: `password123`
+- Email: `bob.wilson@example.com` / Password: `password123`
+- Access: Customer features (shopping, orders, reviews, profile)
+
+### Running the Development Server
+
 First, run the development server:
 
 ```bash
