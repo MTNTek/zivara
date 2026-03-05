@@ -1,33 +1,30 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { getProducts, getCategories } from '@/features/products/cached-queries';
+import { getProducts } from '@/features/products/cached-queries';
+import { ProductCard } from '@/components/product/ProductCard';
 
 export default async function HomePage() {
-  // Fetch featured products (newest products)
+  // Fetch featured products
   const { products: featuredProducts } = await getProducts({
-    limit: 8,
+    limit: 12,
     sortBy: 'newest',
   });
 
-  // Fetch top categories
-  const categories = await getCategories();
-  const topCategories = categories.filter(c => !c.parentId).slice(0, 6);
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-teal-600 to-teal-500 text-white">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+    <div className="min-h-screen bg-white">
+      {/* Hero Banner */}
+      <section className="relative bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 h-[400px] overflow-hidden">
+        <div className="absolute inset-0 bg-black opacity-30"></div>
+        <div className="relative w-full px-4 h-full flex items-center">
+          <div className="max-w-2xl text-white">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4">
               Welcome to Zivara
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-teal-50">
+            <p className="text-xl md:text-2xl mb-8 text-gray-100">
               Discover amazing products at unbeatable prices
             </p>
             <Link
               href="/products"
-              className="inline-block bg-white text-teal-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="inline-block bg-[#032854] hover:bg-[#021d3d] text-white px-8 py-3 rounded font-bold transition-colors"
             >
               Shop Now
             </Link>
@@ -35,156 +32,94 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="container mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">
-          Shop by Category
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {topCategories.map((category) => (
+      {/* Category Cards */}
+      <section className="w-full px-4 -mt-16 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { name: 'Electronics', icon: '💻', href: '/products?category=electronics' },
+            { name: 'Fashion', icon: '👕', href: '/products?category=fashion' },
+            { name: 'Home & Kitchen', icon: '🏠', href: '/products?category=home' },
+            { name: 'Books', icon: '📚', href: '/products?category=books' },
+          ].map((category) => (
             <Link
-              key={category.id}
-              href={`/products/category/${category.slug}`}
-              className="group"
+              key={category.name}
+              href={category.href}
+              className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow text-center"
             >
-              <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-                {category.imageUrl && (
-                  <div className="relative w-full h-32 mb-4">
-                    <Image
-                      src={category.imageUrl}
-                      alt={category.name}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                    />
-                  </div>
-                )}
-                <h3 className="text-center font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">
-                  {category.name}
-                </h3>
-              </div>
+              <div className="text-4xl mb-2">{category.icon}</div>
+              <h3 className="font-bold text-gray-900">{category.name}</h3>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">
+      {/* Today's Deals Banner */}
+      <section className="w-full px-4 mt-8">
+        <div className="bg-white rounded-lg p-6 shadow-md">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Today's Deals
+          </h2>
+          <p className="text-gray-600">
+            Don't miss out on our special offers
+          </p>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="w-full px-4 py-8">
+        <div className="bg-white rounded-lg p-6 shadow-md">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Featured Products
           </h2>
-          <Link
-            href="/products"
-            className="text-teal-600 hover:text-teal-700 font-semibold"
-          >
-            View All →
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {featuredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                discountPrice={product.discountPrice}
+                imageUrl={product.images?.[0]?.imageUrl}
+                averageRating={product.averageRating}
+                reviewCount={product.reviewCount || 0}
+              />
+            ))}
+          </div>
+          
+          <div className="mt-6 text-center">
             <Link
-              key={product.id}
-              href={`/products/${product.id}`}
-              className="group"
+              href="/products"
+              className="inline-block text-[#007185] hover:text-[#febd69] hover:underline font-medium"
             >
-              <div className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow border border-gray-200 overflow-hidden">
-                <div className="relative w-full h-64 bg-gray-100">
-                  {product.images?.[0] ? (
-                    <Image
-                      src={product.images[0].imageUrl}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      {product.discountPrice ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-teal-600">
-                            ${Number(product.discountPrice).toFixed(2)}
-                          </span>
-                          <span className="text-sm text-gray-500 line-through">
-                            ${Number(product.price).toFixed(2)}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-lg font-bold text-gray-900">
-                          ${Number(product.price).toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-                    {product.averageRating && Number(product.averageRating) > 0 && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-yellow-400">★</span>
-                        <span className="text-sm text-gray-600">
-                          {Number(product.averageRating).toFixed(1)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              See more products →
             </Link>
-          ))}
+          </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-white py-12 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Quality Products
-              </h3>
-              <p className="text-gray-600">
-                Carefully curated selection of high-quality items
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Best Prices
-              </h3>
-              <p className="text-gray-600">
-                Competitive pricing on all products
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Fast Shipping
-              </h3>
-              <p className="text-gray-600">
-                Quick and reliable delivery to your door
-              </p>
-            </div>
+      {/* Promotional Banners */}
+      <section className="w-full px-4 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+            <h3 className="text-xl font-bold mb-2">Free Shipping</h3>
+            <p className="mb-4">On orders over $50</p>
+            <Link href="/products" className="text-sm underline hover:no-underline">
+              Shop Now →
+            </Link>
+          </div>
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
+            <h3 className="text-xl font-bold mb-2">New Arrivals</h3>
+            <p className="mb-4">Check out the latest products</p>
+            <Link href="/products?sortBy=newest" className="text-sm underline hover:no-underline">
+              Explore →
+            </Link>
+          </div>
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+            <h3 className="text-xl font-bold mb-2">Best Sellers</h3>
+            <p className="mb-4">Most popular items</p>
+            <Link href="/products?sortBy=rating" className="text-sm underline hover:no-underline">
+              View All →
+            </Link>
           </div>
         </div>
       </section>

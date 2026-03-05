@@ -3,7 +3,6 @@ import { getProducts, getCategories } from '@/features/products/cached-queries';
 import { ProductGrid } from '@/components/product/product-grid';
 import { ProductFilters } from '@/components/product/product-filters';
 import { Pagination } from '@/components/ui/pagination';
-import { ProductSearch } from '@/components/product/product-search';
 import { MobileFilters } from '@/components/product/mobile-filters';
 
 interface ProductsPageProps {
@@ -50,12 +49,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Products</h1>
-          <ProductSearch initialValue={searchParams.search} />
+          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">

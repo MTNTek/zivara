@@ -14,6 +14,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Zivara - Your Online Shopping Destination",
   description: "Discover amazing products at unbeatable prices. Shop quality items with fast shipping and excellent customer service.",
+  icons: {
+    icon: [
+      { url: '/logo.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/logo.svg', type: 'image/svg+xml' },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
