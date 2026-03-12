@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  
+  /* Zivara Simple 3-Color Palette */
+  --primary-grey: #6B7280;    /* Main grey for text and elements */
+  --navy: #032854;            /* Navy blue for top navigation bar */
+  --white: #FFFFFF;           /* White for backgrounds */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  
+  /* Custom navy color */
+  --color-navy-600: #032854;
+  --color-navy-700: #021d3d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+/* Ensure proper touch target sizes on mobile */
+@media (max-width: 767px) {
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--navy);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #021d3d;
+}
+
+/* Toast notifications styling */
+[data-sonner-toast] {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+[data-sonner-toast][data-type="success"] {
+  background: #f0fdf4 !important;
+  border-color: #86efac !important;
+  color: #166534 !important;
+}
+
+[data-sonner-toast][data-type="success"] [data-icon] {
+  color: #22c55e !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  background: #fef2f2 !important;
+  border-color: #fca5a5 !important;
+  color: #991b1b !important;
+}
+
+[data-sonner-toast][data-type="error"] [data-icon] {
+  color: #ef4444 !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+  color: #1e40af !important;
+}
+
+[data-sonner-toast][data-type="info"] [data-icon] {
+  color: #3b82f6 !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  background: #fffbeb !important;
+  border-color: #fcd34d !important;
+  color: #92400e !important;
+}
+
+[data-sonner-toast][data-type="warning"] [data-icon] {
+  color: #f59e0b !important;
+}
+
+[data-sonner-toast] [data-title] {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+[data-sonner-toast] [data-description] {
+  font-size: 0.8125rem;
+  opacity: 0.9;
+}
+
+/* Mega Menu Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.15s ease-in;
+}
+
+/* Product Card Animations */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Smooth image zoom on hover */
+.group:hover img {
+  transform: scale(1.1);
+}
