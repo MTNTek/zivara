@@ -19,7 +19,7 @@ interface CheckoutFormProps {
   total: number;
 }
 
-export function CheckoutForm({ cartItems, subtotal, tax, shipping, total }: CheckoutFormProps) {
+export function CheckoutForm({ total }: CheckoutFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);

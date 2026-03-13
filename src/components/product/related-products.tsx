@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { products, productImages, inventory } from '@/db/schema';
+import { products } from '@/db/schema';
 import { eq, ne, and, sql } from 'drizzle-orm';
 import Link from 'next/link';
 import Image from 'next/image';

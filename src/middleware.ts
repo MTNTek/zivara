@@ -8,7 +8,6 @@ export default async function middleware(req: NextRequest) {
     || req.cookies.get('__Secure-better-auth.session_token');
 
   const isAuthenticated = !!sessionCookie?.value;
-  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
 
   // Redirect unauthenticated users to login
   if (!isAuthenticated) {

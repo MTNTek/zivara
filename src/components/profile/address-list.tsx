@@ -6,7 +6,9 @@ interface AddressListProps {
   userId: string;
 }
 
-export function AddressList({ userId }: AddressListProps) {
+export function AddressList({ userId: _userId }: AddressListProps) {
+  // userId reserved for future address CRUD operations
+  void _userId;
   const [showForm, setShowForm] = useState(false);
 
   return (

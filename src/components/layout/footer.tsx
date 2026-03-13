@@ -44,12 +44,12 @@ export function Footer() {
                 <ul className="space-y-2 text-sm">
                   <li>
                     <Link href="/products/category/mens-fashion" className="hover:underline transition-colors">
-                      Men's Fashion
+                      Men&apos;s Fashion
                     </Link>
                   </li>
                   <li>
                     <Link href="/products/category/womens-fashion" className="hover:underline transition-colors">
-                      Women's Fashion
+                      Women&apos;s Fashion
                     </Link>
                   </li>
                   <li>

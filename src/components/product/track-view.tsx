@@ -14,6 +14,7 @@ interface TrackViewProps {
 export function TrackView(props: TrackViewProps) {
   useEffect(() => {
     trackProductView(props);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.id]);
 
   return null;

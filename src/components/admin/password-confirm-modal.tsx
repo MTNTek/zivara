@@ -42,8 +42,8 @@ export function PasswordConfirmModal({
     setError(null);
     try {
       await onConfirm(password);
-    } catch (err: any) {
-      setError(err.message || 'Incorrect password');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Incorrect password');
     } finally {
       setLoading(false);
     }

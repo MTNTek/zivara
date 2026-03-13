@@ -9,7 +9,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit } from '@/lib/rate-limit-middleware';
 import { requireCsrfProtection } from '@/lib/security';
 import { handleError } from '@/lib/error-handler';
-import { ValidationError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 
 /**

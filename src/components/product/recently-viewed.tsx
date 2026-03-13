@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -26,15 +26,30 @@ export function trackProductView(product: Omit<RecentProduct, 'viewedAt'>) {
   } catch { /* ignore */ }
 }
 
-export function RecentlyViewed({ excludeId }: { excludeId?: string }) {
-  const [items, setItems] = useState<RecentProduct[]>([]);
+const emptyArray: RecentProduct[] = [];
 
-  useEffect(() => {
+function subscribeToStorage(callback: () => void) {
+  window.addEventListener('storage', callback);
+  return () => window.removeEventListener('storage', callback);
+}
+
+function getServerSnapshot(): RecentProduct[] {
+  return emptyArray;
+}
+
+export function RecentlyViewed({ excludeId }: { excludeId?: string }) {
+  const getSnapshot = useCallback(() => {
     try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') as RecentProduct[];
-      setItems(excludeId ? stored.filter((p) => p.id !== excludeId) : stored);
-    } catch { /* ignore */ }
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return emptyArray;
+      const stored = JSON.parse(raw) as RecentProduct[];
+      return excludeId ? stored.filter((p) => p.id !== excludeId) : stored;
+    } catch {
+      return emptyArray;
+    }
   }, [excludeId]);
+
+  const items = useSyncExternalStore(subscribeToStorage, getSnapshot, getServerSnapshot);
 
   if (items.length === 0) return null;
 

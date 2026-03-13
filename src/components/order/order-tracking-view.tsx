@@ -1,10 +1,46 @@
 'use client';
 
+interface StatusHistoryEntry {
+  status: string;
+  createdAt: string | Date;
+  notes?: string | null;
+}
+
+interface OrderItem {
+  id: string;
+  productName: string;
+  quantity: number;
+  subtotal: string;
+}
+
+interface OrderData {
+  orderNumber: string;
+  status: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  estimatedDeliveryDate?: string | Date | null;
+  trackingNumber?: string | null;
+  carrierName?: string | null;
+  subtotal: string;
+  tax: string;
+  shipping: string;
+  total: string;
+  shippingAddressLine1: string;
+  shippingAddressLine2?: string | null;
+  shippingCity: string;
+  shippingState: string;
+  shippingPostalCode: string;
+  shippingCountry: string;
+  statusHistory?: StatusHistoryEntry[];
+  items?: OrderItem[];
+  [key: string]: unknown;
+}
+
 /**
  * Order tracking view component
  * Validates: Requirements 23.1-23.7
  */
-export default function OrderTrackingView({ order }: { order: any }) {
+export default function OrderTrackingView({ order }: { order: OrderData }) {
   // Format relative time
   const formatRelativeTime = (date: Date) => {
     const now = new Date();
@@ -86,7 +122,7 @@ export default function OrderTrackingView({ order }: { order: any }) {
               const isCompleted = index <= currentStatusIndex;
               const isCurrent = index === currentStatusIndex;
               const statusHistory = order.statusHistory?.find(
-                (h: any) => h.status === step.key
+                (h: StatusHistoryEntry) => h.status === step.key
               );
 
               return (
@@ -192,7 +228,7 @@ export default function OrderTrackingView({ order }: { order: any }) {
           Order Items
         </h3>
         <div className="space-y-4">
-          {order.items?.map((item: any) => (
+          {order.items?.map((item: OrderItem) => (
             <div
               key={item.id}
               className="flex items-center justify-between border-b border-gray-200 pb-4 last:border-0 last:pb-0"

@@ -2,11 +2,11 @@ import Link from 'next/link';
 
 interface CartSummaryProps {
   subtotal: number;
-  itemCount: number;
+  itemCount?: number;
   totalQuantity: number;
 }
 
-export function CartSummary({ subtotal, itemCount, totalQuantity }: CartSummaryProps) {
+export function CartSummary({ subtotal, totalQuantity }: CartSummaryProps) {
   // Calculate estimated tax (example: 10%)
   const tax = subtotal * 0.1;
   

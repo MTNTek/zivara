@@ -56,7 +56,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
   };
 
   // Handle form field changes
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | boolean | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error for this field
     if (errors[field as keyof FormErrors]) {
@@ -163,7 +163,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       } else {
         setErrors(prev => ({ ...prev, general: result.error || 'Failed to upload image' }));
       }
-    } catch (error) {
+    } catch {
       setErrors(prev => ({ ...prev, general: 'Failed to upload image' }));
     } finally {
       setUploadingImage(false);

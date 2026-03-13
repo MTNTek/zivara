@@ -21,7 +21,7 @@ export function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
           Something went wrong
         </h2>
         <p className="mb-6 text-gray-600">
-          We're sorry for the inconvenience. Please try again.
+          We&apos;re sorry for the inconvenience. Please try again.
         </p>
         <button
           onClick={reset}

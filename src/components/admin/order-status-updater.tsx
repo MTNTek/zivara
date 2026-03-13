@@ -55,7 +55,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
         setSuccess(false);
       }, 3000);
     } else {
-      const errorMsg = typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to update order status';
+      const errorMsg = typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to update order status');
       setError(errorMsg);
       toast.error('Could not update status', errorMsg);
     }
@@ -173,7 +173,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
         ) : (
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
             <p className="text-sm text-gray-600">
-              This order cannot be updated. Orders with status "{currentStatus}" are final.
+              This order cannot be updated. Orders with status &quot;{currentStatus}&quot; are final.
             </p>
           </div>
         )}

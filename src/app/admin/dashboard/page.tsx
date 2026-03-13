@@ -65,7 +65,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Today's Revenue</p>
+              <p className="text-sm font-medium text-gray-600">Today&apos;s Revenue</p>
               <p className="mt-2 text-3xl font-bold text-gray-900">${parseFloat(stats.todayRevenue).toFixed(2)}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">

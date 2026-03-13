@@ -8,7 +8,7 @@ interface StatusHistoryItem {
 
 interface OrderStatusHistoryViewProps {
   statusHistory: StatusHistoryItem[];
-  currentStatus: string;
+  currentStatus?: string;
 }
 
 /**
@@ -17,7 +17,6 @@ interface OrderStatusHistoryViewProps {
  */
 export function OrderStatusHistoryView({
   statusHistory,
-  currentStatus,
 }: OrderStatusHistoryViewProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {

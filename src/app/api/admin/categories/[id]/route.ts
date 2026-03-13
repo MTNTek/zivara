@@ -34,8 +34,8 @@ export async function PUT(
     }
 
     return NextResponse.json(updated);
-  } catch (error: any) {
-    if (error.code === '23505') {
+  } catch (error: unknown) {
+    if ((error as Record<string, string>)?.code === '23505') {
       return NextResponse.json({ error: 'A category with this slug already exists' }, { status: 409 });
     }
     return NextResponse.json({ error: 'Failed to update category' }, { status: 500 });
@@ -65,8 +65,8 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    if (error.code === '23503') {
+  } catch (error: unknown) {
+    if ((error as Record<string, string>)?.code === '23503') {
       return NextResponse.json({ error: 'Cannot delete: category has products assigned to it' }, { status: 409 });
     }
     return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });

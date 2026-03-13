@@ -79,7 +79,7 @@ export default async function HomePage() {
       <section className="w-full px-4 mt-8">
         <div className="bg-white rounded-lg p-6 shadow-md">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Today's Deals
+            Today&apos;s Deals
           </h2>
           {dealProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 
 interface SuggestionData {
@@ -19,26 +18,31 @@ export function SearchSuggestions({ query, visible, onSelect }: SearchSuggestion
   const [data, setData] = useState<SuggestionData | null>(null);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const router = useRouter();
+  const prevQueryRef = useRef(query);
+
+  const fetchSuggestions = useCallback(async (q: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `/api/products/search-suggestions?q=${encodeURIComponent(q)}`
+      );
+      if (res.ok) setData(await res.json());
+    } catch { /* ignore */ }
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     if (!visible || query.length < 2) {
-      setData(null);
+      prevQueryRef.current = query;
       return;
     }
+    if (prevQueryRef.current !== query) {
+      prevQueryRef.current = query;
+    }
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `/api/products/search-suggestions?q=${encodeURIComponent(query)}`
-        );
-        if (res.ok) setData(await res.json());
-      } catch { /* ignore */ }
-      setLoading(false);
-    }, 250);
+    debounceRef.current = setTimeout(() => fetchSuggestions(query), 250);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query, visible]);
+  }, [query, visible, fetchSuggestions]);
 
   if (!visible || query.length < 2 || (!data && !loading)) return null;
 

@@ -49,7 +49,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
         setSelectedProducts([]);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to activate products');
+        setError(typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to activate products'));
       }
     });
   };
@@ -69,7 +69,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
         setSelectedProducts([]);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to deactivate products');
+        setError(typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to deactivate products'));
       }
     });
   };
@@ -90,7 +90,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
         setShowBulkActions(false);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to update category');
+        setError(typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to update category'));
       }
     });
   };
@@ -98,16 +98,15 @@ export function ProductListActions({ products, categories }: ProductListActionsP
   // Set up event listeners for checkboxes
   if (typeof window !== 'undefined') {
     // Handle select all
-    const selectAllCheckbox = document.getElementById('select-all') as HTMLInputElement;
+    const selectAllCheckbox = document.getElementById('select-all') as HTMLInputElement | null;
     if (selectAllCheckbox) {
       selectAllCheckbox.checked = selectedProducts.length === products.length && products.length > 0;
       selectAllCheckbox.indeterminate = selectedProducts.length > 0 && selectedProducts.length < products.length;
-      selectAllCheckbox.onchange = handleSelectAll as unknown as (this: GlobalEventHandlers, ev: Event) => any;
+      selectAllCheckbox.onchange = handleSelectAll as unknown as (this: GlobalEventHandlers, ev: Event) => void;
     }
 
     // Handle individual checkboxes
-    document.querySelectorAll('.product-checkbox').forEach((checkbox) => {
-      const input = checkbox as HTMLInputElement;
+    document.querySelectorAll<HTMLInputElement>('.product-checkbox').forEach((input) => {
       const productId = input.dataset.productId;
       if (productId) {
         input.checked = selectedProducts.includes(productId);
