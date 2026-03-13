@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "scripts", "seed-demo-data.ts", "clear-users.ts", "migrate-accounts.ts", "src/db/seed-enhanced.ts"]
 }

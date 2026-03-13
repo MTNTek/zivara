@@ -22,7 +22,7 @@ export const auth = betterAuth({
       generateId: false, // Let PostgreSQL generate UUIDs via gen_random_uuid()
     },
   },
-  trustedOrigins: ['http://localhost:3000'],
+  trustedOrigins: [process.env.BETTER_AUTH_URL || 'http://localhost:3000'],
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,

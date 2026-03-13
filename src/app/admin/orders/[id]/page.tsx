@@ -9,9 +9,9 @@ import { OrderStatusHistoryView } from '@/components/admin/order-status-history'
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -20,7 +20,8 @@ interface PageProps {
  */
 export default async function AdminOrderDetailPage({ params }: PageProps) {
   await requireAdmin();
-  const order = await getOrderById(params.id);
+  const { id } = await params;
+  const order = await getOrderById(id);
 
   if (!order) {
     notFound();

@@ -1,9 +1,5 @@
 import Link from 'next/link';
-import type { Review, User } from '@/types';
-
-interface ReviewWithUser extends Review {
-  user: User;
-}
+import type { ReviewWithUser } from '@/features/reviews/queries';
 
 interface ProductReviewsProps {
   productId: string;

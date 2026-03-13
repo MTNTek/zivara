@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getOrdersByUser } from '@/features/orders/queries';
+import { getUserOrders } from '@/features/orders/queries';
+
+export const metadata: Metadata = {
+  title: 'My Orders - Zivara',
+  description: 'View and track your orders.',
+};
 import { getCurrentUserId } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -10,7 +16,7 @@ export default async function OrdersPage() {
     redirect('/login?redirect=/orders');
   }
 
-  const { orders } = await getOrdersByUser(userId, { page: 1, limit: 50 });
+  const { orders } = await getUserOrders(userId, { page: 1, limit: 50 });
 
   const getStatusColor = (status: string) => {
     switch (status) {

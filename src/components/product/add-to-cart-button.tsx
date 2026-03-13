@@ -31,7 +31,7 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
         toast.success('Added to cart', `${quantity} item${quantity > 1 ? 's' : ''} added successfully`);
         setTimeout(() => setSuccess(false), 3000);
       } else {
-        const errorMsg = result.error?.message || result.error || 'Failed to add to cart';
+        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to add to cart';
         setError(errorMsg);
         toast.error('Could not add to cart', errorMsg);
       }
@@ -47,7 +47,7 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
       if (result.success) {
         router.push('/cart');
       } else {
-        const errorMsg = result.error?.message || result.error || 'Failed to add to cart';
+        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to add to cart';
         setError(errorMsg);
         toast.error('Could not add to cart', errorMsg);
       }

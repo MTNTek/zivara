@@ -5,7 +5,9 @@ import { usePathname } from 'next/navigation';
 const pageTitles: Record<string, string> = {
   '/admin/dashboard': 'Dashboard',
   '/admin/products': 'Products',
+  '/admin/products/new': 'New Product',
   '/admin/categories': 'Categories',
+  '/admin/categories/new': 'New Category',
   '/admin/orders': 'Orders',
   '/admin/users': 'Users',
   '/admin/reviews': 'Reviews',
@@ -15,7 +17,13 @@ const pageTitles: Record<string, string> = {
 
 export function AdminHeader() {
   const pathname = usePathname();
-  const title = pageTitles[pathname] || 'Admin';
+  const title = pageTitles[pathname] || 
+    (pathname.includes('/edit') ? 'Edit' :
+     pathname.includes('/products/') ? 'Product Details' :
+     pathname.includes('/orders/') ? 'Order Details' :
+     pathname.includes('/users/') ? 'User Details' :
+     pathname.includes('/categories/') ? 'Category Details' :
+     'Admin');
 
   return (
     <header className="bg-white shadow-sm">

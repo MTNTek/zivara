@@ -15,9 +15,11 @@ interface OrderStatusUpdaterProps {
  * Order status update dropdown for admin
  * Validates: Requirements 21.4, 21.5
  */
+type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
 export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdaterProps) {
   const router = useRouter();
-  const [status, setStatus] = useState(currentStatus);
+  const [status, setStatus] = useState<OrderStatus>(currentStatus as OrderStatus);
   const [notes, setNotes] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
         setSuccess(false);
       }, 3000);
     } else {
-      const errorMsg = result.error?.message || result.error || 'Failed to update order status';
+      const errorMsg = typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to update order status';
       setError(errorMsg);
       toast.error('Could not update status', errorMsg);
     }
@@ -117,7 +119,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
               <select
                 id="status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
+                onChange={(e) => setStatus(e.target.value as OrderStatus)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               >
                 <option value={currentStatus}>Select new status...</option>

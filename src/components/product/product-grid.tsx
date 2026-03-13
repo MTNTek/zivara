@@ -1,10 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Product, ProductImage } from '@/types';
-
-interface ProductWithImages extends Product {
-  images?: ProductImage[];
-}
+import type { ProductWithImages } from '@/types';
 
 interface ProductGridProps {
   products: ProductWithImages[];

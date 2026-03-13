@@ -12,7 +12,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Zivara - Your Online Shopping Destination",
+  title: {
+    default: "Zivara - Your Online Shopping Destination",
+    template: "%s | Zivara",
+  },
   description: "Discover amazing products at unbeatable prices. Shop quality items with fast shipping and excellent customer service.",
   icons: {
     icon: [
@@ -22,6 +25,18 @@ export const metadata: Metadata = {
       { url: '/logo.svg', type: 'image/svg+xml' },
     ],
   },
+  openGraph: {
+    type: 'website',
+    siteName: 'Zivara',
+    title: 'Zivara - Your Online Shopping Destination',
+    description: 'Discover amazing products at unbeatable prices. Shop quality items with fast shipping and excellent customer service.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Zivara - Your Online Shopping Destination',
+    description: 'Discover amazing products at unbeatable prices.',
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
 };
 
 export const viewport: Viewport = {

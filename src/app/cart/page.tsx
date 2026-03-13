@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getCartSummary } from '@/features/cart/queries';
 import { CartItemsList } from '@/components/cart/cart-items-list';
 import { CartSummary } from '@/components/cart/cart-summary';
+
+export const metadata: Metadata = {
+  title: 'Shopping Cart - Zivara',
+  description: 'Review items in your shopping cart.',
+};
 
 export default async function CartPage() {
   const cartData = await getCartSummary();

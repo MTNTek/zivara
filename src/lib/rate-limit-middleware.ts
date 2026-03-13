@@ -16,7 +16,7 @@ import { auth } from './auth';
  * Returns null if rate limit is not exceeded, otherwise returns a 429 response
  */
 export async function applyRateLimit(request: NextRequest): Promise<NextResponse | null> {
-  const ip = getClientIp();
+  const ip = await getClientIp();
 
   // Check if user is authenticated via Better Auth session
   const session = await auth.api.getSession({

@@ -48,7 +48,7 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
     startTransition(async () => {
       const result = await updateCartItemQuantity({ cartItemId: itemId, quantity: newQuantity });
       if (!result.success) {
-        const errorMsg = result.error?.message || result.error || 'Failed to update quantity';
+        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to update quantity';
         setError(errorMsg);
         toast.error('Could not update quantity', errorMsg);
       } else {
@@ -68,7 +68,7 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
     startTransition(async () => {
       const result = await removeFromCart({ cartItemId: itemId });
       if (!result.success) {
-        const errorMsg = result.error?.message || result.error || 'Failed to remove item';
+        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to remove item';
         setError(errorMsg);
         toast.error('Could not remove item', errorMsg);
       } else {

@@ -9,9 +9,10 @@ import OrderTrackingView from '@/components/order/order-tracking-view';
 export default async function TrackOrderPage({
   params,
 }: {
-  params: { orderNumber: string };
+  params: Promise<{ orderNumber: string }>;
 }) {
-  const order = await getOrderByNumber(params.orderNumber);
+  const { orderNumber } = await params;
+  const order = await getOrderByNumber(orderNumber);
 
   if (!order) {
     notFound();

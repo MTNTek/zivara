@@ -48,6 +48,9 @@ export async function getUserOrders(
       orderBy: [desc(orders.createdAt)],
       limit,
       offset,
+      with: {
+        items: true,
+      },
     });
 
     // Get total count
@@ -93,7 +96,11 @@ export async function getOrderById(orderId: string) {
       with: {
         items: {
           with: {
-            product: true,
+            product: {
+              with: {
+                images: true,
+              },
+            },
           },
         },
         statusHistory: {

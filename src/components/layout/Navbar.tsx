@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { CartCount } from './cart-count';
+import { SearchSuggestions } from './search-suggestions';
+import { useSession } from '@/lib/auth-client';
 
 export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +19,7 @@ export default function Navbar() {
   const [selectedLocation, setSelectedLocation] = useState('United States');
   const [locationSearch, setLocationSearch] = useState('');
   const router = useRouter();
+  const { data: session } = useSession();
 
   const categories = [
     { value: 'all', label: 'All Departments' },
@@ -262,7 +266,7 @@ export default function Navbar() {
             placeholder="Search products..."
           />
 
-          {/* Trending Searches Dropdown */}
+          {/* Trending Searches Dropdown (when empty) */}
           {isSearchFocused && searchQuery === '' && (
             <div className="absolute left-0 right-0 top-full mt-1 bg-white shadow-lg z-50 border border-gray-200 rounded-md max-h-96 overflow-y-auto">
               <div className="p-4">
@@ -296,6 +300,17 @@ export default function Navbar() {
               </div>
             </div>
           )}
+
+          {/* Live Search Suggestions (when typing) */}
+          <SearchSuggestions
+            query={searchQuery}
+            visible={isSearchFocused && searchQuery.length >= 2}
+            onSelect={(text) => {
+              setSearchQuery(text);
+              setIsSearchFocused(false);
+              router.push(`/products?search=${encodeURIComponent(text)}`);
+            }}
+          />
 
           {/* Search Button */}
           <button 
@@ -375,9 +390,17 @@ export default function Navbar() {
         </div>
 
         {/* Account */}
-        <Link href="/profile" className="text-xs cursor-pointer px-2 py-1 transition-colors whitespace-nowrap hidden md:block flex-shrink-0">
-          <div className="text-[10px]">Hello, Sign in</div>
+        <Link href={session ? "/profile" : "/login"} className="text-xs cursor-pointer px-2 py-1 transition-colors whitespace-nowrap hidden md:block flex-shrink-0">
+          <div className="text-[10px]">
+            {session ? `Hello, ${session.user.name?.split(' ')[0]}` : 'Hello, Sign in'}
+          </div>
           <div className="font-bold">Account</div>
+        </Link>
+
+        {/* Wishlist */}
+        <Link href="/wishlist" className="text-xs cursor-pointer px-2 py-1 transition-colors whitespace-nowrap hidden lg:block flex-shrink-0">
+          <div className="text-[10px]">Your</div>
+          <div className="font-bold">Wishlist</div>
         </Link>
 
         {/* Orders */}
@@ -387,8 +410,9 @@ export default function Navbar() {
         </Link>
 
         {/* Cart */}
-        <Link href="/cart" className="text-sm font-bold cursor-pointer px-2 py-1 transition-colors whitespace-nowrap flex-shrink-0">
+        <Link href="/cart" className="relative text-sm font-bold cursor-pointer px-2 py-1 transition-colors whitespace-nowrap flex-shrink-0">
           🛒 Cart
+          <CartCount />
         </Link>
       </div>
     </div>

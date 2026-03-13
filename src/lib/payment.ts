@@ -8,8 +8,6 @@ if (process.env.STRIPE_SECRET_KEY) {
     apiVersion: '2026-02-25.clover',
     typescript: true,
   });
-} else if (process.env.NODE_ENV === 'production') {
-  throw new Error('STRIPE_SECRET_KEY is required in production');
 }
 
 export { stripe };

@@ -20,14 +20,15 @@ interface SearchParams {
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   await requireAdmin();
-  const page = parseInt(searchParams.page || '1');
-  const limit = parseInt(searchParams.limit || '20');
-  const search = searchParams.search || '';
-  const sortBy = searchParams.sortBy || 'createdAt';
-  const sortOrder = searchParams.sortOrder || 'desc';
+  const resolvedParams = await searchParams;
+  const page = parseInt(resolvedParams.page || '1');
+  const limit = parseInt(resolvedParams.limit || '20');
+  const search = resolvedParams.search || '';
+  const sortBy = resolvedParams.sortBy || 'createdAt';
+  const sortOrder = resolvedParams.sortOrder || 'desc';
 
   const { users, pagination } = await getUsers({
     page,

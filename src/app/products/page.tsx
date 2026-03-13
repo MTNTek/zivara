@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getProducts, getCategories } from '@/features/products/cached-queries';
 import { ProductGrid } from '@/components/product/product-grid';
@@ -5,10 +6,16 @@ import { ProductFilters } from '@/components/product/product-filters';
 import { Pagination } from '@/components/ui/pagination';
 import { MobileFilters } from '@/components/product/mobile-filters';
 
+export const metadata: Metadata = {
+  title: 'Products - Zivara',
+  description: 'Browse our collection of quality products. Find electronics, clothing, home goods, and more at great prices.',
+};
+
 interface ProductsPageProps {
   searchParams: Promise<{
     page?: string;
     search?: string;
+    category?: string;
     categoryId?: string;
     minPrice?: string;
     maxPrice?: string;
@@ -22,12 +29,24 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const page = Number(params.page) || 1;
   const limit = 24;
 
+  // Resolve category slug to ID if needed
+  let categoryId = params.categoryId;
+  if (!categoryId && params.category) {
+    const allCategories = await getCategories();
+    const match = allCategories.find(
+      (c) => c.slug === params.category || c.slug.startsWith(params.category!)
+    );
+    if (match) {
+      categoryId = match.id;
+    }
+  }
+
   // Build query parameters
   const queryParams = {
     page,
     limit,
     search: params.search,
-    categoryId: params.categoryId,
+    categoryId,
     minPrice: params.minPrice ? Number(params.minPrice) : undefined,
     maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
     minRating: params.minRating ? Number(params.minRating) : undefined,
@@ -42,7 +61,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const totalPages = Math.ceil(total / limit);
 
   const currentFilters = {
-    categoryId: params.categoryId,
+    categoryId,
     minPrice: params.minPrice ? Number(params.minPrice) : undefined,
     maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
     minRating: params.minRating ? Number(params.minRating) : undefined,

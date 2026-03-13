@@ -41,6 +41,8 @@ export type ProductWithDetails = Product & {
 
 export type ProductWithImages = Product & {
   images: ProductImage[];
+  category?: Category | null;
+  inventory?: Inventory | null;
 };
 
 export type CategoryWithChildren = Category & {

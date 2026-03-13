@@ -92,7 +92,7 @@ export async function deleteImage(url: string): Promise<void> {
   //   Key: key,
   // }));
   
-  console.log('Delete image:', url);
+  // TODO: Implement actual deletion from cloud storage
 }
 
 /**

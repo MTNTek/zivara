@@ -5,22 +5,24 @@ import { getOrderById } from '@/features/orders/queries';
 import { getCurrentUserId } from '@/lib/auth';
 
 interface OrderDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     success?: string;
-  };
+  }>;
 }
 
 export default async function OrderDetailPage({ params, searchParams }: OrderDetailPageProps) {
+  const { id } = await params;
+  const { success } = await searchParams;
   const userId = await getCurrentUserId();
   
   if (!userId) {
-    redirect('/login?redirect=/orders/' + params.id);
+    redirect('/login?redirect=/orders/' + id);
   }
 
-  const order = await getOrderById(params.id);
+  const order = await getOrderById(id);
 
   if (!order || order.userId !== userId) {
     notFound();
@@ -45,7 +47,7 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         {/* Success Message */}
-        {searchParams.success === 'true' && (
+        {success === 'true' && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg mb-6">
             <h3 className="font-semibold mb-1">Order placed successfully!</h3>
             <p>Thank you for your order. We'll send you a confirmation email shortly.</p>

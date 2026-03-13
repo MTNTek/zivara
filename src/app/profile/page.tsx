@@ -1,7 +1,16 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { requireAuth } from '@/lib/auth';
 import { getUserProfile } from '@/features/profile/queries';
 import { ProfileForm } from '@/components/profile/profile-form';
+import { ChangePasswordForm } from '@/components/profile/change-password-form';
+import { SignOutButton } from '@/components/auth/sign-out-button';
+
+export const metadata: Metadata = {
+  title: 'My Profile - Zivara',
+  description: 'Manage your account settings and addresses.',
+};
 import { AddressList } from '@/components/profile/address-list';
 
 export default async function ProfilePage() {
@@ -32,6 +41,12 @@ export default async function ProfilePage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipping Addresses</h2>
               <AddressList userId={session.user.id} />
             </div>
+
+            {/* Change Password */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
+              <ChangePasswordForm />
+            </div>
           </div>
 
           {/* Quick Links */}
@@ -40,19 +55,22 @@ export default async function ProfilePage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h2>
               <nav className="space-y-2">
                 {session.user.role === 'admin' && (
-                  <a href="/admin/dashboard" className="block text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-lg font-medium text-center mb-3">
+                  <Link href="/admin/dashboard" className="block text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-lg font-medium text-center mb-3">
                     Admin Dashboard
-                  </a>
+                  </Link>
                 )}
-                <a href="/orders" className="block text-teal-600 hover:text-teal-700">
+                <Link href="/orders" className="block text-teal-600 hover:text-teal-700">
                   My Orders
-                </a>
-                <a href="/cart" className="block text-teal-600 hover:text-teal-700">
+                </Link>
+                <Link href="/cart" className="block text-teal-600 hover:text-teal-700">
                   Shopping Cart
-                </a>
-                <a href="/products" className="block text-teal-600 hover:text-teal-700">
+                </Link>
+                <Link href="/products" className="block text-teal-600 hover:text-teal-700">
                   Browse Products
-                </a>
+                </Link>
+                <div className="border-t border-gray-200 pt-2 mt-2">
+                  <SignOutButton />
+                </div>
               </nav>
             </div>
           </div>

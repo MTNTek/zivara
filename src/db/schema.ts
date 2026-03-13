@@ -297,6 +297,18 @@ export const searchQueries = pgTable('search_queries', {
   createdAtIdx: index('search_queries_created_at_idx').on(table.createdAt),
 }));
 
+// Wishlist Table
+export const wishlistItems = pgTable('wishlist_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  productId: uuid('product_id').notNull().references(() => products.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  userIdx: index('wishlist_items_user_idx').on(table.userId),
+  productIdx: index('wishlist_items_product_idx').on(table.productId),
+  userProductIdx: index('wishlist_items_user_product_idx').on(table.userId, table.productId),
+}));
+
 // Define relationships between tables
 export const usersRelations = relations(users, ({ many }) => ({
   cartItems: many(cartItems),
@@ -305,6 +317,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   addresses: many(userAddresses),
   sessions: many(sessions),
   accounts: many(accounts),
+  wishlistItems: many(wishlistItems),
 }));
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
@@ -330,6 +343,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   orderItems: many(orderItems),
   reviews: many(reviews),
   priceHistory: many(priceHistory),
+  wishlistItems: many(wishlistItems),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -438,5 +452,16 @@ export const searchQueriesRelations = relations(searchQueries, ({ one }) => ({
   user: one(users, {
     fields: [searchQueries.userId],
     references: [users.id],
+  }),
+}));
+
+export const wishlistItemsRelations = relations(wishlistItems, ({ one }) => ({
+  user: one(users, {
+    fields: [wishlistItems.userId],
+    references: [users.id],
+  }),
+  product: one(products, {
+    fields: [wishlistItems.productId],
+    references: [products.id],
   }),
 }));

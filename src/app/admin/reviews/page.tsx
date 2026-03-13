@@ -2,6 +2,7 @@ import { db } from '@/db';
 import { reviews, users, products } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
+import { ReviewDeleteButton } from '@/components/admin/review-delete-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,12 +72,15 @@ export default async function AdminReviewsPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {allReviews.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                   No reviews found
                 </td>
               </tr>
@@ -121,6 +125,9 @@ export default async function AdminReviewsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(review.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <ReviewDeleteButton reviewId={review.id} />
                   </td>
                 </tr>
               ))

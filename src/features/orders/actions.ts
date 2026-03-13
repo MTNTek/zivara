@@ -77,7 +77,6 @@ export async function createOrder(input: CheckoutInput) {
       return {
         success: false,
         error: cartValidation.error,
-        outOfStockItems: cartValidation.outOfStockItems,
       };
     }
 

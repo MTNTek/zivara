@@ -9,16 +9,17 @@ import { ProductListActions } from '@/components/admin/product-list-actions';
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
-  };
+  }>;
 }
 
 export default async function AdminProductsPage({ searchParams }: PageProps) {
   await requireAdmin();
-  const page = parseInt(searchParams.page || '1', 10);
-  const search = searchParams.search || '';
+  const resolvedParams = await searchParams;
+  const page = parseInt(resolvedParams.page || '1', 10);
+  const search = resolvedParams.search || '';
 
   const { products, total, totalPages } = await getProducts({
     page,
@@ -206,7 +207,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                             Edit
                           </Link>
                           <Link
-                            href={`/products/${product.slug}`}
+                            href={`/products/${product.id}`}
                             target="_blank"
                             className="text-gray-600 hover:text-gray-900"
                           >

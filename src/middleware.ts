@@ -66,5 +66,7 @@ export const config = {
     '/admin/:path*',
     '/profile/:path*',
     '/orders/:path*',
+    '/checkout/:path*',
+    '/wishlist/:path*',
   ],
 };

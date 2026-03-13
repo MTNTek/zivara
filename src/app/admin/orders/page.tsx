@@ -28,18 +28,19 @@ interface SearchParams {
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   await requireAdmin();
-  const page = parseInt(searchParams.page || '1');
-  const limit = parseInt(searchParams.limit || '20');
-  const status = searchParams.status;
-  const startDate = searchParams.startDate ? new Date(searchParams.startDate) : undefined;
-  const endDate = searchParams.endDate ? new Date(searchParams.endDate) : undefined;
-  const userId = searchParams.userId;
-  const orderNumber = searchParams.orderNumber;
-  const sortBy = searchParams.sortBy || 'date';
-  const sortOrder = searchParams.sortOrder || 'desc';
+  const resolvedParams = await searchParams;
+  const page = parseInt(resolvedParams.page || '1');
+  const limit = parseInt(resolvedParams.limit || '20');
+  const status = resolvedParams.status;
+  const startDate = resolvedParams.startDate ? new Date(resolvedParams.startDate) : undefined;
+  const endDate = resolvedParams.endDate ? new Date(resolvedParams.endDate) : undefined;
+  const userId = resolvedParams.userId;
+  const orderNumber = resolvedParams.orderNumber;
+  const sortBy = resolvedParams.sortBy || 'date';
+  const sortOrder = resolvedParams.sortOrder || 'desc';
 
   // Get orders with filters
   const { orders, pagination } = await getAllOrders({
@@ -76,8 +77,8 @@ export default async function AdminOrdersPage({
               <OrderExportButton
                 filters={{
                   status,
-                  startDate: searchParams.startDate,
-                  endDate: searchParams.endDate,
+                  startDate: resolvedParams.startDate,
+                  endDate: resolvedParams.endDate,
                   orderNumber,
                 }}
               />
@@ -98,8 +99,8 @@ export default async function AdminOrdersPage({
         <OrderFilters
           currentFilters={{
             status,
-            startDate: searchParams.startDate,
-            endDate: searchParams.endDate,
+            startDate: resolvedParams.startDate,
+            endDate: resolvedParams.endDate,
             orderNumber,
           }}
         />

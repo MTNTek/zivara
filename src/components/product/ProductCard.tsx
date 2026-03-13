@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { addToCart } from '@/features/cart/actions';
+import { WishlistButton } from './wishlist-button';
 
 interface ProductCardProps {
   id: string;
@@ -13,6 +15,7 @@ interface ProductCardProps {
   averageRating?: string | null;
   reviewCount?: number;
   stock?: number;
+  isWishlisted?: boolean;
 }
 
 export function ProductCard({
@@ -24,23 +27,30 @@ export function ProductCard({
   averageRating,
   reviewCount,
   stock,
+  isWishlisted,
 }: ProductCardProps) {
-  const [isAdding, setIsAdding] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    setIsAdding(true);
-    
-    // Simulate add to cart
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    setIsAdding(false);
-    setShowSuccess(true);
-    
-    setTimeout(() => setShowSuccess(false), 2000);
+    setError(null);
+
+    startTransition(async () => {
+      const result = await addToCart({ productId: id, quantity: 1 });
+      
+      if (result.success) {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+      } else {
+        const msg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to add';
+        setError(msg);
+        setTimeout(() => setError(null), 3000);
+      }
+    });
   };
 
   const discountPercentage = discountPrice
@@ -61,10 +71,22 @@ export function ProductCard({
         </div>
       )}
 
+      {/* Wishlist Button */}
+      <div className="absolute top-2 right-2 z-10 bg-white/80 rounded-full">
+        <WishlistButton productId={id} initialWishlisted={isWishlisted} />
+      </div>
+
       {/* Success Badge */}
       {showSuccess && (
-        <div className="absolute top-2 right-2 z-10 bg-green-500 text-white px-3 py-1 rounded text-xs font-bold animate-slideInRight">
+        <div className="absolute top-12 right-2 z-10 bg-green-500 text-white px-3 py-1 rounded text-xs font-bold animate-slideInRight">
           ✓ Added!
+        </div>
+      )}
+
+      {/* Error Badge */}
+      {error && (
+        <div className="absolute top-12 right-2 z-10 bg-red-500 text-white px-3 py-1 rounded text-xs font-bold">
+          {error}
         </div>
       )}
 
@@ -147,16 +169,16 @@ export function ProductCard({
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          disabled={isAdding || !stock || stock <= 0}
+          disabled={isPending || !stock || stock <= 0}
           className={`w-full py-2 px-4 rounded font-medium transition-all duration-300 ${
-            isAdding
+            isPending
               ? 'bg-gray-400 cursor-wait'
               : stock && stock > 0
               ? 'bg-[#14B8A6] hover:bg-[#0d9488] text-white'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          } ${isAdding ? 'animate-pulse' : ''}`}
+          } ${isPending ? 'animate-pulse' : ''}`}
         >
-          {isAdding ? (
+          {isPending ? (
             <span className="flex items-center justify-center gap-2">
               <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                 <circle

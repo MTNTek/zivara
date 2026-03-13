@@ -1,15 +1,51 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { getProductById } from '@/features/products/cached-queries';
 import { getReviewsByProduct } from '@/features/reviews/queries';
 import { ProductImageGallery } from '@/components/product/product-image-gallery';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
 import { ProductReviews } from '@/components/product/product-reviews';
+import { ReviewForm } from '@/components/product/review-form';
+import { WishlistButton } from '@/components/product/wishlist-button';
+import { TrackView } from '@/components/product/track-view';
+import { RecentlyViewed } from '@/components/product/recently-viewed';
+import { RelatedProducts } from '@/components/product/related-products';
+import { getSession } from '@/lib/auth';
+import { getWishlistProductIds } from '@/features/wishlist/actions';
 import Link from 'next/link';
 
 interface ProductDetailPageProps {
   params: Promise<{
     id: string;
   }>;
+}
+
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProductById(id);
+
+  if (!product) {
+    return { title: 'Product Not Found - Zivara' };
+  }
+
+  const price = product.discountPrice || product.price;
+  const image = product.images?.find((img) => img.isPrimary) || product.images?.[0];
+
+  return {
+    title: `${product.name} - Zivara`,
+    description: product.description?.slice(0, 160) || `Shop ${product.name} at Zivara`,
+    openGraph: {
+      title: product.name,
+      description: product.description?.slice(0, 160),
+      images: image ? [{ url: image.imageUrl, alt: product.name }] : [],
+      type: 'website',
+    },
+    other: {
+      'product:price:amount': Number(price).toFixed(2),
+      'product:price:currency': 'USD',
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
@@ -26,12 +62,24 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   });
   const totalReviews = pagination.total;
 
-  const isInStock = product.inventory && product.inventory.quantity > 0;
+  const session = await getSession();
+  const wishlistIds = session ? await getWishlistProductIds() : [];
+  const isWishlisted = wishlistIds.includes(product.id);
+  const isInStock = !!(product.inventory && product.inventory.quantity > 0);
   const isLowStock = product.inventory && product.inventory.quantity > 0 && 
                      product.inventory.quantity <= product.inventory.lowStockThreshold;
 
+  const primaryImage = product.images?.find((img) => img.isPrimary) || product.images?.[0];
+
   return (
     <div className="min-h-screen bg-white">
+      <TrackView
+        id={product.id}
+        name={product.name}
+        price={product.price}
+        discountPrice={product.discountPrice}
+        imageUrl={primaryImage?.imageUrl}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
         <nav className="mb-6 text-sm">
@@ -68,9 +116,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {/* Product Info */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {product.name}
-            </h1>
+            <div className="flex items-start justify-between gap-2 mb-4">
+              <h1 className="text-3xl font-bold text-gray-900">
+                {product.name}
+              </h1>
+              <WishlistButton productId={product.id} initialWishlisted={isWishlisted} size="md" />
+            </div>
 
             {/* Rating */}
             {product.averageRating && Number(product.averageRating) > 0 && (
@@ -164,6 +215,29 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             averageRating={product.averageRating ? Number(product.averageRating) : 0}
           />
         </div>
+
+        {/* Write a Review */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Write a Review</h2>
+          {session ? (
+            <ReviewForm productId={product.id} />
+          ) : (
+            <p className="text-gray-600">
+              <Link href="/login" className="text-teal-600 hover:text-teal-700 font-semibold">
+                Sign in
+              </Link>{' '}
+              to leave a review.
+            </p>
+          )}
+        </div>
+
+        {/* Related Products */}
+        <Suspense fallback={null}>
+          <RelatedProducts productId={product.id} categoryId={product.categoryId} />
+        </Suspense>
+
+        {/* Recently Viewed */}
+        <RecentlyViewed excludeId={product.id} />
       </div>
     </div>
   );

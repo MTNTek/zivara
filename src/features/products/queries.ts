@@ -155,6 +155,7 @@ export async function getProducts(params: ProductQueryParams = {}) {
         orderBy: (images, { asc }) => [asc(images.displayOrder)],
       },
       category: true,
+      inventory: true,
     },
   });
 
@@ -318,6 +319,7 @@ export async function getProductsByCategory(
         orderBy: (images, { asc }) => [asc(images.displayOrder)],
       },
       category: true,
+      inventory: true,
     },
   });
 

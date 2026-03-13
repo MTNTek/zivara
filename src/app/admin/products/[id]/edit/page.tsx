@@ -5,15 +5,16 @@ import { ProductForm } from '@/components/admin/product-form';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditProductPage({ params }: PageProps) {
   await requireAdmin();
+  const { id } = await params;
   const [product, categories] = await Promise.all([
-    getProductById(params.id),
+    getProductById(id),
     getCategories(),
   ]);
 

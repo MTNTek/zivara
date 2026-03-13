@@ -7,9 +7,9 @@ import { UserActionsPanel } from '@/components/admin/user-actions-panel';
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -18,7 +18,8 @@ interface PageProps {
  */
 export default async function AdminUserDetailPage({ params }: PageProps) {
   await requireAdmin();
-  const user = await getUserWithOrders(params.id);
+  const { id } = await params;
+  const user = await getUserWithOrders(id);
 
   if (!user) {
     notFound();

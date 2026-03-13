@@ -1,6 +1,12 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getCartSummary } from '@/features/cart/queries';
 import { CheckoutForm } from '@/components/checkout/checkout-form';
+
+export const metadata: Metadata = {
+  title: 'Checkout - Zivara',
+  description: 'Complete your purchase securely.',
+};
 
 export default async function CheckoutPage() {
   const cartData = await getCartSummary();

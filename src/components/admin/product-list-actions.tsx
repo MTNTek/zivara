@@ -45,11 +45,11 @@ export function ProductListActions({ products, categories }: ProductListActionsP
       const result = await bulkUpdateProducts(selectedProducts, { isActive: true });
       
       if (result.success) {
-        setSuccess(`Successfully activated ${result.data.updated} products`);
+        setSuccess(`Successfully activated ${result.data?.updated ?? 0} products`);
         setSelectedProducts([]);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Failed to activate products');
+        setError(typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to activate products');
       }
     });
   };
@@ -65,11 +65,11 @@ export function ProductListActions({ products, categories }: ProductListActionsP
       const result = await bulkUpdateProducts(selectedProducts, { isActive: false });
       
       if (result.success) {
-        setSuccess(`Successfully deactivated ${result.data.updated} products`);
+        setSuccess(`Successfully deactivated ${result.data?.updated ?? 0} products`);
         setSelectedProducts([]);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Failed to deactivate products');
+        setError(typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to deactivate products');
       }
     });
   };
@@ -85,12 +85,12 @@ export function ProductListActions({ products, categories }: ProductListActionsP
       const result = await bulkUpdateProducts(selectedProducts, { categoryId });
       
       if (result.success) {
-        setSuccess(`Successfully updated category for ${result.data.updated} products`);
+        setSuccess(`Successfully updated category for ${result.data?.updated ?? 0} products`);
         setSelectedProducts([]);
         setShowBulkActions(false);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Failed to update category');
+        setError(typeof result.error === 'string' ? result.error : (result.error as any)?.message || 'Failed to update category');
       }
     });
   };
@@ -102,7 +102,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
     if (selectAllCheckbox) {
       selectAllCheckbox.checked = selectedProducts.length === products.length && products.length > 0;
       selectAllCheckbox.indeterminate = selectedProducts.length > 0 && selectedProducts.length < products.length;
-      selectAllCheckbox.onchange = handleSelectAll;
+      selectAllCheckbox.onchange = handleSelectAll as unknown as (this: GlobalEventHandlers, ev: Event) => any;
     }
 
     // Handle individual checkboxes

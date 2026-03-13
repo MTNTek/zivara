@@ -70,8 +70,6 @@ export async function updateProfile(
     // 11.3 - Send verification email on email change
     if (emailChanged) {
       // TODO: Implement email verification in Task 15
-      // For now, just log it
-      console.log(`Email verification needed for: ${validatedData.email}`);
     }
 
     return {

@@ -1,13 +1,37 @@
 import Link from 'next/link';
-import { getProducts } from '@/features/products/cached-queries';
+import { getProducts, getCategories } from '@/features/products/cached-queries';
 import { ProductCard } from '@/components/product/ProductCard';
 
+// Map category slugs to display info
+const FEATURED_CATEGORIES = [
+  { slug: 'electronics', icon: '💻' },
+  { slug: 'fashion', icon: '👕' },
+  { slug: 'home-kitchen', icon: '🏠' },
+  { slug: 'books', icon: '📚' },
+];
+
 export default async function HomePage() {
-  // Fetch featured products
-  const { products: featuredProducts } = await getProducts({
-    limit: 12,
-    sortBy: 'newest',
-  });
+  // Fetch featured products and categories
+  const [{ products: featuredProducts }, { products: allProducts }, categories] = await Promise.all([
+    getProducts({ limit: 12, sortBy: 'newest' }),
+    getProducts({ limit: 50 }),
+    getCategories(),
+  ]);
+
+  // Filter products with active discounts
+  const dealProducts = allProducts
+    .filter((p) => p.discountPrice && Number(p.discountPrice) < Number(p.price))
+    .slice(0, 6);
+
+  // Match featured categories to actual DB categories by slug
+  const categoryCards = FEATURED_CATEGORIES.map((fc) => {
+    const match = categories.find(
+      (c) => c.slug === fc.slug || c.slug.startsWith(fc.slug)
+    );
+    return match
+      ? { name: match.name, icon: fc.icon, href: `/products?categoryId=${match.id}` }
+      : null;
+  }).filter(Boolean) as { name: string; icon: string; href: string }[];
 
   return (
     <div className="min-h-screen bg-white">
@@ -35,12 +59,7 @@ export default async function HomePage() {
       {/* Category Cards */}
       <section className="w-full px-4 -mt-16 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: 'Electronics', icon: '💻', href: '/products?category=electronics' },
-            { name: 'Fashion', icon: '👕', href: '/products?category=fashion' },
-            { name: 'Home & Kitchen', icon: '🏠', href: '/products?category=home' },
-            { name: 'Books', icon: '📚', href: '/products?category=books' },
-          ].map((category) => (
+          {categoryCards.map((category) => (
             <Link
               key={category.name}
               href={category.href}
@@ -53,15 +72,33 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Today's Deals Banner */}
+      {/* Today's Deals */}
       <section className="w-full px-4 mt-8">
         <div className="bg-white rounded-lg p-6 shadow-md">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Today's Deals
           </h2>
-          <p className="text-gray-600">
-            Don't miss out on our special offers
-          </p>
+          {dealProducts.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
+              {dealProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  discountPrice={product.discountPrice}
+                  imageUrl={product.images?.[0]?.imageUrl}
+                  averageRating={product.averageRating}
+                  reviewCount={product.reviewCount || 0}
+                  stock={product.inventory?.quantity ?? 0}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600 mt-2">
+              Check back soon for special offers.
+            </p>
+          )}
         </div>
       </section>
 
@@ -82,6 +119,7 @@ export default async function HomePage() {
                 imageUrl={product.images?.[0]?.imageUrl}
                 averageRating={product.averageRating}
                 reviewCount={product.reviewCount || 0}
+                stock={product.inventory?.quantity ?? 0}
               />
             ))}
           </div>
