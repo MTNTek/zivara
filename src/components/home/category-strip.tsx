@@ -56,7 +56,7 @@ export function CategoryStrip({ categories }: CategoryStripProps) {
 
   return (
     <div className="bg-white py-4 px-3 sm:px-6">
-      <div className="max-w-[1500px] mx-auto">
+      <div>
         <div className="flex justify-between items-start gap-2 sm:gap-4 overflow-x-auto scrollbar-hide">
           {items.map((item) => (
             <Link
