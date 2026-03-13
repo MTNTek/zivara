@@ -3,19 +3,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getOrderById } from '@/features/orders/queries';
 import { getCurrentUserId } from '@/lib/auth';
+import { OrderTimeline } from '@/components/orders/order-timeline';
 
 interface OrderDetailPageProps {
   params: Promise<{
     id: string;
   }>;
-  searchParams: Promise<{
-    success?: string;
-  }>;
 }
 
-export default async function OrderDetailPage({ params, searchParams }: OrderDetailPageProps) {
+export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
   const { id } = await params;
-  const { success } = await searchParams;
   const userId = await getCurrentUserId();
   
   if (!userId) {
@@ -46,13 +43,11 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
-        {/* Success Message */}
-        {success === 'true' && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg mb-6">
-            <h3 className="font-semibold mb-1">Order placed successfully!</h3>
-            <p>Thank you for your order. We'll send you a confirmation email shortly.</p>
-          </div>
-        )}
+        {/* Order Status Timeline */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Progress</h2>
+          <OrderTimeline status={order.status} />
+        </div>
 
         {/* Header */}
         <div className="mb-8">

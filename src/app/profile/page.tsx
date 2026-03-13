@@ -62,6 +62,9 @@ export default async function ProfilePage() {
                 <Link href="/orders" className="block text-teal-600 hover:text-teal-700">
                   My Orders
                 </Link>
+                <Link href="/wishlist" className="block text-teal-600 hover:text-teal-700">
+                  Wishlist
+                </Link>
                 <Link href="/cart" className="block text-teal-600 hover:text-teal-700">
                   Shopping Cart
                 </Link>

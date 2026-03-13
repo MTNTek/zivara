@@ -8,6 +8,7 @@ import { AddToCartButton } from '@/components/product/add-to-cart-button';
 import { ProductReviews } from '@/components/product/product-reviews';
 import { ReviewForm } from '@/components/product/review-form';
 import { WishlistButton } from '@/components/product/wishlist-button';
+import { ShareButton } from '@/components/product/share-button';
 import { TrackView } from '@/components/product/track-view';
 import { RecentlyViewed } from '@/components/product/recently-viewed';
 import { RelatedProducts } from '@/components/product/related-products';
@@ -120,7 +121,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <h1 className="text-3xl font-bold text-gray-900">
                 {product.name}
               </h1>
-              <WishlistButton productId={product.id} initialWishlisted={isWishlisted} size="md" />
+              <div className="flex items-center gap-1">
+                <ShareButton productName={product.name} productId={product.id} />
+                <WishlistButton productId={product.id} initialWishlisted={isWishlisted} size="md" />
+              </div>
             </div>
 
             {/* Rating */}

@@ -11,6 +11,8 @@ interface ProductImageGalleryProps {
 
 export function ProductImageGallery({ images, productName }: ProductImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
 
   if (!images || images.length === 0) {
     return (
@@ -26,15 +28,28 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
   const selectedImage = images[selectedIndex];
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomPosition({ x, y });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
-      {/* Main Image */}
-      <div className="aspect-square relative bg-gray-100 rounded-lg overflow-hidden mb-4">
+      {/* Main Image with Zoom */}
+      <div
+        className="aspect-square relative bg-gray-100 rounded-lg overflow-hidden mb-4 cursor-zoom-in"
+        onMouseEnter={() => setIsZoomed(true)}
+        onMouseLeave={() => setIsZoomed(false)}
+        onMouseMove={handleMouseMove}
+      >
         <Image
           src={selectedImage.imageUrl}
           alt={selectedImage.altText || productName}
           fill
-          className="object-contain"
+          className={`object-contain transition-transform duration-200 ${isZoomed ? 'scale-[2]' : 'scale-100'}`}
+          style={isZoomed ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` } : undefined}
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
@@ -67,3 +82,4 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
     </div>
   );
 }
+
