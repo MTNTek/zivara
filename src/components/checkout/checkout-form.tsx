@@ -91,8 +91,8 @@ export function CheckoutForm({ cartItems, subtotal, tax, shipping, total }: Chec
       const result = await createOrder(checkoutData);
 
       if (result.success && result.data?.orderId) {
-        toast.success('Order placed successfully!', 'Redirecting to order details...');
-        router.push(`/orders/${result.data.orderId}?success=true`);
+        toast.success('Order placed successfully!', 'Redirecting...');
+        router.push(`/orders/${result.data.orderId}/success`);
       } else {
         const err = result.error;
         const errorMsg = typeof err === 'object' && err !== null ? err.message : (err || 'Failed to create order');
@@ -143,8 +143,8 @@ export function CheckoutForm({ cartItems, subtotal, tax, shipping, total }: Chec
     startTransition(async () => {
       const result = await createOrder(checkoutData);
       if (result.success && result.data?.orderId) {
-        toast.success('Order placed successfully!', 'Redirecting to order details...');
-        router.push(`/orders/${result.data.orderId}?success=true`);
+        toast.success('Order placed successfully!', 'Redirecting...');
+        router.push(`/orders/${result.data.orderId}/success`);
       } else {
         const err = result.error;
         const errorMsg = typeof err === 'object' && err !== null ? err.message : (err || 'Failed to create order');

@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { ProductWithImages } from '@/types';
+import { WishlistButton } from './wishlist-button';
 
 interface ProductGridProps {
   products: ProductWithImages[];
+  wishlistedIds?: string[];
 }
 
-export function ProductGrid({ products }: ProductGridProps) {
+export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map((product) => {
@@ -48,6 +50,11 @@ export function ProductGrid({ products }: ProductGridProps) {
                     {discountPercentage}% OFF
                   </div>
                 )}
+
+                {/* Wishlist Button */}
+                <div className="absolute top-2 left-2 bg-white/80 rounded-full z-10">
+                  <WishlistButton productId={product.id} initialWishlisted={wishlistedIds.includes(product.id)} />
+                </div>
 
                 {/* Out of Stock Badge */}
                 {isOutOfStock && (

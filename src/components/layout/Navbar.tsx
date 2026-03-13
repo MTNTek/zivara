@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CartCount } from './cart-count';
 import { SearchSuggestions } from './search-suggestions';
+import { MobileMenu } from './mobile-menu';
 import { useSession } from '@/lib/auth-client';
 
 export default function Navbar() {
@@ -99,6 +100,9 @@ export default function Navbar() {
         <Link href="/" className="text-3xl font-bold cursor-pointer transition-colors whitespace-nowrap flex-shrink-0">
           Zivara
         </Link>
+
+        {/* Mobile Menu */}
+        <MobileMenu />
 
         {/* Delivery Address */}
         <button 

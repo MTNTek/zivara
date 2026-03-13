@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getProducts, getCategories } from '@/features/products/cached-queries';
 import { ProductCard } from '@/components/product/ProductCard';
+import { getWishlistProductIds } from '@/features/wishlist/actions';
+import { RecentlyViewed } from '@/components/product/recently-viewed';
 
 // Map category slugs to display info
 const FEATURED_CATEGORIES = [
@@ -12,10 +14,11 @@ const FEATURED_CATEGORIES = [
 
 export default async function HomePage() {
   // Fetch featured products and categories
-  const [{ products: featuredProducts }, { products: allProducts }, categories] = await Promise.all([
+  const [{ products: featuredProducts }, { products: allProducts }, categories, wishlistedIds] = await Promise.all([
     getProducts({ limit: 12, sortBy: 'newest' }),
     getProducts({ limit: 50 }),
     getCategories(),
+    getWishlistProductIds(),
   ]);
 
   // Filter products with active discounts
@@ -91,6 +94,7 @@ export default async function HomePage() {
                   averageRating={product.averageRating}
                   reviewCount={product.reviewCount || 0}
                   stock={product.inventory?.quantity ?? 0}
+                  isWishlisted={wishlistedIds.includes(product.id)}
                 />
               ))}
             </div>
@@ -120,6 +124,7 @@ export default async function HomePage() {
                 averageRating={product.averageRating}
                 reviewCount={product.reviewCount || 0}
                 stock={product.inventory?.quantity ?? 0}
+                isWishlisted={wishlistedIds.includes(product.id)}
               />
             ))}
           </div>
@@ -159,6 +164,13 @@ export default async function HomePage() {
               View All →
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Recently Viewed */}
+      <section className="w-full px-4 pb-8">
+        <div className="bg-white rounded-lg p-6 shadow-md">
+          <RecentlyViewed />
         </div>
       </section>
     </div>

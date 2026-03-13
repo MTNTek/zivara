@@ -5,6 +5,7 @@ import { ProductGrid } from '@/components/product/product-grid';
 import { ProductFilters } from '@/components/product/product-filters';
 import { Pagination } from '@/components/ui/pagination';
 import { MobileFilters } from '@/components/product/mobile-filters';
+import { getWishlistProductIds } from '@/features/wishlist/actions';
 
 export const metadata: Metadata = {
   title: 'Products - Zivara',
@@ -53,9 +54,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     sortBy: params.sortBy as any,
   };
 
-  const [{ products, total }, categories] = await Promise.all([
+  const [{ products, total }, categories, wishlistedIds] = await Promise.all([
     getProducts(queryParams),
     getCategories(),
+    getWishlistProductIds(),
   ]);
 
   const totalPages = Math.ceil(total / limit);
@@ -110,7 +112,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             {/* Products */}
             {products.length > 0 ? (
               <>
-                <ProductGrid products={products} />
+                <ProductGrid products={products} wishlistedIds={wishlistedIds} />
                 {totalPages > 1 && (
                   <div className="mt-8">
                     <Pagination currentPage={page} totalPages={totalPages} />
