@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import type { ProductImage } from '@/types';
 
@@ -13,6 +13,27 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+
+  const goToPrev = useCallback(() => {
+    if (images && images.length > 1) {
+      setSelectedIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    }
+  }, [images]);
+
+  const goToNext = useCallback(() => {
+    if (images && images.length > 1) {
+      setSelectedIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    }
+  }, [images]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') goToPrev();
+      if (e.key === 'ArrowRight') goToNext();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [goToPrev, goToNext]);
 
   if (!images || images.length === 0) {
     return (
@@ -36,7 +57,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
+    <div className="bg-white rounded-lg shadow-sm p-4 group">
       {/* Main Image with Zoom */}
       <div
         className="aspect-square relative bg-gray-100 rounded-lg overflow-hidden mb-4 cursor-zoom-in"
@@ -53,6 +74,29 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
+        {/* Navigation Arrows */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              aria-label="Previous image"
+            >
+              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); goToNext(); }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              aria-label="Next image"
+            >
+              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
       </div>
 
       {/* Thumbnail Grid */}

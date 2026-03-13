@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { getCartSummary } from '@/features/cart/queries';
 import { CartItemsList } from '@/components/cart/cart-items-list';
 import { CartSummary } from '@/components/cart/cart-summary';
+import { CartRecommendations } from '@/components/cart/cart-recommendations';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Shopping Cart - Zivara',
@@ -18,30 +20,37 @@ export default async function CartPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
 
         {cartData.items.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Cart Items ({cartData.totalQuantity})
-                  </h2>
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Cart Items */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-lg shadow-sm">
+                  <div className="p-6 border-b border-gray-200">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Cart Items ({cartData.totalQuantity})
+                    </h2>
+                  </div>
+                  <CartItemsList items={cartData.items} />
                 </div>
-                <CartItemsList items={cartData.items} />
+              </div>
+
+              {/* Cart Summary */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
+                  <CartSummary
+                    subtotal={cartData.subtotal}
+                    itemCount={cartData.itemCount}
+                    totalQuantity={cartData.totalQuantity}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Cart Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
-                <CartSummary
-                  subtotal={cartData.subtotal}
-                  itemCount={cartData.itemCount}
-                  totalQuantity={cartData.totalQuantity}
-                />
-              </div>
-            </div>
-          </div>
+            {/* Recommendations */}
+            <Suspense fallback={null}>
+              <CartRecommendations excludeIds={cartData.items.map((i) => i.product.id)} />
+            </Suspense>
+          </>
         ) : (
           <div className="bg-white rounded-lg shadow-sm p-12 text-center">
             <svg
