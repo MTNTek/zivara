@@ -2,43 +2,48 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const slides = [
   {
     id: 1,
-    gradient: 'from-[#232f3e] via-[#37475a] to-[#232f3e]',
-    title: 'Shop the Latest Electronics',
-    subtitle: 'Discover deals on smartphones, laptops, headphones and more',
-    cta: 'Shop Electronics',
     href: '/products?categoryId=electronics',
-    accent: '#febd69',
+    alt: 'Shop Electronics — Smartphones, Laptops, Headphones & More',
+    // Deep navy/dark blue — tech & electronics feel
+    bg: '#232f3e',
+    bannerUrl: 'https://placehold.co/1500x600/232f3e/febd69?text=Shop+the+Latest+Electronics',
   },
   {
     id: 2,
-    gradient: 'from-[#1a3a4a] via-[#2d6a7a] to-[#1a3a4a]',
-    title: 'New Season Fashion',
-    subtitle: 'Refresh your wardrobe with trending styles',
-    cta: 'Explore Fashion',
     href: '/products?categoryId=fashion',
-    accent: '#ff9900',
+    alt: 'New Season Fashion — Trending Styles for Everyone',
+    // Warm burgundy/wine — fashion & style
+    bg: '#5c1a33',
+    bannerUrl: 'https://placehold.co/1500x600/5c1a33/f8e0c0?text=New+Season+Fashion',
   },
   {
     id: 3,
-    gradient: 'from-[#3b1f2b] via-[#6b3a4a] to-[#3b1f2b]',
-    title: 'Home & Kitchen Essentials',
-    subtitle: 'Everything you need to make your house a home',
-    cta: 'Shop Home',
     href: '/products?categoryId=home-kitchen',
-    accent: '#febd69',
+    alt: 'Home & Kitchen Essentials — Upgrade Your Space',
+    // Earthy teal/green — home & nature
+    bg: '#1a4a3a',
+    bannerUrl: 'https://placehold.co/1500x600/1a4a3a/c8e6d0?text=Home+%26+Kitchen+Essentials',
   },
   {
     id: 4,
-    gradient: 'from-[#1a2e1a] via-[#2d5a2d] to-[#1a2e1a]',
-    title: 'Deals of the Day',
-    subtitle: 'Limited-time offers on top products — save big today',
-    cta: 'See Deals',
     href: '/products?sortBy=price_asc',
-    accent: '#ff9900',
+    alt: 'Deals of the Day — Limited Time Offers',
+    // Rich dark orange/brown — urgency & deals
+    bg: '#6b3410',
+    bannerUrl: 'https://placehold.co/1500x600/6b3410/ffd699?text=Deals+of+the+Day',
+  },
+  {
+    id: 5,
+    href: '/products?categoryId=beauty-health',
+    alt: 'Beauty & Health — Skincare, Makeup & Wellness',
+    // Soft plum/purple — beauty & wellness
+    bg: '#3d1f4a',
+    bannerUrl: 'https://placehold.co/1500x600/3d1f4a/e0c8f0?text=Beauty+%26+Health',
   },
 ];
 
@@ -56,80 +61,102 @@ export function HeroCarousel() {
 
   useEffect(() => {
     if (isPaused) return;
-    const timer = setInterval(next, 5000);
+    const timer = setInterval(next, 6000);
     return () => clearInterval(timer);
   }, [isPaused, next]);
 
-  const slide = slides[current];
-
   return (
     <div
-      className="relative w-full h-[280px] sm:h-[350px] md:h-[420px] overflow-hidden"
+      className="relative w-full"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Background gradient */}
+      {/* Background color that matches current slide — visible while image loads */}
       <div
-        className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} transition-all duration-700`}
+        className="absolute inset-0 transition-colors duration-700"
+        style={{ backgroundColor: slides[current].bg }}
       />
 
-      {/* Decorative pattern overlay */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-1/2 h-full">
-          <svg viewBox="0 0 400 400" className="w-full h-full" fill="none">
-            <circle cx="300" cy="200" r="180" stroke="white" strokeWidth="0.5" />
-            <circle cx="300" cy="200" r="140" stroke="white" strokeWidth="0.5" />
-            <circle cx="300" cy="200" r="100" stroke="white" strokeWidth="0.5" />
-          </svg>
-        </div>
+      {/* Slide images */}
+      <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[600px] overflow-hidden">
+        {slides.map((slide, i) => (
+          <Link
+            key={slide.id}
+            href={slide.href}
+            className={`absolute inset-0 transition-opacity duration-700 ${
+              i === current ? 'opacity-100 z-[1]' : 'opacity-0 z-0'
+            }`}
+            aria-hidden={i !== current}
+            tabIndex={i === current ? 0 : -1}
+          >
+            <Image
+              src={slide.bannerUrl}
+              alt={slide.alt}
+              fill
+              className="object-cover object-top"
+              sizes="100vw"
+              priority={i === 0}
+            />
+          </Link>
+        ))}
       </div>
 
-      {/* Content */}
-      <div className="relative h-full flex items-center">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-lg">
-            <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 leading-tight transition-all duration-500"
-              key={slide.id}
-            >
-              {slide.title}
-            </h2>
-            <p className="text-base sm:text-lg text-gray-300 mb-6">
-              {slide.subtitle}
-            </p>
-            <Link
-              href={slide.href}
-              className="inline-block px-8 py-3 rounded-sm font-semibold text-sm transition-colors"
-              style={{ backgroundColor: slide.accent, color: '#0f1111' }}
-            >
-              {slide.cta}
-            </Link>
-          </div>
-        </div>
-      </div>
+      {/* Bottom gradient fade — Amazon's signature fade to page background */}
+      <div className="absolute bottom-0 left-0 right-0 h-[80px] sm:h-[120px] md:h-[160px] lg:h-[280px] bg-gradient-to-t from-[#e3e6e6] to-transparent z-[2] pointer-events-none" />
 
-      {/* Bottom fade for card overlap effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#e3e6e6] to-transparent" />
-
-      {/* Navigation arrows */}
+      {/* Left arrow */}
       <button
-        onClick={prev}
-        className="absolute left-0 top-0 bottom-16 w-12 sm:w-16 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/10 transition-colors"
+        onClick={(e) => { e.stopPropagation(); prev(); }}
+        className="absolute left-0 top-0 z-[3] h-[calc(100%-80px)] sm:h-[calc(100%-120px)] md:h-[calc(100%-160px)] lg:h-[calc(100%-280px)] w-[42px] sm:w-[56px] lg:w-[80px] flex items-center justify-center cursor-pointer group"
         aria-label="Previous slide"
       >
-        <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-[18px] h-[36px] sm:w-[22px] sm:h-[44px] lg:w-[28px] lg:h-[56px] text-[#484848] group-hover:text-white transition-colors"
+          viewBox="0 0 20 40"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="15 5 5 20 15 35" />
         </svg>
       </button>
+
+      {/* Right arrow */}
       <button
-        onClick={next}
-        className="absolute right-0 top-0 bottom-16 w-12 sm:w-16 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/10 transition-colors"
+        onClick={(e) => { e.stopPropagation(); next(); }}
+        className="absolute right-0 top-0 z-[3] h-[calc(100%-80px)] sm:h-[calc(100%-120px)] md:h-[calc(100%-160px)] lg:h-[calc(100%-280px)] w-[42px] sm:w-[56px] lg:w-[80px] flex items-center justify-center cursor-pointer group"
         aria-label="Next slide"
       >
-        <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-[18px] h-[36px] sm:w-[22px] sm:h-[44px] lg:w-[28px] lg:h-[56px] text-[#484848] group-hover:text-white transition-colors"
+          viewBox="0 0 20 40"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="5 5 15 20 5 35" />
         </svg>
       </button>
+
+      {/* Dot indicators */}
+      <div className="absolute bottom-[90px] sm:bottom-[130px] md:bottom-[170px] lg:bottom-[290px] left-1/2 -translate-x-1/2 z-[3] flex gap-2">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              i === current
+                ? 'bg-white w-4'
+                : 'bg-white/40 hover:bg-white/70'
+            }`}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

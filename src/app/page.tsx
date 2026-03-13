@@ -51,9 +51,9 @@ export default async function HomePage() {
       {/* Hero Carousel */}
       <HeroCarousel />
 
-      {/* Category Cards — overlapping the hero bottom fade */}
-      <div className="relative z-10 -mt-28 sm:-mt-36 max-w-[1500px] mx-auto px-3 sm:px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Category Cards — overlapping the hero bottom fade (Amazon-style) */}
+      <div className="relative z-10 -mt-[60px] sm:-mt-[100px] md:-mt-[140px] lg:-mt-[260px] max-w-[1500px] mx-auto px-3 sm:px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
           <CategoryCardsGrid categories={categories} />
         </div>
       </div>
