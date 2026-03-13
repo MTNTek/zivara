@@ -7,7 +7,7 @@ import Image from 'next/image';
 const slides = [
   {
     id: 1,
-    href: '/products?categoryId=electronics',
+    href: '/products?category=electronics',
     alt: 'Shop Electronics — Smartphones, Laptops, Headphones & More',
     // Deep navy/dark blue — tech & electronics feel
     bg: '#232f3e',
@@ -15,7 +15,7 @@ const slides = [
   },
   {
     id: 2,
-    href: '/products?categoryId=fashion',
+    href: '/products?category=fashion',
     alt: 'New Season Fashion — Trending Styles for Everyone',
     // Warm burgundy/wine — fashion & style
     bg: '#5c1a33',
@@ -23,7 +23,7 @@ const slides = [
   },
   {
     id: 3,
-    href: '/products?categoryId=home-kitchen',
+    href: '/products?category=home-kitchen',
     alt: 'Home & Kitchen Essentials — Upgrade Your Space',
     // Earthy teal/green — home & nature
     bg: '#1a4a3a',
@@ -39,7 +39,7 @@ const slides = [
   },
   {
     id: 5,
-    href: '/products?categoryId=beauty-health',
+    href: '/products?category=beauty-health',
     alt: 'Beauty & Health — Skincare, Makeup & Wellness',
     // Soft plum/purple — beauty & wellness
     bg: '#3d1f4a',
