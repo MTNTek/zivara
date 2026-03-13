@@ -8,6 +8,8 @@ import { CategoryCardsGrid } from '@/components/home/category-cards';
 import { ProductRow } from '@/components/home/product-row';
 import { SignInCard } from '@/components/home/sign-in-card';
 
+import { CategoryStrip } from '@/components/home/category-strip';
+
 export default async function HomePage() {
   const [
     { products: featuredProducts },
@@ -51,8 +53,13 @@ export default async function HomePage() {
       {/* Hero Carousel */}
       <HeroCarousel />
 
-      {/* Category Cards — overlapping the hero bottom fade (Amazon-style) */}
-      <div className="relative z-10 -mt-[60px] sm:-mt-[100px] md:-mt-[140px] lg:-mt-[260px] max-w-[1500px] mx-auto px-3 sm:px-4">
+      {/* Category Strip — 6 circular icons like Noon */}
+      <div className="relative z-10 -mt-[60px] sm:-mt-[100px] md:-mt-[140px] lg:-mt-[260px]">
+        <CategoryStrip categories={categories} />
+      </div>
+
+      {/* Category Cards */}
+      <div className="max-w-[1500px] mx-auto px-3 sm:px-4 mt-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
           <CategoryCardsGrid categories={categories} />
         </div>
