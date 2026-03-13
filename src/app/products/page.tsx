@@ -5,6 +5,8 @@ import { ProductGrid } from '@/components/product/product-grid';
 import { ProductFilters } from '@/components/product/product-filters';
 import { Pagination } from '@/components/ui/pagination';
 import { MobileFilters } from '@/components/product/mobile-filters';
+import { SortDropdown } from '@/components/product/sort-dropdown';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { getWishlistProductIds } from '@/features/wishlist/actions';
 
 export const metadata: Metadata = {
@@ -73,6 +75,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[{ label: 'Products' }]} />
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
@@ -106,6 +111,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   Showing {products.length > 0 ? (page - 1) * limit + 1 : 0} -{' '}
                   {Math.min(page * limit, total)} of {total} products
                 </p>
+                <SortDropdown currentSort={params.sortBy} />
               </div>
             </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getUserOrders } from '@/features/orders/queries';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'My Orders - Zivara',
@@ -36,6 +37,7 @@ export default async function OrdersPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ label: 'Orders' }]} />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
 
         {orders.length > 0 ? (

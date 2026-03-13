@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { getCurrentUserId } from '@/lib/auth';
 import { getWishlistItems } from '@/features/wishlist/actions';
 import { ProductCard } from '@/components/product/ProductCard';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'My Wishlist - Zivara',
@@ -19,6 +20,7 @@ export default async function WishlistPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ label: 'Wishlist' }]} />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           My Wishlist {items.length > 0 && <span className="text-lg font-normal text-gray-500">({items.length})</span>}
         </h1>

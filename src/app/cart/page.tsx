@@ -4,6 +4,8 @@ import { getCartSummary } from '@/features/cart/queries';
 import { CartItemsList } from '@/components/cart/cart-items-list';
 import { CartSummary } from '@/components/cart/cart-summary';
 import { CartRecommendations } from '@/components/cart/cart-recommendations';
+import { RecentlyViewed } from '@/components/product/recently-viewed';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
@@ -17,6 +19,7 @@ export default async function CartPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ label: 'Cart' }]} />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
 
         {cartData.items.length > 0 ? (
@@ -78,6 +81,13 @@ export default async function CartPage() {
             >
               Continue Shopping
             </Link>
+          </div>
+        )}
+
+        {/* Recently Viewed (shown when cart is empty too) */}
+        {cartData.items.length === 0 && (
+          <div className="mt-8">
+            <RecentlyViewed />
           </div>
         )}
       </div>
