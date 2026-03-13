@@ -53,8 +53,8 @@ export default async function HomePage() {
       {/* Hero Carousel */}
       <HeroCarousel />
 
-      {/* Category Strip — 6 circular icons like Noon */}
-      <div className="relative z-10 -mt-[60px] sm:-mt-[100px] md:-mt-[140px] lg:-mt-[260px]">
+      {/* Category Strip — 6 circular icons */}
+      <div className="relative z-10 -mt-10 sm:-mt-16">
         <CategoryStrip categories={categories} />
       </div>
 
