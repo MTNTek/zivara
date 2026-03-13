@@ -15,7 +15,7 @@ async function createAuditLog(
   action: string,
   entityType: string,
   entityId: string,
-  changes: any,
+  changes: Record<string, unknown>,
   userId?: string | null
 ) {
   try {

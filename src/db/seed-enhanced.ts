@@ -1,7 +1,6 @@
 import { config } from 'dotenv';
 import { db, client } from './index';
 import * as schema from './schema';
-import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 
 // Load environment variables
@@ -228,7 +227,7 @@ async function seedEnhanced() {
 
     // Electronics products
     const electronicsCategory = mainCategories.find(c => c.slug === 'electronics')!;
-    for (const [subcategory, items] of Object.entries(productData.electronics)) {
+    for (const [, items] of Object.entries(productData.electronics)) {
       for (const item of items) {
         allProducts.push({
           name: item.name,
@@ -245,7 +244,7 @@ async function seedEnhanced() {
 
     // Fashion products
     const fashionCategory = mainCategories.find(c => c.slug === 'fashion')!;
-    for (const [subcategory, items] of Object.entries(productData.fashion)) {
+    for (const [, items] of Object.entries(productData.fashion)) {
       for (const item of items) {
         allProducts.push({
           name: item.name,

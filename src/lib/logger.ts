@@ -20,7 +20,7 @@ export interface LogEntry {
   level: LogLevel;
   message: string;
   timestamp: Date;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 /**
@@ -35,7 +35,7 @@ class Logger {
    * @param message - Log message
    * @param context - Additional context data
    */
-  log(level: LogLevel, message: string, context?: Record<string, any>): void {
+  log(level: LogLevel, message: string, context?: Record<string, unknown>): void {
     const entry: LogEntry = {
       level,
       message,
@@ -64,7 +64,7 @@ class Logger {
    * @param message - Log message
    * @param context - Additional context data
    */
-  info(message: string, context?: Record<string, any>): void {
+  info(message: string, context?: Record<string, unknown>): void {
     this.log('info', message, context);
   }
 
@@ -75,7 +75,7 @@ class Logger {
    * @param message - Log message
    * @param context - Additional context data
    */
-  warn(message: string, context?: Record<string, any>): void {
+  warn(message: string, context?: Record<string, unknown>): void {
     this.log('warn', message, context);
   }
 
@@ -86,7 +86,7 @@ class Logger {
    * @param message - Log message
    * @param context - Additional context data
    */
-  error(message: string, context?: Record<string, any>): void {
+  error(message: string, context?: Record<string, unknown>): void {
     this.log('error', message, context);
   }
 
@@ -98,7 +98,7 @@ class Logger {
    * @param message - Log message
    * @param context - Additional context data
    */
-  critical(message: string, context?: Record<string, any>): void {
+  critical(message: string, context?: Record<string, unknown>): void {
     this.log('critical', message, context);
   }
 
@@ -110,7 +110,7 @@ class Logger {
    * @param email - User email
    * @param context - Additional context (IP address, user agent, etc.)
    */
-  logAuthAttempt(success: boolean, email: string, context?: Record<string, any>): void {
+  logAuthAttempt(success: boolean, email: string, context?: Record<string, unknown>): void {
     const level = success ? 'info' : 'warn';
     const message = success 
       ? `Authentication successful: ${email}` 
@@ -183,7 +183,7 @@ class Logger {
    * @param message - Alert message
    * @param context - Additional context data
    */
-  private sendAlert(message: string, context?: Record<string, any>): void {
+  private sendAlert(message: string, context?: Record<string, unknown>): void {
     // Implementation depends on alerting mechanism
     // Options include:
     // - Email notifications

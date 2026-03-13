@@ -15,7 +15,7 @@ describe('Cache Utilities', () => {
   describe('invalidateProductCache', () => {
     it('should invalidate product-related cache tags', async () => {
       const { invalidateProductCache, CACHE_TAGS } = await import('./cache');
-      const mockRevalidateTag = revalidateTag as any;
+      const mockRevalidateTag = revalidateTag as unknown as ReturnType<typeof vi.fn>;
       
       invalidateProductCache('test-product-id');
       
@@ -26,7 +26,7 @@ describe('Cache Utilities', () => {
 
     it('should invalidate general product caches without specific product ID', async () => {
       const { invalidateProductCache, CACHE_TAGS } = await import('./cache');
-      const mockRevalidateTag = revalidateTag as any;
+      const mockRevalidateTag = revalidateTag as unknown as ReturnType<typeof vi.fn>;
       
       invalidateProductCache();
       
@@ -39,7 +39,7 @@ describe('Cache Utilities', () => {
   describe('invalidateCategoryCache', () => {
     it('should invalidate category-related cache tags', async () => {
       const { invalidateCategoryCache, CACHE_TAGS } = await import('./cache');
-      const mockRevalidateTag = revalidateTag as any;
+      const mockRevalidateTag = revalidateTag as unknown as ReturnType<typeof vi.fn>;
       
       invalidateCategoryCache('test-category-id');
       
@@ -51,7 +51,7 @@ describe('Cache Utilities', () => {
 
     it('should invalidate general category caches without specific category ID', async () => {
       const { invalidateCategoryCache, CACHE_TAGS } = await import('./cache');
-      const mockRevalidateTag = revalidateTag as any;
+      const mockRevalidateTag = revalidateTag as unknown as ReturnType<typeof vi.fn>;
       
       invalidateCategoryCache();
       

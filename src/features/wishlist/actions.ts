@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { wishlistItems, products, productImages, inventory } from '@/db/schema';
+import { wishlistItems } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getCurrentUserId } from '@/lib/auth';
 

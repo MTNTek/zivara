@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { orders, products, users } from '@/db/schema';
-import { sql, and, gte, lte, eq, desc } from 'drizzle-orm';
+import { sql, and, gte, eq, desc } from 'drizzle-orm';
 
 export interface DashboardStats {
   totalOrders: number;
@@ -117,7 +117,7 @@ export async function getRecentOrders(limit: number = 10): Promise<RecentOrder[]
     .orderBy(desc(orders.createdAt))
     .limit(limit);
 
-  return recentOrders.map((order: any) => ({
+  return recentOrders.map((order) => ({
     id: order.id,
     orderNumber: order.orderNumber,
     status: order.status,

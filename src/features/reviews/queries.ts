@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { reviews, users, orderItems, orders } from '@/db/schema';
+import { reviews, orderItems, orders } from '@/db/schema';
 import { eq, desc, asc, sql, and } from 'drizzle-orm';
 
 export type ReviewSortOption = 'recent' | 'highest' | 'lowest';

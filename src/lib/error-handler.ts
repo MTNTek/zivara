@@ -18,14 +18,14 @@ export interface ErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
 }
 
 /**
  * Success response format
  */
-export interface SuccessResponse<T = any> {
+export interface SuccessResponse<T = unknown> {
   success: true;
   data: T;
 }
@@ -33,7 +33,7 @@ export interface SuccessResponse<T = any> {
 /**
  * Union type for all responses
  */
-export type ApiResponse<T = any> = SuccessResponse<T> | ErrorResponse;
+export type ApiResponse<T = unknown> = SuccessResponse<T> | ErrorResponse;
 
 /**
  * Global error handler
@@ -164,7 +164,7 @@ function getSeverityFromStatusCode(statusCode: number): 'info' | 'warn' | 'error
  * @param fn - The async function to wrap
  * @returns Wrapped function that handles errors
  */
-export function withErrorHandling<T extends any[], R>(
+export function withErrorHandling<T extends unknown[], R>(
   fn: (...args: T) => Promise<R>
 ): (...args: T) => Promise<ApiResponse<R>> {
   return async (...args: T): Promise<ApiResponse<R>> => {

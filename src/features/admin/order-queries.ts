@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { orders, users } from '@/db/schema';
-import { sql, and, gte, lte, eq, desc } from 'drizzle-orm';
+import { orders } from '@/db/schema';
+import { sql, and, gte, lte, eq } from 'drizzle-orm';
 
 export interface OrderStatistics {
   totalRevenue: string;

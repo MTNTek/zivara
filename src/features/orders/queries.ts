@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { orders } from '@/db/schema';
-import { eq, desc, and, or, gte, lte, like, sql, asc } from 'drizzle-orm';
+import { eq, desc, and, gte, lte, like, sql, asc } from 'drizzle-orm';
 
 /**
  * Get all orders for a user with pagination
@@ -104,7 +104,7 @@ export async function getOrderById(orderId: string) {
           },
         },
         statusHistory: {
-          orderBy: (statusHistory: any, { desc }: any) => [desc(statusHistory.createdAt)],
+          orderBy: (statusHistory, { desc }) => [desc(statusHistory.createdAt)],
         },
       },
     });
@@ -134,7 +134,7 @@ export async function getOrderByNumber(orderNumber: string) {
           },
         },
         statusHistory: {
-          orderBy: (statusHistory: any, { desc }: any) => [desc(statusHistory.createdAt)],
+          orderBy: (statusHistory, { desc }) => [desc(statusHistory.createdAt)],
         },
       },
     });

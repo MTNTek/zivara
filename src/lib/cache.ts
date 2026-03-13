@@ -46,7 +46,7 @@ export function invalidateCategoryCache(categoryId?: string) {
 /**
  * Create a cached version of a function with tags
  */
-export function createCachedFunction<T extends (...args: any[]) => Promise<any>>(
+export function createCachedFunction<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   options: {
     tags: string[];

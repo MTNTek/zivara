@@ -1,7 +1,7 @@
 import { db } from '@/db';
-import { products, categories, productImages, inventory, searchQueries } from '@/db/schema';
-import { eq, and, gte, lte, like, or, desc, asc, sql, ilike, inArray } from 'drizzle-orm';
-import type { Product, ProductWithDetails, ProductWithImages, Category, ProductQueryParams } from '@/types';
+import { products, categories, searchQueries } from '@/db/schema';
+import { eq, and, gte, lte, or, desc, asc, sql, ilike, inArray } from 'drizzle-orm';
+import type { ProductWithDetails, ProductWithImages, Category, ProductQueryParams } from '@/types';
 
 // Common stop words to filter out from search queries
 const STOP_WORDS = new Set([

@@ -25,7 +25,7 @@ describe('Input Sanitization', () => {
     });
 
     it('should return empty string for non-string input', () => {
-      const result = sanitizeInput(123 as any);
+      const result = sanitizeInput(123 as unknown as string);
       expect(result).toBe('');
     });
 
@@ -55,7 +55,7 @@ describe('Input Sanitization', () => {
     });
 
     it('should return empty string for non-string input', () => {
-      const result = sanitizeHtml(null as any);
+      const result = sanitizeHtml(null as unknown as string);
       expect(result).toBe('');
     });
   });

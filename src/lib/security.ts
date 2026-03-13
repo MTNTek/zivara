@@ -14,7 +14,7 @@ import { logRateLimitViolation as logRateLimit } from '@/lib/audit';
  * Next.js Server Actions have built-in CSRF protection via origin checking
  * This function provides additional validation for API routes
  */
-export async function verifyCsrfToken(request: Request): Promise<boolean> {
+export async function verifyCsrfToken(_request: Request): Promise<boolean> {
   const headersList = await headers();
   const origin = headersList.get('origin');
   const host = headersList.get('host');

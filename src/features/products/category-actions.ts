@@ -17,7 +17,7 @@ async function createAuditLog(
   action: string,
   entityType: string,
   entityId: string,
-  changes: any,
+  changes: Record<string, unknown>,
   userId?: string | null
 ) {
   try {
@@ -221,7 +221,7 @@ export async function updateCategory(data: UpdateCategoryInput) {
     }
 
     // Prepare update data
-    const updates: any = {
+    const updates: Record<string, unknown> = {
       updatedAt: new Date(),
     };
 

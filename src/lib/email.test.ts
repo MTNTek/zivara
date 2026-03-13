@@ -20,10 +20,10 @@ import {
 
 // Get the mock send function
 const { Resend } = await import('resend');
-const mockSend = new (Resend as any)().emails.send;
+const mockSend = new (Resend as unknown as new () => { emails: { send: ReturnType<typeof vi.fn> } })().emails.send;
 
 describe('Email Notification System', () => {
-  let consoleErrorSpy: any;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});

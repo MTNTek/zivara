@@ -25,7 +25,7 @@ import { logger } from '@/lib/logger';
  * @param input - Product ID and quantity
  * @returns Success status with cart item or error
  */
-export async function addToCart(input: AddToCartInput): Promise<ApiResponse<any>> {
+export async function addToCart(input: AddToCartInput): Promise<ApiResponse<unknown>> {
   try {
     // Validate input
     const validated = addToCartSchema.parse(input);
@@ -181,7 +181,7 @@ export async function addToCart(input: AddToCartInput): Promise<ApiResponse<any>
  * @param input - Cart item ID and new quantity
  * @returns Success status with updated cart item or error
  */
-export async function updateCartItemQuantity(input: UpdateCartItemInput): Promise<ApiResponse<any>> {
+export async function updateCartItemQuantity(input: UpdateCartItemInput): Promise<ApiResponse<unknown>> {
   try {
     // Validate input
     const validated = updateCartItemSchema.parse(input);
@@ -334,7 +334,7 @@ export async function clearCart(): Promise<ApiResponse<void>> {
  * 
  * @returns Validation result with any out-of-stock items
  */
-export async function validateCartInventory(): Promise<ApiResponse<any>> {
+export async function validateCartInventory(): Promise<ApiResponse<unknown>> {
   try {
     // Get current user ID
     const userId = await getCurrentUserId();

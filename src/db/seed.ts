@@ -392,7 +392,7 @@ async function seed() {
     ];
 
     console.log(`Inserting ${allProductSeeds.length} products...`);
-    const createdProducts: any[] = [];
+    const createdProducts: Array<typeof schema.products.$inferSelect> = [];
     for (const p of allProductSeeds) {
       const [product] = await db.insert(schema.products).values({
         name: p.name, slug: p.slug, description: p.description,
@@ -434,7 +434,7 @@ async function seed() {
       const customer = customers[i % 3];
       const status = statuses[i % 4];
       const items = orderProducts.slice(i % 6, (i % 6) + 2);
-      const subtotal = items.reduce((sum: number, p: any) => sum + parseFloat(p.price), 0);
+      const subtotal = items.reduce((sum: number, p: typeof schema.products.$inferSelect) => sum + parseFloat(p.price), 0);
       const tax = subtotal * 0.08;
       const shipping = subtotal > 100 ? 0 : 9.99;
       const total = subtotal + tax + shipping;

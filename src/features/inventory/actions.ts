@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/db';
 import { inventory, products } from '@/db/schema';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { 
   updateInventorySchema, 
   setLowStockThresholdSchema,
@@ -246,7 +246,7 @@ export async function isProductInStock(productId: string): Promise<boolean> {
     });
 
     return inventoryRecord ? inventoryRecord.quantity > 0 : false;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -276,7 +276,7 @@ export async function checkInventoryAvailability(
       available: inventoryRecord.quantity >= requestedQuantity,
       availableQuantity: inventoryRecord.quantity,
     };
-  } catch (error) {
+  } catch {
     return { available: false, availableQuantity: 0 };
   }
 }

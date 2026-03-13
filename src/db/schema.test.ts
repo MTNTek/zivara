@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import { pgTable } from 'drizzle-orm/pg-core';
 import * as schema from './schema';
 
 /**
@@ -68,12 +67,12 @@ describe('Database Schema - Foreign Key Referential Integrity', () => {
 
   it('should have all expected foreign key relationships defined', () => {
     // Verify that all expected foreign keys exist in the schema
-    expectedForeignKeys.forEach(({ table, column, references }) => {
-      const tableSchema = (schema as any)[table];
+    expectedForeignKeys.forEach(({ table }) => {
+      const tableSchema = (schema as unknown as Record<string, Record<symbol, unknown>>)[table];
       expect(tableSchema, `Table ${table} should exist in schema`).toBeDefined();
-      
+
       // Check that the table is a Drizzle table
-      expect(tableSchema[Symbol.for('drizzle:Name')], `${table} should be a Drizzle table`).toBeDefined();
+      expect((tableSchema as Record<symbol, unknown>)[Symbol.for('drizzle:Name')], `${table} should be a Drizzle table`).toBeDefined();
     });
   });
 
@@ -91,7 +90,7 @@ describe('Database Schema - Foreign Key Referential Integrity', () => {
     ];
 
     cascadeDeletes.forEach(tableName => {
-      const tableSchema = (schema as any)[tableName];
+      const tableSchema = (schema as unknown as Record<string, Record<symbol, unknown>>)[tableName];
       expect(tableSchema, `Table ${tableName} should exist`).toBeDefined();
     });
   });
@@ -102,14 +101,14 @@ describe('Database Schema - Foreign Key Referential Integrity', () => {
       fc.property(
         fc.constantFrom(...expectedForeignKeys),
         (fk) => {
-          const childTable = (schema as any)[fk.table];
-          const parentTable = (schema as any)[fk.references];
+          const childTable = (schema as unknown as Record<string, Record<symbol, unknown>>)[fk.table];
+          const parentTable = (schema as unknown as Record<string, Record<symbol, unknown>>)[fk.references];
           
           // Both tables must exist
           expect(childTable).toBeDefined();
           expect(parentTable).toBeDefined();
           
-          // Child table must be a valid Drizzle table
+      // Child table must be a valid Drizzle table
           expect(childTable[Symbol.for('drizzle:Name')]).toBeDefined();
           
           // Parent table must be a valid Drizzle table
@@ -141,7 +140,7 @@ describe('Database Schema - Foreign Key Referential Integrity', () => {
     ];
 
     requiredTables.forEach(tableName => {
-      const table = (schema as any)[tableName];
+      const table = (schema as unknown as Record<string, Record<symbol, unknown>>)[tableName];
       expect(table, `Table ${tableName} should be defined`).toBeDefined();
       expect(table[Symbol.for('drizzle:Name')], `${tableName} should be a Drizzle table`).toBeDefined();
     });
@@ -153,7 +152,7 @@ describe('Database Schema - Foreign Key Referential Integrity', () => {
       fc.property(
         fc.constantFrom(...expectedForeignKeys),
         (fk) => {
-          const tableSchema = (schema as any)[fk.table];
+          const tableSchema = (schema as unknown as Record<string, unknown>)[fk.table];
           
           // Verify table exists
           expect(tableSchema).toBeDefined();
@@ -186,7 +185,7 @@ describe('Database Schema - Foreign Key Referential Integrity', () => {
     ];
 
     expectedRelations.forEach(relationName => {
-      const relation = (schema as any)[relationName];
+      const relation = (schema as unknown as Record<string, unknown>)[relationName];
       expect(relation, `Relation ${relationName} should be defined`).toBeDefined();
     });
   });
@@ -227,7 +226,7 @@ describe('Database Schema - Foreign Key Referential Integrity', () => {
     ];
 
     tablesWithForeignKeys.forEach(tableName => {
-      const table = (schema as any)[tableName];
+      const table = (schema as unknown as Record<string, unknown>)[tableName];
       expect(table, `Table ${tableName} with foreign keys should exist`).toBeDefined();
     });
   });

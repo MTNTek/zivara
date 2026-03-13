@@ -6,7 +6,7 @@ import { db } from '@/db';
 import { products, priceHistory, auditLogs } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { productSchema, updateProductSchema } from './schemas';
-import { requireAdmin, getCurrentUserId } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { invalidateProductCache } from '@/lib/cache';
 import type { ProductInput, UpdateProductInput } from './schemas';
 
@@ -17,7 +17,7 @@ async function createAuditLog(
   action: string,
   entityType: string,
   entityId: string,
-  changes: any,
+  changes: Record<string, unknown>,
   userId?: string | null
 ) {
   try {
@@ -115,7 +115,7 @@ export async function updateProduct(data: UpdateProductInput) {
     }
 
     // Prepare update data
-    const updates: any = {
+    const updates: Record<string, unknown> = {
       updatedAt: new Date(),
     };
 
@@ -300,7 +300,7 @@ export async function bulkUpdateProducts(
     const session = await requireAdmin();
 
     // Prepare update data
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updatedAt: new Date(),
     };
 

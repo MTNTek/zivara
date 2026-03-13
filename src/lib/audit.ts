@@ -11,7 +11,7 @@ export interface AuditLogData {
   action: string;
   entityType: string;
   entityId?: string | null;
-  changes?: any;
+  changes?: Record<string, unknown>;
   ipAddress?: string | null;
   userAgent?: string | null;
 }
@@ -69,7 +69,7 @@ export async function logAdminAction(
   action: string,
   entityType: string,
   entityId: string,
-  changes?: any,
+  changes?: Record<string, unknown>,
   ipAddress?: string,
   userAgent?: string
 ): Promise<void> {

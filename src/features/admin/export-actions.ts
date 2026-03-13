@@ -1,14 +1,44 @@
 'use server';
 
 import { db } from '@/db';
-import { orders, orderItems, users } from '@/db/schema';
+import { orders } from '@/db/schema';
 import { eq, and, gte, lte, like } from 'drizzle-orm';
+
+interface OrderExportItem {
+  productName: string;
+  quantity: number;
+}
+
+interface OrderExportData {
+  orderNumber: string;
+  createdAt: Date;
+  status: string;
+  customerName: string | null;
+  customerEmail: string | null;
+  guestEmail: string | null;
+  subtotal: string;
+  tax: string;
+  shipping: string;
+  total: string;
+  paymentMethod: string;
+  lastFourDigits: string | null;
+  shippingAddressLine1: string;
+  shippingAddressLine2: string | null;
+  shippingCity: string;
+  shippingState: string;
+  shippingPostalCode: string;
+  shippingCountry: string;
+  trackingNumber: string | null;
+  carrierName: string | null;
+  estimatedDeliveryDate: Date | null;
+  items: OrderExportItem[];
+}
 
 /**
  * Generate CSV content from orders data
  * Validates: Requirement 21.6
  */
-function generateOrdersCSV(ordersData: any[]): string {
+function generateOrdersCSV(ordersData: OrderExportData[]): string {
   // CSV Headers
   const headers = [
     'Order Number',
@@ -35,7 +65,7 @@ function generateOrdersCSV(ordersData: any[]): string {
   ];
 
   // Escape CSV field
-  const escapeCSV = (field: any): string => {
+  const escapeCSV = (field: unknown): string => {
     if (field === null || field === undefined) {
       return '';
     }
@@ -51,7 +81,7 @@ function generateOrdersCSV(ordersData: any[]): string {
   const rows = ordersData.map((order) => {
     // Format items as a string
     const itemsStr = order.items
-      .map((item: any) => `${item.productName} (x${item.quantity})`)
+      .map((item) => `${item.productName} (x${item.quantity})`)
       .join('; ');
 
     return [

@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { cartItems, products, productImages } from '@/db/schema';
+import { cartItems } from '@/db/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { getCurrentUserId } from '@/lib/auth';
 

@@ -80,7 +80,7 @@ export async function generateThumbnail(file: File): Promise<File> {
  * Delete an image from storage
  * @param url - The URL or public ID of the image to delete
  */
-export async function deleteImage(url: string): Promise<void> {
+export async function deleteImage(_url: string): Promise<void> {
   // In production, this would delete from cloud storage
   
   // TODO: Implement actual deletion
@@ -121,7 +121,7 @@ export function validateImageFile(file: File): void {
  */
 export function getOptimizedImageUrl(
   url: string,
-  options?: {
+  _options?: {
     width?: number;
     height?: number;
     quality?: number;

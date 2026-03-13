@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { updateProfile, addAddress, updateAddress, deleteAddress, setDefaultAddress } from './actions';
+import { updateProfile, addAddress, updateAddress } from './actions';
 
 // Note: These tests require a running PostgreSQL database
 // Skip if DATABASE_URL is not configured

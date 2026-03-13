@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { db } from '@/db';
 import { users, products, categories, inventory, orders, orderItems } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -18,7 +18,7 @@ describe.skipIf(!isDatabaseAvailable)('Order Query Functions (Unit Tests)', () =
   let testUserId2: string;
   let testCategoryId: string;
   let testProductId: string;
-  let testOrderIds: string[] = [];
+  const testOrderIds: string[] = [];
 
   beforeAll(async () => {
     if (!isDatabaseAvailable) {
@@ -163,7 +163,7 @@ describe.skipIf(!isDatabaseAvailable)('Order Query Functions (Unit Tests)', () =
       const result = await getUserOrders(testUserId1);
 
       expect(result.orders.length).toBe(3);
-      expect(result.orders.every((order: any) => order.userId === testUserId1)).toBe(true);
+      expect(result.orders.every((order: unknown) => (order as Record<string, unknown>).userId === testUserId1)).toBe(true);
     });
 
     it('should support pagination', async () => {
@@ -212,7 +212,7 @@ describe.skipIf(!isDatabaseAvailable)('Order Query Functions (Unit Tests)', () =
         status: 'delivered',
       });
 
-      expect(result.orders.every((order: any) => order.status === 'delivered')).toBe(true);
+      expect(result.orders.every((order: unknown) => (order as Record<string, unknown>).status === 'delivered')).toBe(true);
       expect(result.orders.length).toBeGreaterThanOrEqual(2);
     });
 
@@ -222,7 +222,7 @@ describe.skipIf(!isDatabaseAvailable)('Order Query Functions (Unit Tests)', () =
       });
 
       expect(result.orders.length).toBe(2);
-      expect(result.orders.every((order: any) => order.userId === testUserId2)).toBe(true);
+      expect(result.orders.every((order: unknown) => (order as Record<string, unknown>).userId === testUserId2)).toBe(true);
     });
 
     it('should sort by total amount', async () => {
@@ -281,7 +281,7 @@ describe.skipIf(!isDatabaseAvailable)('Order Query Functions (Unit Tests)', () =
       const result = await searchOrdersByNumber('USER1');
 
       expect(result.length).toBe(3);
-      expect(result.every((order: any) => order.orderNumber.includes('USER1'))).toBe(true);
+      expect(result.every((order: unknown) => (order as Record<string, unknown>).orderNumber && ((order as Record<string, unknown>).orderNumber as string).includes('USER1'))).toBe(true);
     });
 
     it('should find orders by exact order number', async () => {

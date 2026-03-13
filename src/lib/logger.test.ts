@@ -5,12 +5,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { logger, type LogLevel, type LogEntry } from './logger';
+import { logger, type LogLevel } from './logger';
 
 describe('Logger', () => {
-  let consoleInfoSpy: any;
-  let consoleWarnSpy: any;
-  let consoleErrorSpy: any;
+  let consoleInfoSpy: ReturnType<typeof vi.spyOn>;
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let originalNodeEnv: string | undefined;
 
   beforeEach(() => {

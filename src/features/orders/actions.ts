@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/db';
 import { orders, orderItems, orderStatusHistory, cartItems, users } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 import { 
   checkoutSchema,
   updateOrderStatusSchema,
@@ -17,7 +17,6 @@ import { adjustInventoryQuantity } from '@/features/inventory/actions';
 import { getCurrentUserId } from '@/lib/auth';
 import { 
   createPaymentIntent, 
-  getPaymentIntent, 
   handlePaymentWithTimeout,
   getCardLast4Digits 
 } from '@/lib/payment';
@@ -80,10 +79,14 @@ export async function createOrder(input: CheckoutInput) {
       };
     }
 
-    const cartItemsList = cartValidation.data!;
+    const cartItemsList = cartValidation.data as Array<{
+      productId: string;
+      quantity: number;
+      product: { name: string; price: string };
+    }>;
 
     // Calculate totals
-    const subtotal = cartItemsList.reduce((sum: number, item: any) => {
+    const subtotal = cartItemsList.reduce((sum, item) => {
       const price = parseFloat(item.product.price);
       return sum + (price * item.quantity);
     }, 0);
@@ -148,7 +151,7 @@ export async function createOrder(input: CheckoutInput) {
     }
 
     // Start transaction (Requirement 16.4)
-    const result = await db.transaction(async (tx: any) => {
+    const result = await db.transaction(async (tx) => {
       // Create order
       const [order] = await tx
         .insert(orders)
@@ -328,7 +331,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
     }
 
     // Update order status in transaction (Requirement 7.2, 7.3)
-    await db.transaction(async (tx: any) => {
+    await db.transaction(async (tx) => {
       // Update order
       await tx
         .update(orders)
@@ -471,7 +474,7 @@ export async function cancelOrder(input: CancelOrderInput) {
     }
 
     // Cancel order and restore inventory in transaction (Requirement 16.4)
-    await db.transaction(async (tx: any) => {
+    await db.transaction(async (tx) => {
       // Update order status
       await tx
         .update(orders)
@@ -540,10 +543,14 @@ export async function createCheckoutPaymentIntent() {
       };
     }
 
-    const cartItemsList = cartValidation.data!;
+    const cartItemsList = cartValidation.data as Array<{
+      productId: string;
+      quantity: number;
+      product: { name: string; price: string };
+    }>;
 
     // Calculate totals
-    const subtotal = cartItemsList.reduce((sum: number, item: any) => {
+    const subtotal = cartItemsList.reduce((sum, item) => {
       const price = parseFloat(item.product.price);
       return sum + (price * item.quantity);
     }, 0);
