@@ -92,7 +92,20 @@ export async function getProducts(params: ProductQueryParams = {}) {
   conditions.push(eq(products.isActive, true));
   
   if (categoryId) {
-    conditions.push(eq(products.categoryId, categoryId));
+    // If categoryId looks like a slug (not a UUID), resolve it
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(categoryId);
+    if (isUUID) {
+      conditions.push(eq(products.categoryId, categoryId));
+    } else {
+      // Treat as slug — look up the category
+      const category = await db.query.categories.findFirst({
+        where: eq(categories.slug, categoryId),
+        columns: { id: true },
+      });
+      if (category) {
+        conditions.push(eq(products.categoryId, category.id));
+      }
+    }
   }
   
   if (minPrice !== undefined) {
