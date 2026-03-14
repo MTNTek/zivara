@@ -183,3 +183,9 @@ select:focus,
 textarea:focus {
   color: #000000;
 }
+
+/* Force blue accent color on radio buttons and checkboxes */
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: #1e40af;
+}
