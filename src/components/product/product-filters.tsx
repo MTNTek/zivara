@@ -90,29 +90,30 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
       <div>
         <h3 className="font-semibold text-gray-900 mb-3">Category</h3>
         <div className="space-y-3">
-          <label className="flex items-center min-h-[44px]">
-            <input
-              type="radio"
-              name="category"
-              checked={!currentFilters.categoryId}
-              onChange={() => updateFilter('categoryId', null)}
-              className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
-              disabled={isPending}
-            />
+          <button
+            type="button"
+            onClick={() => updateFilter('categoryId', null)}
+            className="flex items-center min-h-[44px] w-full text-left"
+            disabled={isPending}
+          >
+            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.categoryId ? 'border-blue-800' : 'border-gray-300'}`}>
+              {!currentFilters.categoryId && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+            </span>
             <span className="ml-3 text-sm text-gray-700">All Categories</span>
-          </label>
+          </button>
           {topCategories.map((category) => (
-            <label key={category.id} className="flex items-center min-h-[44px]">
-              <input
-                type="radio"
-                name="category"
-                checked={currentFilters.categoryId === category.id}
-                onChange={() => updateFilter('categoryId', category.id)}
-                className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
-                disabled={isPending}
-              />
+            <button
+              type="button"
+              key={category.id}
+              onClick={() => updateFilter('categoryId', category.id)}
+              className="flex items-center min-h-[44px] w-full text-left"
+              disabled={isPending}
+            >
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.categoryId === category.id ? 'border-blue-800' : 'border-gray-300'}`}>
+                {currentFilters.categoryId === category.id && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+              </span>
               <span className="ml-3 text-sm text-gray-700">{category.name}</span>
-            </label>
+            </button>
           ))}
         </div>
       </div>
@@ -149,34 +150,35 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
         <h3 className="font-semibold text-gray-900 mb-3">Minimum Rating</h3>
         <div className="space-y-3">
           {[4, 3, 2, 1].map((rating) => (
-            <label key={rating} className="flex items-center min-h-[44px]">
-              <input
-                type="radio"
-                name="rating"
-                checked={currentFilters.minRating === rating}
-                onChange={() => updateFilter('minRating', rating.toString())}
-                className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
-                disabled={isPending}
-              />
+            <button
+              type="button"
+              key={rating}
+              onClick={() => updateFilter('minRating', rating.toString())}
+              className="flex items-center min-h-[44px] w-full text-left"
+              disabled={isPending}
+            >
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.minRating === rating ? 'border-blue-800' : 'border-gray-300'}`}>
+                {currentFilters.minRating === rating && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+              </span>
               <span className="ml-3 text-sm text-gray-700 flex items-center">
                 {[...Array(rating)].map((_, i) => (
                   <span key={i} className="text-[#14B8A6]">★</span>
                 ))}
                 <span className="ml-1">& up</span>
               </span>
-            </label>
+            </button>
           ))}
-          <label className="flex items-center min-h-[44px]">
-            <input
-              type="radio"
-              name="rating"
-              checked={!currentFilters.minRating}
-              onChange={() => updateFilter('minRating', null)}
-              className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
-              disabled={isPending}
-            />
+          <button
+            type="button"
+            onClick={() => updateFilter('minRating', null)}
+            className="flex items-center min-h-[44px] w-full text-left"
+            disabled={isPending}
+          >
+            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.minRating ? 'border-blue-800' : 'border-gray-300'}`}>
+              {!currentFilters.minRating && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+            </span>
             <span className="ml-3 text-sm text-gray-700">All Ratings</span>
-          </label>
+          </button>
         </div>
       </div>
     </div>
