@@ -86,14 +86,14 @@ export function OrderListTable({
     
     if (sortOrder === 'asc') {
       return (
-        <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
         </svg>
       );
     }
     
     return (
-      <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
       </svg>
     );
@@ -131,7 +131,7 @@ export function OrderListTable({
             id="pageSize"
             value={currentLimit}
             onChange={(e) => handleLimitChange(parseInt(e.target.value))}
-            className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
           >
             <option value="10">10</option>
             <option value="20">20</option>
@@ -197,7 +197,7 @@ export function OrderListTable({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="text-teal-600 hover:text-teal-800 font-medium"
+                      className="text-black hover:text-blue-800 font-medium"
                     >
                       {order.orderNumber}
                     </Link>
@@ -234,7 +234,7 @@ export function OrderListTable({
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="text-teal-600 hover:text-teal-800"
+                      className="text-black hover:text-blue-800"
                     >
                       View Details
                     </Link>
@@ -283,7 +283,7 @@ export function OrderListTable({
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-4 py-2 border rounded-lg text-sm font-medium ${
                       currentPage === pageNum
-                        ? 'bg-teal-600 text-white border-teal-600'
+                        ? 'bg-blue-800 text-white border-blue-800'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >

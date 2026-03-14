@@ -43,7 +43,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
             </div>
             <Link
               href="/admin/products/new"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F52BA]"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -71,7 +71,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     <input
                       type="checkbox"
                       id="select-all"
-                      className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                      className="rounded border-gray-300 text-black focus:ring-[#0F52BA]"
                     />
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -111,7 +111,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                         {!search && (
                           <Link
                             href="/admin/products/new"
-                            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
+                            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900"
                           >
                             Add your first product
                           </Link>
@@ -131,7 +131,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                           <input
                             type="checkbox"
                             data-product-id={product.id}
-                            className="product-checkbox rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                            className="product-checkbox rounded border-gray-300 text-black focus:ring-[#0F52BA]"
                           />
                         </td>
                         <td className="px-6 py-4">
@@ -202,7 +202,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
                             href={`/admin/products/${product.id}/edit`}
-                            className="text-teal-600 hover:text-teal-900 mr-4"
+                            className="text-black hover:text-blue-900 mr-4"
                           >
                             Edit
                           </Link>
@@ -283,7 +283,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                           href={`/admin/products?page=${pageNum}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                             page === pageNum
-                              ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
+                              ? 'z-10 bg-blue-50 border-blue-800 text-black'
                               : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                           }`}
                         >

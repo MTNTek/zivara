@@ -28,13 +28,13 @@ export default function Error({
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             onClick={reset}
-            className="rounded-md bg-teal-600 px-6 py-3 text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+            className="rounded-md bg-blue-800 px-6 py-3 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2"
           >
             Try again
           </button>
           <Link
             href="/"
-            className="rounded-md border border-gray-300 bg-white px-6 py-3 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+            className="rounded-md border border-gray-300 bg-white px-6 py-3 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2"
           >
             Go to homepage
           </Link>

@@ -49,7 +49,7 @@ export async function RelatedProducts({ productId, categoryId }: RelatedProducts
                 <div className="flex items-center justify-center h-full text-gray-400 text-xs">No Image</div>
               )}
             </div>
-            <p className="text-sm text-gray-900 line-clamp-2 group-hover:text-teal-600 transition-colors min-h-[40px]">
+            <p className="text-sm text-gray-900 line-clamp-2 group-hover:text-black transition-colors min-h-[40px]">
               {product.name}
             </p>
             <div className="mt-1">

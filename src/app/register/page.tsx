@@ -108,7 +108,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-teal-600" aria-label="Zivara home">
+          <Link href="/" className="text-3xl font-bold text-black" aria-label="Zivara home">
             Zivara
           </Link>
           <h1 className="mt-6 text-3xl font-bold text-gray-900">
@@ -116,7 +116,7 @@ export default function RegisterPage() {
           </h1>
           <p className="mt-2 text-gray-600">
             Already have an account?{' '}
-            <Link href="/login" className="text-teal-600 hover:text-teal-700 font-medium">
+            <Link href="/login" className="text-black hover:text-blue-800 font-medium">
               Sign in
             </Link>
           </p>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
                 id="name"
                 value={formData.name}
                 onChange={(e) => handleFieldChange('name', e.target.value)}
-                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 ${
                   fieldErrors.name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
@@ -158,7 +158,7 @@ export default function RegisterPage() {
                 id="email"
                 value={formData.email}
                 onChange={(e) => handleFieldChange('email', e.target.value)}
-                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 ${
                   fieldErrors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
@@ -183,7 +183,7 @@ export default function RegisterPage() {
                 id="password"
                 value={formData.password}
                 onChange={(e) => handleFieldChange('password', e.target.value)}
-                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 ${
                   fieldErrors.password ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
@@ -212,7 +212,7 @@ export default function RegisterPage() {
                 id="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={(e) => handleFieldChange('confirmPassword', e.target.value)}
-                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 ${
                   fieldErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
@@ -238,7 +238,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-teal-600 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+              className="w-full bg-blue-800 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2"
               aria-label={isPending ? 'Creating account' : 'Create account'}
             >
               {isPending && <ButtonSpinner />}
@@ -247,9 +247,9 @@ export default function RegisterPage() {
 
             <p className="text-xs text-gray-600 text-center">
               By creating an account, you agree to our{' '}
-              <Link href="/terms" className="text-teal-600 hover:underline">Terms of Service</Link>
+              <Link href="/terms" className="text-black hover:underline">Terms of Service</Link>
               {' '}and{' '}
-              <Link href="/privacy" className="text-teal-600 hover:underline">Privacy Policy</Link>
+              <Link href="/privacy" className="text-black hover:underline">Privacy Policy</Link>
             </p>
           </form>
         </div>

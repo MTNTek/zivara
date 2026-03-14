@@ -43,11 +43,11 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
         {/* Breadcrumbs */}
         <nav className="mb-6 text-sm">
           <ol className="flex items-center space-x-2 text-gray-600">
-            <li><Link href="/" className="hover:text-teal-600">Home</Link></li>
+            <li><Link href="/" className="hover:text-black">Home</Link></li>
             <li>/</li>
-            <li><Link href="/products" className="hover:text-teal-600">Products</Link></li>
+            <li><Link href="/products" className="hover:text-black">Products</Link></li>
             <li>/</li>
-            <li><Link href={`/products/${id}`} className="hover:text-teal-600">{product.name}</Link></li>
+            <li><Link href={`/products/${id}`} className="hover:text-black">{product.name}</Link></li>
             <li>/</li>
             <li className="text-gray-900 font-medium">Reviews</li>
           </ol>
@@ -83,7 +83,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
                 href={`/products/${id}/reviews?sort=${option}`}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   sortBy === option
-                    ? 'bg-teal-600 text-white'
+                    ? 'bg-blue-800 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                 }`}
               >
@@ -136,7 +136,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
         ) : (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
             <p className="text-gray-600">No reviews yet for this product.</p>
-            <Link href={`/products/${id}`} className="text-teal-600 hover:text-teal-700 font-semibold mt-2 inline-block">
+            <Link href={`/products/${id}`} className="text-black hover:text-gray-700 font-semibold mt-2 inline-block">
               ← Back to Product
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
                 href={`/products/${id}/reviews?page=${p}&sort=${sortBy}`}
                 className={`px-4 py-2 rounded-lg text-sm ${
                   p === page
-                    ? 'bg-teal-600 text-white'
+                    ? 'bg-blue-800 text-white'
                     : 'bg-white border border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -179,7 +179,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href={`/products/${id}`} className="text-teal-600 hover:text-teal-700 font-semibold">
+          <Link href={`/products/${id}`} className="text-black hover:text-gray-700 font-semibold">
             ← Back to Product
           </Link>
         </div>

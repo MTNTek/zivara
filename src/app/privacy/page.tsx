@@ -46,7 +46,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">Contact</h2>
-            <p>For privacy-related inquiries, please <Link href="/contact" className="text-teal-600 hover:underline">contact us</Link>.</p>
+            <p>For privacy-related inquiries, please <Link href="/contact" className="text-black hover:underline">contact us</Link>.</p>
           </section>
         </div>
       </div>

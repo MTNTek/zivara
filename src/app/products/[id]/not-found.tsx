@@ -14,7 +14,7 @@ export default function ProductNotFound() {
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/products"
-            className="rounded-lg bg-teal-600 px-6 py-3 text-white font-semibold hover:bg-teal-700 transition-colors"
+            className="rounded-lg bg-blue-800 px-6 py-3 text-white font-semibold hover:bg-blue-900 transition-colors"
           >
             Browse products
           </Link>

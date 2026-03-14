@@ -83,7 +83,7 @@ export default async function AdminAnalyticsPage() {
                 <div className="w-24 text-sm text-gray-600">{day.date}</div>
                 <div className="flex-1 flex items-center">
                   <div
-                    className="bg-teal-500 h-8 rounded"
+                    className="bg-blue-500 h-8 rounded"
                     style={{
                       width: `${(parseFloat(day.revenue) / Math.max(...recentOrders.map((d) => parseFloat(d.revenue)))) * 100}%`,
                       minWidth: '2rem',

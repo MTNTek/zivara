@@ -84,7 +84,7 @@ export function RecentlyViewed({ excludeId }: { excludeId?: string }) {
                 <div className="flex items-center justify-center h-full text-gray-400 text-xs">No Image</div>
               )}
             </div>
-            <p className="text-sm text-gray-900 line-clamp-2 group-hover:text-teal-600 transition-colors">
+            <p className="text-sm text-gray-900 line-clamp-2 group-hover:text-black transition-colors">
               {product.name}
             </p>
             <p className="text-sm font-semibold text-gray-900">

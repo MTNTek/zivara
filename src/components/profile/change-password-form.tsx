@@ -55,7 +55,7 @@ export function ChangePasswordForm() {
           id="currentPassword"
           value={formData.currentPassword}
           onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
           required
           autoComplete="current-password"
         />
@@ -70,7 +70,7 @@ export function ChangePasswordForm() {
           id="newPassword"
           value={formData.newPassword}
           onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
           required
           minLength={8}
           autoComplete="new-password"
@@ -86,7 +86,7 @@ export function ChangePasswordForm() {
           id="confirmPassword"
           value={formData.confirmPassword}
           onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
           required
           minLength={8}
           autoComplete="new-password"
@@ -108,7 +108,7 @@ export function ChangePasswordForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors disabled:opacity-50"
+        className="w-full bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors disabled:opacity-50"
       >
         {isPending ? 'Changing...' : 'Change Password'}
       </button>

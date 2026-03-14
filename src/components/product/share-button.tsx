@@ -40,7 +40,7 @@ export function ShareButton({ productName, productId }: ShareButtonProps) {
     <div className="relative">
       <button
         onClick={() => typeof navigator !== 'undefined' && 'share' in navigator ? handleNativeShare() : setShowMenu(!showMenu)}
-        className="p-2 text-gray-500 hover:text-teal-600 hover:bg-gray-100 rounded-full transition-colors"
+        className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-colors"
         aria-label="Share product"
         title="Share"
       >

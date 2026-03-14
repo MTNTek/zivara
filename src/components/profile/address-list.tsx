@@ -17,7 +17,7 @@ export function AddressList({ userId: _userId }: AddressListProps) {
       
       <button
         onClick={() => setShowForm(!showForm)}
-        className="w-full bg-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+        className="w-full bg-blue-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-900 transition-colors"
       >
         Add New Address
       </button>

@@ -34,7 +34,7 @@ export function CartSummary({ subtotal, totalQuantity }: CartSummaryProps) {
           <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
         </div>
         {subtotal < 50 && (
-          <p className="text-sm text-teal-600">
+          <p className="text-sm text-black">
             Add ${(50 - subtotal).toFixed(2)} more for free shipping!
           </p>
         )}
@@ -48,14 +48,14 @@ export function CartSummary({ subtotal, totalQuantity }: CartSummaryProps) {
 
       <Link
         href="/checkout"
-        className="block w-full bg-teal-600 text-white text-center px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors mb-3"
+        className="block w-full bg-blue-800 text-white text-center px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors mb-3"
       >
         Proceed to Checkout
       </Link>
 
       <Link
         href="/products"
-        className="block w-full text-center text-teal-600 hover:text-teal-700 font-medium"
+        className="block w-full text-center text-black hover:text-blue-800 font-medium"
       >
         Continue Shopping
       </Link>

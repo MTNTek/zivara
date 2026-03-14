@@ -100,7 +100,7 @@ function LoginForm() {
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-teal-600" aria-label="Zivara home">
+          <Link href="/" className="text-3xl font-bold text-black" aria-label="Zivara home">
             Zivara
           </Link>
           <h1 className="mt-6 text-3xl font-bold text-gray-900">
@@ -108,7 +108,7 @@ function LoginForm() {
           </h1>
           <p className="mt-2 text-gray-600">
             Or{' '}
-            <Link href="/register" className="text-teal-600 hover:text-teal-700 font-medium">
+            <Link href="/register" className="text-black hover:text-blue-800 font-medium">
               create a new account
             </Link>
           </p>
@@ -125,7 +125,7 @@ function LoginForm() {
                 id="email"
                 value={formData.email}
                 onChange={(e) => handleFieldChange('email', e.target.value)}
-                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 ${
                   fieldErrors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
@@ -150,7 +150,7 @@ function LoginForm() {
                 id="password"
                 value={formData.password}
                 onChange={(e) => handleFieldChange('password', e.target.value)}
-                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                className={`w-full px-4 py-2 min-h-[44px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 ${
                   fieldErrors.password ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
@@ -177,13 +177,13 @@ function LoginForm() {
                 <input
                   id="remember"
                   type="checkbox"
-                  className="w-4 h-4 text-teal-600 focus:ring-teal-500 focus:ring-2 focus:ring-offset-2 border-gray-300 rounded"
+                  className="w-4 h-4 text-black focus:ring-[#0F52BA] focus:ring-2 focus:ring-offset-2 border-gray-300 rounded"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
                   Remember me
                 </label>
               </div>
-              <Link href="/reset-password" className="text-sm text-teal-600 hover:text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded">
+              <Link href="/reset-password" className="text-sm text-black hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 rounded">
                 Forgot password?
               </Link>
             </div>
@@ -191,7 +191,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-teal-600 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+              className="w-full bg-blue-800 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2"
               aria-label={isPending ? 'Signing in' : 'Sign in'}
             >
               {isPending && <ButtonSpinner />}

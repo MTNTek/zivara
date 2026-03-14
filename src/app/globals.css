@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
   
   /* Zivara Simple 3-Color Palette */
   --primary-grey: #6B7280;    /* Main grey for text and elements */
@@ -175,4 +175,11 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Force black text on focused inputs */
+input:focus,
+select:focus,
+textarea:focus {
+  color: #000000;
 }

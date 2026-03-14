@@ -38,9 +38,9 @@ export function OrderTimeline({ status }: { status: string }) {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                   isComplete
-                    ? 'bg-teal-600 text-white'
+                    ? 'bg-blue-800 text-white'
                     : 'bg-gray-200 text-gray-500'
-                } ${isCurrent ? 'ring-2 ring-teal-300' : ''}`}
+                } ${isCurrent ? 'ring-2 ring-blue-300' : ''}`}
               >
                 {isComplete ? (
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,12 +50,12 @@ export function OrderTimeline({ status }: { status: string }) {
                   i + 1
                 )}
               </div>
-              <span className={`text-xs mt-1 ${isComplete ? 'text-teal-700 font-medium' : 'text-gray-500'}`}>
+              <span className={`text-xs mt-1 ${isComplete ? 'text-blue-800 font-medium' : 'text-gray-500'}`}>
                 {step.label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`h-0.5 flex-1 mx-1 ${i < currentIndex ? 'bg-teal-600' : 'bg-gray-200'}`} />
+              <div className={`h-0.5 flex-1 mx-1 ${i < currentIndex ? 'bg-blue-800' : 'bg-gray-200'}`} />
             )}
           </div>
         );

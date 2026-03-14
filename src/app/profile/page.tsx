@@ -55,20 +55,20 @@ export default async function ProfilePage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h2>
               <nav className="space-y-2">
                 {session.user.role === 'admin' && (
-                  <Link href="/admin/dashboard" className="block text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-lg font-medium text-center mb-3">
+                  <Link href="/admin/dashboard" className="block text-white bg-blue-800 hover:bg-blue-900 px-4 py-2 rounded-lg font-medium text-center mb-3">
                     Admin Dashboard
                   </Link>
                 )}
-                <Link href="/orders" className="block text-teal-600 hover:text-teal-700">
+                <Link href="/orders" className="block text-black hover:text-blue-800">
                   My Orders
                 </Link>
-                <Link href="/wishlist" className="block text-teal-600 hover:text-teal-700">
+                <Link href="/wishlist" className="block text-black hover:text-blue-800">
                   Wishlist
                 </Link>
-                <Link href="/cart" className="block text-teal-600 hover:text-teal-700">
+                <Link href="/cart" className="block text-black hover:text-blue-800">
                   Shopping Cart
                 </Link>
-                <Link href="/products" className="block text-teal-600 hover:text-teal-700">
+                <Link href="/products" className="block text-black hover:text-blue-800">
                   Browse Products
                 </Link>
                 <div className="border-t border-gray-200 pt-2 mt-2">

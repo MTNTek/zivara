@@ -120,7 +120,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
                 id="status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as OrderStatus)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
               >
                 <option value={currentStatus}>Select new status...</option>
                 {validStatuses.map((validStatus) => (
@@ -142,7 +142,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder="Add any notes about this status change..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
               />
             </div>
 
@@ -164,7 +164,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
             <button
               onClick={handleUpdateStatus}
               disabled={isUpdating || status === currentStatus}
-              className="w-full px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full px-6 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isUpdating && <ButtonSpinner />}
               {isUpdating ? 'Updating...' : 'Update Status'}

@@ -190,7 +190,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <Link
                               href={`/admin/orders/${order.id}`}
-                              className="text-teal-600 hover:text-teal-900"
+                              className="text-black hover:text-gray-900"
                             >
                               View Order
                             </Link>

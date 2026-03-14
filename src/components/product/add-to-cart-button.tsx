@@ -78,7 +78,7 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
                 setQuantity(val);
               }
             }}
-            className="w-20 text-center border border-gray-300 rounded-md py-3 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 text-lg"
+            className="w-20 text-center border border-gray-300 rounded-md py-3 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 text-lg"
             disabled={isPending}
             aria-label="Product quantity"
           />

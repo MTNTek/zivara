@@ -77,7 +77,7 @@ export default async function CartPage() {
             </p>
             <Link
               href="/products"
-              className="inline-block bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+              className="inline-block bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors"
             >
               Continue Shopping
             </Link>

@@ -90,7 +90,7 @@ export default async function AdminReviewsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/products/${review.productId}`}
-                      className="text-sm font-medium text-teal-600 hover:text-teal-900"
+                      className="text-sm font-medium text-black hover:text-blue-900"
                     >
                       {review.productName}
                     </Link>

@@ -80,7 +80,7 @@ export function OrderFilters({ currentFilters }: OrderFiltersProps) {
             id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
           >
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
@@ -101,7 +101,7 @@ export function OrderFilters({ currentFilters }: OrderFiltersProps) {
             id="startDate"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
           />
         </div>
 
@@ -115,7 +115,7 @@ export function OrderFilters({ currentFilters }: OrderFiltersProps) {
             id="endDate"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
           />
         </div>
 
@@ -130,7 +130,7 @@ export function OrderFilters({ currentFilters }: OrderFiltersProps) {
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value)}
             placeholder="Search by order number"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
           />
         </div>
       </div>
@@ -139,7 +139,7 @@ export function OrderFilters({ currentFilters }: OrderFiltersProps) {
       <div className="flex gap-4 mt-4">
         <button
           onClick={handleApplyFilters}
-          className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          className="px-6 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors"
         >
           Apply Filters
         </button>

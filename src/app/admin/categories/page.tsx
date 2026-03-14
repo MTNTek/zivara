@@ -30,7 +30,7 @@ export default async function AdminCategoriesPage() {
         <p className="text-gray-600">Manage product categories and hierarchy</p>
         <Link
           href="/admin/categories/new"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -91,7 +91,7 @@ export default async function AdminCategoriesPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Link
                       href={`/admin/categories/${category.id}/edit`}
-                      className="text-teal-600 hover:text-teal-900 mr-4"
+                      className="text-black hover:text-blue-900 mr-4"
                     >
                       Edit
                     </Link>

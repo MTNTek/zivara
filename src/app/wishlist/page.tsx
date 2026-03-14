@@ -49,7 +49,7 @@ export default async function WishlistPage() {
             </svg>
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your wishlist is empty</h2>
             <p className="text-gray-600 mb-6">Save products you love by clicking the heart icon</p>
-            <Link href="/products" className="inline-block bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors">
+            <Link href="/products" className="inline-block bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors">
               Browse Products
             </Link>
           </div>

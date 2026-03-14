@@ -42,10 +42,10 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
     setPendingItemId(itemId);
     setError(null);
 
-    // Optimistic update
-    updateOptimisticItems({ type: 'update', itemId, quantity: newQuantity });
-
     startTransition(async () => {
+      // Optimistic update
+      updateOptimisticItems({ type: 'update', itemId, quantity: newQuantity });
+
       const result = await updateCartItemQuantity({ cartItemId: itemId, quantity: newQuantity });
       if (!result.success) {
         const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to update quantity';
@@ -62,10 +62,10 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
     setPendingItemId(itemId);
     setError(null);
 
-    // Optimistic update
-    updateOptimisticItems({ type: 'remove', itemId });
-
     startTransition(async () => {
+      // Optimistic update
+      updateOptimisticItems({ type: 'remove', itemId });
+
       const result = await removeFromCart({ cartItemId: itemId });
       if (!result.success) {
         const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to remove item';
@@ -119,7 +119,7 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
                 <div className="flex-1 min-w-0">
                   <Link 
                     href={`/products/${item.product.id}`}
-                    className="font-semibold text-gray-900 hover:text-teal-600 transition-colors"
+                    className="font-semibold text-gray-900 hover:text-black transition-colors"
                   >
                     {item.product.name}
                   </Link>

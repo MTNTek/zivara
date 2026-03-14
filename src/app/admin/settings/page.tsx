@@ -15,7 +15,7 @@ export default async function AdminSettingsPage() {
               <input
                 type="text"
                 defaultValue="Zivara"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
                 disabled
               />
             </div>
@@ -26,7 +26,7 @@ export default async function AdminSettingsPage() {
               <input
                 type="email"
                 defaultValue="admin@zivara.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
                 disabled
               />
             </div>
@@ -35,7 +35,7 @@ export default async function AdminSettingsPage() {
                 Currency
               </label>
               <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
                 disabled
               >
                 <option>USD ($)</option>
@@ -96,7 +96,7 @@ export default async function AdminSettingsPage() {
               <input
                 type="email"
                 defaultValue="noreply@zivara.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
                 disabled
               />
             </div>

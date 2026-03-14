@@ -172,7 +172,7 @@ export default async function AdminUsersPage({
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           href={`/admin/users/${user.id}`}
-                          className="text-teal-600 hover:text-teal-900"
+                          className="text-black hover:text-blue-900"
                         >
                           View Details
                         </Link>
@@ -249,7 +249,7 @@ export default async function AdminUsersPage({
                           href={`/admin/users?page=${pageNum}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                             page === pageNum
-                              ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
+                              ? 'z-10 bg-blue-50 border-blue-800 text-black'
                               : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                           }`}
                         >

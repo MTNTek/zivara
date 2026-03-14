@@ -70,7 +70,7 @@ export function MobileFilters({ categories, currentFilters }: MobileFiltersProps
             <div className="p-4 border-t border-gray-200">
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-full bg-teal-600 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+                className="w-full bg-blue-800 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-blue-900 transition-colors"
               >
                 Apply Filters
               </button>

@@ -62,7 +62,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
       {hasFilters && (
         <button
           onClick={clearFilters}
-          className="w-full text-sm text-teal-600 hover:text-teal-700 font-medium py-3 min-h-[44px]"
+          className="w-full text-sm text-black hover:text-gray-700 font-medium py-3 min-h-[44px]"
           disabled={isPending}
         >
           Clear all filters
@@ -75,7 +75,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
         <select
           value={currentFilters.sortBy || ''}
           onChange={(e) => updateFilter('sortBy', e.target.value || null)}
-          className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
+          className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA] text-base"
           disabled={isPending}
         >
           <option value="">Default</option>
@@ -96,7 +96,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
               name="category"
               checked={!currentFilters.categoryId}
               onChange={() => updateFilter('categoryId', null)}
-              className="w-5 h-5 text-teal-600 focus:ring-teal-500"
+              className="w-5 h-5 text-black focus:ring-[#0F52BA]"
               disabled={isPending}
             />
             <span className="ml-3 text-sm text-gray-700">All Categories</span>
@@ -108,7 +108,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
                 name="category"
                 checked={currentFilters.categoryId === category.id}
                 onChange={() => updateFilter('categoryId', category.id)}
-                className="w-5 h-5 text-teal-600 focus:ring-teal-500"
+                className="w-5 h-5 text-black focus:ring-[#0F52BA]"
                 disabled={isPending}
               />
               <span className="ml-3 text-sm text-gray-700">{category.name}</span>
@@ -126,7 +126,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             placeholder="Min price"
             value={currentFilters.minPrice || ''}
             onChange={(e) => updateFilter('minPrice', e.target.value || null)}
-            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA] text-base"
             min="0"
             step="0.01"
             disabled={isPending}
@@ -136,7 +136,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             placeholder="Max price"
             value={currentFilters.maxPrice || ''}
             onChange={(e) => updateFilter('maxPrice', e.target.value || null)}
-            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA] text-base"
             min="0"
             step="0.01"
             disabled={isPending}
@@ -155,7 +155,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
                 name="rating"
                 checked={currentFilters.minRating === rating}
                 onChange={() => updateFilter('minRating', rating.toString())}
-                className="w-5 h-5 text-teal-600 focus:ring-teal-500"
+                className="w-5 h-5 text-black focus:ring-[#0F52BA]"
                 disabled={isPending}
               />
               <span className="ml-3 text-sm text-gray-700 flex items-center">
@@ -172,7 +172,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
               name="rating"
               checked={!currentFilters.minRating}
               onChange={() => updateFilter('minRating', null)}
-              className="w-5 h-5 text-teal-600 focus:ring-teal-500"
+              className="w-5 h-5 text-black focus:ring-[#0F52BA]"
               disabled={isPending}
             />
             <span className="ml-3 text-sm text-gray-700">All Ratings</span>

@@ -140,7 +140,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
               <button
                 onClick={handleBulkActivate}
                 disabled={isPending}
-                className="text-sm text-teal-600 hover:text-teal-800 font-medium disabled:opacity-50"
+                className="text-sm text-black hover:text-blue-800 font-medium disabled:opacity-50"
               >
                 Activate
               </button>
@@ -178,7 +178,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
                   id="bulk-category"
                   onChange={(e) => handleBulkAssignCategory(e.target.value)}
                   disabled={isPending}
-                  className="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm disabled:opacity-50"
+                  className="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-800 focus:ring-[#0F52BA] sm:text-sm disabled:opacity-50"
                   defaultValue=""
                 >
                   <option value="">Choose a category...</option>

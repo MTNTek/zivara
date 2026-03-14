@@ -72,7 +72,7 @@ export default async function OrderSuccessPage({ params }: SuccessPageProps) {
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
             href={`/orders/${id}`}
-            className="flex-1 bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors text-center"
+            className="flex-1 bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors text-center"
           >
             View Order Details
           </Link>

@@ -24,7 +24,7 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
             className="group"
             aria-label={`View ${product.name}${isOutOfStock ? ' (Out of stock)' : ''}`}
           >
-            <article className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow border border-gray-200 overflow-hidden h-full flex flex-col">
+            <article className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
               {/* Product Image */}
               <div className="relative w-full h-64 bg-gray-100">
                 {product.images?.[0] ? (
@@ -32,7 +32,7 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
                     src={product.images[0].imageUrl}
                     alt={product.images[0].altText || product.name}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover"
                     loading="lazy"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
@@ -68,7 +68,7 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
 
               {/* Product Info */}
               <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-teal-600 transition-colors flex-1">
+                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 flex-1">
                   {product.name}
                 </h3>
                 
@@ -96,7 +96,7 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
                   <div>
                     {product.discountPrice ? (
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-teal-600" aria-label={`Sale price $${Number(product.discountPrice).toFixed(2)}`}>
+                        <span className="text-lg font-bold text-black" aria-label={`Sale price $${Number(product.discountPrice).toFixed(2)}`}>
                           ${Number(product.discountPrice).toFixed(2)}
                         </span>
                         <span className="text-sm text-gray-500 line-through" aria-label={`Original price $${Number(product.price).toFixed(2)}`}>

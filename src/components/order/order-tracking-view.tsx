@@ -131,9 +131,9 @@ export default function OrderTrackingView({ order }: { order: OrderData }) {
                   <div
                     className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full text-2xl ${
                       isCompleted
-                        ? 'bg-teal-600 text-white'
+                        ? 'bg-blue-800 text-white'
                         : 'bg-gray-200 text-gray-400'
-                    } ${isCurrent ? 'ring-4 ring-teal-100' : ''}`}
+                    } ${isCurrent ? 'ring-4 ring-blue-100' : ''}`}
                   >
                     {step.icon}
                   </div>
@@ -184,11 +184,11 @@ export default function OrderTrackingView({ order }: { order: OrderData }) {
 
       {/* Estimated Delivery */}
       {estimatedDelivery && order.status !== 'cancelled' && order.status !== 'delivered' && (
-        <div className="bg-teal-50 border border-teal-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-teal-900 mb-2">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">
             Estimated Delivery
           </h3>
-          <p className="text-teal-700">
+          <p className="text-blue-800">
             {estimatedDelivery.toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
@@ -269,7 +269,7 @@ export default function OrderTrackingView({ order }: { order: OrderData }) {
             </div>
             <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
               <span className="text-gray-900">Total:</span>
-              <span className="text-teal-600">
+              <span className="text-black">
                 ${parseFloat(order.total).toFixed(2)}
               </span>
             </div>

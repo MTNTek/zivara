@@ -97,7 +97,7 @@ export function ProductReviews({ productId, reviews, totalReviews, averageRating
         <div className="mt-6 text-center">
           <Link
             href={`/products/${productId}/reviews`}
-            className="text-teal-600 hover:text-teal-700 font-semibold"
+            className="text-black hover:text-blue-800 font-semibold"
           >
             View All {totalReviews} Reviews →
           </Link>

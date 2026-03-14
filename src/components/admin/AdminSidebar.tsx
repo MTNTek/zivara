@@ -94,7 +94,7 @@ export function AdminSidebar() {
           {/* Logo */}
           <div className="flex h-16 flex-shrink-0 items-center border-b border-gray-200 px-6">
             <Link href="/admin/dashboard" className="flex items-center">
-              <span className="text-2xl font-bold text-teal-600">Zivara</span>
+              <span className="text-2xl font-bold text-black">Zivara</span>
               <span className="ml-2 text-sm text-gray-500">Admin</span>
             </Link>
           </div>
@@ -110,14 +110,14 @@ export function AdminSidebar() {
                   className={clsx(
                     'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
                     isActive
-                      ? 'bg-teal-50 text-teal-600'
+                      ? 'bg-blue-50 text-black'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                   )}
                 >
                   <span
                     className={clsx(
                       'mr-3 flex-shrink-0',
-                      isActive ? 'text-teal-600' : 'text-gray-400 group-hover:text-gray-500'
+                      isActive ? 'text-black' : 'text-gray-400 group-hover:text-gray-500'
                     )}
                   >
                     {item.icon}

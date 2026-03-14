@@ -62,7 +62,7 @@ export function ProductCard({
   return (
     <Link
       href={`/products/${id}`}
-      className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+      className="group relative bg-white border border-gray-200 rounded-lg overflow-hidden"
     >
       {/* Discount Badge */}
       {discountPercentage > 0 && (
@@ -97,7 +97,7 @@ export function ProductCard({
             src={imageUrl}
             alt={name}
             fill
-            className="object-contain p-4 group-hover:scale-110 transition-transform duration-500"
+            className="object-contain p-4"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
           />
         ) : (
@@ -110,7 +110,7 @@ export function ProductCard({
       {/* Product Info */}
       <div className="p-4">
         {/* Product Name */}
-        <h3 className="text-sm text-gray-900 mb-2 line-clamp-2 group-hover:text-[#14B8A6] transition-colors min-h-[40px]">
+        <h3 className="text-sm text-gray-900 mb-2 line-clamp-2 min-h-[40px]">
           {name}
         </h3>
 

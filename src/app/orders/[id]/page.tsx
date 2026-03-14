@@ -51,7 +51,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
         {/* Header */}
         <div className="mb-8">
-          <Link href="/orders" className="text-teal-600 hover:text-teal-700 mb-4 inline-block">
+          <Link href="/orders" className="text-black hover:text-gray-700 mb-4 inline-block">
             ← Back to Orders
           </Link>
           <div className="flex items-center justify-between">

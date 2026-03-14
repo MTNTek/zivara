@@ -66,7 +66,7 @@ export function PasswordConfirmModal({
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 mb-3"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA] mb-3"
             placeholder="Enter your password"
             autoComplete="current-password"
           />
@@ -86,7 +86,7 @@ export function PasswordConfirmModal({
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm bg-teal-600 text-white rounded-md hover:bg-teal-700 disabled:opacity-50"
+              className="px-4 py-2 text-sm bg-blue-800 text-white rounded-md hover:bg-blue-900 disabled:opacity-50"
             >
               {loading ? 'Verifying...' : 'Confirm'}
             </button>
