@@ -20,7 +20,7 @@ export default function HomeLoading() {
       <div className="px-4 py-8">
         <div className="bg-white rounded-lg p-6 shadow-md">
           <div className="h-7 w-48 bg-gray-200 rounded mb-6" />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {[...Array(12)].map((_, i) => (
               <div key={i} className="space-y-2">
                 <div className="aspect-square bg-gray-200 rounded" />

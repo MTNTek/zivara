@@ -340,7 +340,7 @@ async function RelatedProductsSection({ productId, categoryId }: { productId: st
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
       <h2 className="text-lg font-bold text-[#0f1111] mb-4">Products related to this item</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {related.map((p) => (
           <Link key={p.id} href={`/products/${p.id}`} className="group">
             <div className="relative aspect-square bg-gray-50 rounded overflow-hidden mb-2">

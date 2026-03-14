@@ -29,7 +29,7 @@ export async function RelatedProducts({ productId, categoryId }: RelatedProducts
   return (
     <section className="bg-white rounded-lg shadow-sm p-6 mt-6">
       <h2 className="text-xl font-bold text-gray-900 mb-4">You Might Also Like</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {related.map((product) => (
           <Link
             key={product.id}
