@@ -20,7 +20,7 @@ export default async function AdminLayout({
       <div className="lg:pl-64">
         <AdminHeader />
         <main className="py-6">
-          <div className="mx-auto max-w-[1536px] px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8">
             {children}
           </div>
         </main>

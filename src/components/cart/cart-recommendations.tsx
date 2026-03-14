@@ -16,8 +16,8 @@ export async function CartRecommendations({ excludeIds }: CartRecommendationsPro
 
   return (
     <div className="mt-12">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">You Might Also Like</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <h2 className="text-[21px] font-bold text-[#0f1111] mb-4">You Might Also Like</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-x-3 gap-y-5">
         {recommended.map((product) => (
           <ProductCard
             key={product.id}

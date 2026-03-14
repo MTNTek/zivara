@@ -3,7 +3,7 @@ import { Skeleton, TableSkeleton } from '@/components/ui/skeleton';
 export default function AdminProductsLoading() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Skeleton */}
         <div className="mb-8">
           <div className="flex items-center justify-between">

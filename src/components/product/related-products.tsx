@@ -28,47 +28,44 @@ export async function RelatedProducts({ productId, categoryId }: RelatedProducts
 
   return (
     <section className="bg-white rounded-lg shadow-sm p-6 mt-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">You Might Also Like</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {related.map((product) => (
-          <Link
-            key={product.id}
-            href={`/products/${product.id}`}
-            className="group"
-          >
-            <div className="relative aspect-square bg-gray-50 rounded-lg overflow-hidden mb-2">
-              {product.images?.[0] ? (
-                <Image
-                  src={product.images[0].imageUrl}
-                  alt={product.name}
-                  fill
-                  className="object-contain p-2 group-hover:scale-105 transition-transform"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-400 text-xs">No Image</div>
-              )}
-            </div>
-            <p className="text-sm text-gray-900 line-clamp-2 group-hover:text-black transition-colors min-h-[40px]">
-              {product.name}
-            </p>
-            <div className="mt-1">
-              {product.discountPrice ? (
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-bold text-red-600">${Number(product.discountPrice).toFixed(2)}</span>
-                  <span className="text-xs text-gray-500 line-through">${Number(product.price).toFixed(2)}</span>
-                </div>
-              ) : (
-                <span className="text-sm font-bold text-gray-900">${Number(product.price).toFixed(2)}</span>
-              )}
-            </div>
-            {product.inventory && (
-              <p className={`text-xs mt-1 ${product.inventory.quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {product.inventory.quantity > 0 ? 'In Stock' : 'Out of Stock'}
+      <h2 className="text-[21px] font-bold text-[#0f1111] mb-4">You Might Also Like</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-x-3 gap-y-5">
+        {related.map((product) => {
+          const displayPrice = product.discountPrice || product.price;
+          const dollars = Math.floor(Number(displayPrice));
+          const cents = Math.round((Number(displayPrice) - dollars) * 100).toString().padStart(2, '0');
+
+          return (
+            <Link key={product.id} href={`/products/${product.id}`} className="group">
+              <div className="relative aspect-square bg-white overflow-hidden mb-1">
+                {product.images?.[0] ? (
+                  <Image
+                    src={product.images[0].imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-contain p-3"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-300 text-xs">No Image</div>
+                )}
+              </div>
+              <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#c7511f] transition-colors min-h-[36px]">
+                {product.name}
               </p>
-            )}
-          </Link>
-        ))}
+              <span className="text-[#0F1111]">
+                <sup className="text-[11px] font-medium" style={{ top: '-0.5em' }}>$</sup>
+                <span className="text-[21px] font-light">{dollars}</span>
+                <sup className="text-[11px] font-medium" style={{ top: '-0.5em' }}>{cents}</sup>
+              </span>
+              {product.inventory && (
+                <p className={`text-[12px] mt-0.5 ${product.inventory.quantity > 0 ? 'text-[#007600]' : 'text-red-600'}`}>
+                  {product.inventory.quantity > 0 ? 'In Stock' : 'Currently unavailable'}
+                </p>
+              )}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

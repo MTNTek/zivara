@@ -7,7 +7,6 @@ import { HeroCarousel } from '@/components/home/hero-carousel';
 import { CategoryCardsGrid } from '@/components/home/category-cards';
 import { ProductRow } from '@/components/home/product-row';
 import { SignInCard } from '@/components/home/sign-in-card';
-
 import { CategoryStrip } from '@/components/home/category-strip';
 
 export default async function HomePage() {
@@ -23,17 +22,14 @@ export default async function HomePage() {
     getWishlistProductIds(),
   ]);
 
-  // Products with active discounts
   const dealProducts = allProducts
     .filter((p) => p.discountPrice && Number(p.discountPrice) < Number(p.price))
     .slice(0, 12);
 
-  // Top rated products
   const topRated = [...allProducts]
     .sort((a, b) => Number(b.averageRating || 0) - Number(a.averageRating || 0))
     .slice(0, 12);
 
-  // Budget picks under $50
   const budgetPicks = allProducts
     .filter((p) => Number(p.discountPrice || p.price) < 50)
     .slice(0, 12);
@@ -49,70 +45,46 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#e3e6e6]">
-      {/* Hero Carousel */}
+    <div className="min-h-screen bg-[#EAEDED]">
       <HeroCarousel />
 
-      {/* Category Strip — 6 circular icons */}
       <div className="relative z-10 -mt-10 sm:-mt-16">
         <CategoryStrip categories={categories} />
       </div>
 
-      {/* Category Cards */}
-      <div className="px-6 sm:px-10 lg:px-16 mt-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+      {/* Category Cards — Amazon 4-col grid */}
+      <div className="max-w-[1500px] mx-auto px-[15px] sm:px-[20px] mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[14px]">
           <CategoryCardsGrid categories={categories} />
         </div>
       </div>
 
-      {/* Main content area */}
-      <div className="px-6 sm:px-10 lg:px-16 mt-4 space-y-4 pb-8">
-
-        {/* Sign-in card for mobile (hidden on lg) */}
+      {/* Main content */}
+      <div className="max-w-[1500px] mx-auto px-[15px] sm:px-[20px] mt-[14px] space-y-[14px] pb-8">
         <div className="lg:hidden">
           <SignInCard />
         </div>
 
-        {/* Today's Deals — horizontal scroll */}
         {dealProducts.length > 0 && (
-          <ProductRow
-            title="Today's Deals"
-            products={dealProducts.map(toRowItem)}
-            seeMoreHref="/products?sortBy=price_asc"
-          />
+          <ProductRow title="Today&apos;s Deals" products={dealProducts.map(toRowItem)} seeMoreHref="/products?sortBy=price_asc" />
         )}
 
-        {/* Top Rated */}
-        <ProductRow
-          title="Top Rated Products"
-          products={topRated.map(toRowItem)}
-          seeMoreHref="/products?sortBy=rating"
-        />
+        <ProductRow title="Top Rated Products" products={topRated.map(toRowItem)} seeMoreHref="/products?sortBy=rating" />
 
-        {/* Budget Picks */}
         {budgetPicks.length > 0 && (
-          <ProductRow
-            title="Under $50"
-            products={budgetPicks.map(toRowItem)}
-            seeMoreHref="/products?sortBy=price_asc"
-          />
+          <ProductRow title="Under $50" products={budgetPicks.map(toRowItem)} seeMoreHref="/products?sortBy=price_asc" />
         )}
 
         {/* Featured Products Grid */}
         <div className="bg-white p-5">
-          <div className="flex items-baseline justify-between mb-4">
-            <h2 className="text-xl font-bold text-[#0f1111]">
-              Featured Products
-            </h2>
-            <Link
-              href="/products"
-              className="text-sm text-[#007185] hover:text-[#c7511f] hover:underline"
-            >
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-[21px] font-bold text-[#0f1111]">Featured Products</h2>
+            <Link href="/products" className="text-[13px] text-[#007185] hover:text-[#c7511f] hover:underline">
               Shop all products
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {featuredProducts.slice(0, 12).map((product) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-5">
+            {featuredProducts.slice(0, 10).map((product) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
@@ -129,54 +101,27 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Promotional Banners */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            href="/products"
-            className="bg-white p-5 hover:shadow-md transition-shadow"
-          >
-            <h3 className="text-lg font-bold text-[#0f1111] mb-1">
-              Free Shipping
-            </h3>
-            <p className="text-sm text-gray-600 mb-3">
-              On orders over $50
-            </p>
-            <span className="text-sm text-[#007185] hover:text-[#c7511f]">
-              Shop now
-            </span>
+        {/* Promo banners */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-[14px]">
+          <Link href="/products" className="bg-white p-5 hover:shadow-sm transition-shadow">
+            <h3 className="text-[16px] font-bold text-[#0f1111] mb-1">Free Shipping</h3>
+            <p className="text-[13px] text-[#565959] mb-2">On orders over $50</p>
+            <span className="text-[13px] text-[#007185] hover:text-[#c7511f]">Shop now</span>
           </Link>
-          <Link
-            href="/products?sortBy=newest"
-            className="bg-white p-5 hover:shadow-md transition-shadow"
-          >
-            <h3 className="text-lg font-bold text-[#0f1111] mb-1">
-              New Arrivals
-            </h3>
-            <p className="text-sm text-gray-600 mb-3">
-              Check out the latest products
-            </p>
-            <span className="text-sm text-[#007185] hover:text-[#c7511f]">
-              Explore
-            </span>
+          <Link href="/products?sortBy=newest" className="bg-white p-5 hover:shadow-sm transition-shadow">
+            <h3 className="text-[16px] font-bold text-[#0f1111] mb-1">New Arrivals</h3>
+            <p className="text-[13px] text-[#565959] mb-2">Check out the latest products</p>
+            <span className="text-[13px] text-[#007185] hover:text-[#c7511f]">Explore</span>
           </Link>
-          <Link
-            href="/products?sortBy=rating"
-            className="bg-white p-5 hover:shadow-md transition-shadow"
-          >
-            <h3 className="text-lg font-bold text-[#0f1111] mb-1">
-              Best Sellers
-            </h3>
-            <p className="text-sm text-gray-600 mb-3">
-              Most popular items this week
-            </p>
-            <span className="text-sm text-[#007185] hover:text-[#c7511f]">
-              View all
-            </span>
+          <Link href="/products?sortBy=rating" className="bg-white p-5 hover:shadow-sm transition-shadow">
+            <h3 className="text-[16px] font-bold text-[#0f1111] mb-1">Best Sellers</h3>
+            <p className="text-[13px] text-[#565959] mb-2">Most popular items this week</p>
+            <span className="text-[13px] text-[#007185] hover:text-[#c7511f]">View all</span>
           </Link>
         </div>
 
-        {/* More Category Cards — second row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* More categories */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[14px]">
           <CategoryCardsGrid
             categories={categories.filter(
               (c) => !['electronics', 'fashion', 'home-kitchen', 'beauty-health'].includes(c.slug)
@@ -184,7 +129,6 @@ export default async function HomePage() {
           />
         </div>
 
-        {/* Recently Viewed */}
         <div className="bg-white p-5">
           <RecentlyViewed />
         </div>

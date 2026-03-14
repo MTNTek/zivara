@@ -340,20 +340,29 @@ async function RelatedProductsSection({ productId, categoryId }: { productId: st
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
       <h2 className="text-lg font-bold text-[#0f1111] mb-4">Products related to this item</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {related.map((p) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-x-3 gap-y-5">
+        {related.map((p) => {
+          const dp = p.discountPrice || p.price;
+          const d = Math.floor(Number(dp));
+          const c = Math.round((Number(dp) - d) * 100).toString().padStart(2, '0');
+          return (
           <Link key={p.id} href={`/products/${p.id}`} className="group">
-            <div className="relative aspect-square bg-gray-50 rounded overflow-hidden mb-2">
+            <div className="relative aspect-square bg-white rounded overflow-hidden mb-1">
               {p.images?.[0] ? (
-                <Image src={p.images[0].imageUrl} alt={p.name} fill className="object-contain p-2 group-hover:scale-105 transition-transform" sizes="(max-width: 640px) 50vw, 16vw" />
+                <Image src={p.images[0].imageUrl} alt={p.name} fill className="object-contain p-3" sizes="(max-width: 640px) 50vw, 16vw" />
               ) : (
-                <div className="flex items-center justify-center h-full text-gray-400 text-xs">No Image</div>
+                <div className="flex items-center justify-center h-full text-gray-300 text-xs">No Image</div>
               )}
             </div>
-            <p className="text-xs text-[#0f1111] line-clamp-2 group-hover:text-[#c7511f] transition-colors">{p.name}</p>
-            <span className="text-sm font-medium text-[#0f1111]">${Number(p.discountPrice || p.price).toFixed(2)}</span>
+            <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#c7511f] transition-colors">{p.name}</p>
+            <span className="text-[#0F1111]">
+              <sup className="text-[11px] font-medium" style={{ top: '-0.5em' }}>$</sup>
+              <span className="text-[21px] font-light">{d}</span>
+              <sup className="text-[11px] font-medium" style={{ top: '-0.5em' }}>{c}</sup>
+            </span>
           </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
