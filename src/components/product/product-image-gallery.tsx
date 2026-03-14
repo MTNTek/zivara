@@ -13,6 +13,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+  const [showFullscreen, setShowFullscreen] = useState(false);
 
   const goToPrev = useCallback(() => {
     if (images && images.length > 1) {
@@ -28,21 +29,20 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (showFullscreen && e.key === 'Escape') setShowFullscreen(false);
       if (e.key === 'ArrowLeft') goToPrev();
       if (e.key === 'ArrowRight') goToNext();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goToPrev, goToNext]);
+  }, [goToPrev, goToNext, showFullscreen]);
 
   if (!images || images.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-8">
-        <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-          <svg className="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
+      <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+        <svg className="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
       </div>
     );
   }
@@ -57,73 +57,172 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 group">
-      {/* Main Image with Zoom */}
-      <div
-        className="aspect-square relative bg-gray-100 rounded-lg overflow-hidden mb-4 cursor-zoom-in"
-        onMouseEnter={() => setIsZoomed(true)}
-        onMouseLeave={() => setIsZoomed(false)}
-        onMouseMove={handleMouseMove}
-      >
-        <Image
-          src={selectedImage.imageUrl}
-          alt={selectedImage.altText || productName}
-          fill
-          className={`object-contain transition-transform duration-200 ${isZoomed ? 'scale-[2]' : 'scale-100'}`}
-          style={isZoomed ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` } : undefined}
-          priority
-          sizes="(max-width: 1024px) 100vw, 50vw"
-        />
-        {/* Navigation Arrows */}
-        {images.length > 1 && (
-          <>
-            <button
-              onClick={(e) => { e.stopPropagation(); goToPrev(); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
-              aria-label="Previous image"
-            >
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); goToNext(); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
-              aria-label="Next image"
-            >
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </>
-        )}
-      </div>
-
-      {/* Thumbnail Grid */}
-      {images.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
+    <>
+      <div className="flex gap-3">
+        {/* Left: Vertical thumbnail strip */}
+        <div className="flex flex-col gap-2 w-[60px] flex-shrink-0">
           {images.map((image, index) => (
             <button
               key={image.id}
+              onMouseEnter={() => setSelectedIndex(index)}
               onClick={() => setSelectedIndex(index)}
-              className={`aspect-square relative bg-gray-100 rounded-lg overflow-hidden border-2 transition-colors ${
+              className={`w-[60px] h-[60px] relative bg-gray-50 rounded border-2 overflow-hidden transition-colors flex-shrink-0 ${
                 index === selectedIndex
-                  ? 'border-teal-600'
-                  : 'border-transparent hover:border-gray-300'
+                  ? 'border-[#007185] shadow-sm'
+                  : 'border-gray-200 hover:border-[#007185]'
               }`}
             >
               <Image
                 src={image.thumbnailUrl || image.imageUrl}
                 alt={image.altText || `${productName} - Image ${index + 1}`}
                 fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 25vw, 12.5vw"
+                className="object-contain p-1"
+                sizes="60px"
               />
             </button>
           ))}
         </div>
+
+        {/* Right: Main image */}
+        <div className="flex-1 relative group">
+          <div
+            className="aspect-square relative bg-white rounded overflow-hidden cursor-crosshair"
+            onMouseEnter={() => setIsZoomed(true)}
+            onMouseLeave={() => setIsZoomed(false)}
+            onMouseMove={handleMouseMove}
+          >
+            <Image
+              src={selectedImage.imageUrl}
+              alt={selectedImage.altText || productName}
+              fill
+              className={`object-contain transition-transform duration-200 ${isZoomed ? 'scale-[2.5]' : 'scale-100'}`}
+              style={isZoomed ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` } : undefined}
+              priority
+              sizes="(max-width: 1024px) 100vw, 40vw"
+            />
+
+            {/* Navigation arrows */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+                  className="absolute left-1 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  aria-label="Previous image"
+                >
+                  <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  aria-label="Next image"
+                >
+                  <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* View full image link */}
+          <button
+            onClick={() => setShowFullscreen(true)}
+            className="mt-2 text-xs text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-1"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+            </svg>
+            Click to open expanded view
+          </button>
+        </div>
+      </div>
+
+      {/* Fullscreen lightbox */}
+      {showFullscreen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setShowFullscreen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setShowFullscreen(false)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 z-50"
+            aria-label="Close fullscreen view"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Fullscreen image */}
+          <div
+            className="relative w-[90vw] h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={selectedImage.imageUrl}
+              alt={selectedImage.altText || productName}
+              fill
+              className="object-contain"
+              sizes="90vw"
+            />
+          </div>
+
+          {/* Prev / Next */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); goToPrev(); }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+                aria-label="Previous image"
+              >
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); goToNext(); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+                aria-label="Next image"
+              >
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Bottom thumbnails in fullscreen */}
+          {images.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2" onClick={(e) => e.stopPropagation()}>
+              {images.map((image, index) => (
+                <button
+                  key={image.id}
+                  onClick={() => setSelectedIndex(index)}
+                  className={`w-14 h-14 relative rounded overflow-hidden border-2 transition-colors ${
+                    index === selectedIndex ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <Image
+                    src={image.thumbnailUrl || image.imageUrl}
+                    alt={image.altText || `${productName} - Image ${index + 1}`}
+                    fill
+                    className="object-contain bg-white p-0.5"
+                    sizes="56px"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Image counter */}
+          <div className="absolute top-4 left-4 text-white text-sm">
+            {selectedIndex + 1} / {images.length}
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 }
-
