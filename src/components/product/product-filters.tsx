@@ -160,7 +160,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
               />
               <span className="ml-3 text-sm text-gray-700 flex items-center">
                 {[...Array(rating)].map((_, i) => (
-                  <span key={i} className="text-yellow-400">★</span>
+                  <span key={i} className="text-[#14B8A6]">★</span>
                 ))}
                 <span className="ml-1">& up</span>
               </span>

@@ -103,7 +103,7 @@ export default async function AdminReviewsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <span className="text-yellow-400 mr-1">★</span>
+                      <span className="text-[#14B8A6] mr-1">★</span>
                       <span className="text-sm font-medium text-gray-900">{review.rating}</span>
                     </div>
                   </td>

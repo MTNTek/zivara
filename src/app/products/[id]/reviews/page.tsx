@@ -62,7 +62,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
             <div className="flex items-center gap-3">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className={i < Math.round(avgRating) ? 'text-yellow-400 text-xl' : 'text-gray-300 text-xl'}>
+                  <span key={i} className={i < Math.round(avgRating) ? 'text-[#14B8A6] text-xl' : 'text-gray-300 text-xl'}>
                     ★
                   </span>
                 ))}
@@ -111,7 +111,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
                     <div className="flex items-center gap-2">
                       <div className="flex">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < review.rating ? 'text-yellow-400' : 'text-gray-300'}>
+                          <span key={i} className={i < review.rating ? 'text-[#14B8A6]' : 'text-gray-300'}>
                             ★
                           </span>
                         ))}

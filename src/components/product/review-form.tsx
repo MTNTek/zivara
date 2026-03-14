@@ -70,7 +70,7 @@ export function ReviewForm({ productId }: ReviewFormProps) {
               onMouseLeave={() => setHoveredRating(0)}
               onClick={() => setRating(star)}
             >
-              <span className={star <= (hoveredRating || rating) ? 'text-yellow-400' : 'text-gray-300'}>
+              <span className={star <= (hoveredRating || rating) ? 'text-[#14B8A6]' : 'text-gray-300'}>
                 ★
               </span>
             </button>

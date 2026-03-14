@@ -79,7 +79,7 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
                       {[...Array(5)].map((_, i) => (
                         <span
                           key={i}
-                          className={i < Math.round(Number(product.averageRating)) ? 'text-yellow-400' : 'text-gray-300'}
+                          className={i < Math.round(Number(product.averageRating)) ? 'text-[#14B8A6]' : 'text-gray-300'}
                         >
                           ★
                         </span>
