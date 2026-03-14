@@ -187,5 +187,12 @@ textarea:focus {
 /* Force blue accent color on radio buttons and checkboxes */
 input[type="radio"],
 input[type="checkbox"] {
-  accent-color: #1e40af;
+  accent-color: #1e40af !important;
+  color: #1e40af !important;
+}
+input[type="radio"]:checked,
+input[type="checkbox"]:checked {
+  accent-color: #1e40af !important;
+  background-color: #1e40af !important;
+  border-color: #1e40af !important;
 }
