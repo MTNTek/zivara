@@ -177,7 +177,7 @@ function LoginForm() {
                 <input
                   id="remember"
                   type="checkbox"
-                  className="w-4 h-4 text-black focus:ring-[#0F52BA] focus:ring-2 focus:ring-offset-2 border-gray-300 rounded"
+                  className="w-4 h-4 accent-blue-800 focus:ring-[#0F52BA] focus:ring-2 focus:ring-offset-2 border-gray-300 rounded"
                 />
                 <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
                   Remember me

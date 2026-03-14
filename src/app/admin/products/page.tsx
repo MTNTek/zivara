@@ -71,7 +71,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     <input
                       type="checkbox"
                       id="select-all"
-                      className="rounded border-gray-300 text-black focus:ring-[#0F52BA]"
+                      className="rounded border-gray-300 accent-blue-800 focus:ring-[#0F52BA]"
                     />
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -131,7 +131,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                           <input
                             type="checkbox"
                             data-product-id={product.id}
-                            className="product-checkbox rounded border-gray-300 text-black focus:ring-[#0F52BA]"
+                            className="product-checkbox rounded border-gray-300 accent-blue-800 focus:ring-[#0F52BA]"
                           />
                         </td>
                         <td className="px-6 py-4">

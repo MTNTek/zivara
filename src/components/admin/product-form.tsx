@@ -494,7 +494,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             id="isActive"
             checked={formData.isActive}
             onChange={(e) => handleChange('isActive', e.target.checked)}
-            className="h-4 w-4 text-black focus:ring-[#0F52BA] border-gray-300 rounded"
+            className="h-4 w-4 accent-blue-800 focus:ring-[#0F52BA] border-gray-300 rounded"
           />
           <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
             Product is active and visible to customers

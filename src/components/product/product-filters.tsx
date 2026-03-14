@@ -96,7 +96,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
               name="category"
               checked={!currentFilters.categoryId}
               onChange={() => updateFilter('categoryId', null)}
-              className="w-5 h-5 text-black focus:ring-[#0F52BA]"
+              className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
               disabled={isPending}
             />
             <span className="ml-3 text-sm text-gray-700">All Categories</span>
@@ -108,7 +108,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
                 name="category"
                 checked={currentFilters.categoryId === category.id}
                 onChange={() => updateFilter('categoryId', category.id)}
-                className="w-5 h-5 text-black focus:ring-[#0F52BA]"
+                className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
                 disabled={isPending}
               />
               <span className="ml-3 text-sm text-gray-700">{category.name}</span>
@@ -155,7 +155,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
                 name="rating"
                 checked={currentFilters.minRating === rating}
                 onChange={() => updateFilter('minRating', rating.toString())}
-                className="w-5 h-5 text-black focus:ring-[#0F52BA]"
+                className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
                 disabled={isPending}
               />
               <span className="ml-3 text-sm text-gray-700 flex items-center">
@@ -172,7 +172,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
               name="rating"
               checked={!currentFilters.minRating}
               onChange={() => updateFilter('minRating', null)}
-              className="w-5 h-5 text-black focus:ring-[#0F52BA]"
+              className="w-5 h-5 accent-blue-800 focus:ring-[#0F52BA]"
               disabled={isPending}
             />
             <span className="ml-3 text-sm text-gray-700">All Ratings</span>
