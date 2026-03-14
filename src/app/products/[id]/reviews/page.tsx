@@ -148,7 +148,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
             {page > 1 && (
               <Link
                 href={`/products/${id}/reviews?page=${page - 1}&sort=${sortBy}`}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-black hover:bg-gray-50"
               >
                 Previous
               </Link>
@@ -160,7 +160,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
                 className={`px-4 py-2 rounded-lg text-sm ${
                   p === page
                     ? 'bg-blue-800 text-white'
-                    : 'bg-white border border-gray-300 hover:bg-gray-50'
+                    : 'bg-white border border-gray-300 hover:bg-gray-50 text-black'
                 }`}
               >
                 {p}
@@ -169,7 +169,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
             {page < pagination.totalPages && (
               <Link
                 href={`/products/${id}/reviews?page=${page + 1}&sort=${sortBy}`}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-black hover:bg-gray-50"
               >
                 Next
               </Link>

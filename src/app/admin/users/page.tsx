@@ -191,7 +191,7 @@ export default async function AdminUsersPage({
                 {page > 1 && (
                   <Link
                     href={`/admin/users?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-black bg-white hover:bg-gray-50"
                   >
                     Previous
                   </Link>
@@ -199,7 +199,7 @@ export default async function AdminUsersPage({
                 {page < pagination.totalPages && (
                   <Link
                     href={`/admin/users?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-black bg-white hover:bg-gray-50"
                   >
                     Next
                   </Link>
@@ -218,7 +218,7 @@ export default async function AdminUsersPage({
                     {page > 1 && (
                       <Link
                         href={`/admin/users?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-black hover:bg-gray-50"
                       >
                         <span className="sr-only">Previous</span>
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -250,7 +250,7 @@ export default async function AdminUsersPage({
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                             page === pageNum
                               ? 'z-10 bg-blue-50 border-blue-800 text-black'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              : 'bg-white border-gray-300 text-black hover:bg-gray-50'
                           }`}
                         >
                           {pageNum}
@@ -261,7 +261,7 @@ export default async function AdminUsersPage({
                     {page < pagination.totalPages && (
                       <Link
                         href={`/admin/users?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-black hover:bg-gray-50"
                       >
                         <span className="sr-only">Next</span>
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
