@@ -33,6 +33,11 @@ body {
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
+/* Expand container width */
+.container {
+  max-width: 1536px !important;
+}
+
 /* Ensure proper touch target sizes on mobile */
 @media (max-width: 767px) {
   button,
