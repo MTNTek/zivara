@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, useCallback } from 'react';
+import { useSyncExternalStore, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -38,12 +38,20 @@ function getServerSnapshot(): RecentProduct[] {
 }
 
 export function RecentlyViewed({ excludeId }: { excludeId?: string }) {
+  const cachedRef = useRef<{ raw: string | null; result: RecentProduct[] }>({ raw: null, result: emptyArray });
+
   const getSnapshot = useCallback(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return emptyArray;
+      if (raw === cachedRef.current.raw) return cachedRef.current.result;
+      if (!raw) {
+        cachedRef.current = { raw, result: emptyArray };
+        return emptyArray;
+      }
       const stored = JSON.parse(raw) as RecentProduct[];
-      return excludeId ? stored.filter((p) => p.id !== excludeId) : stored;
+      const result = excludeId ? stored.filter((p) => p.id !== excludeId) : stored;
+      cachedRef.current = { raw, result };
+      return result;
     } catch {
       return emptyArray;
     }
