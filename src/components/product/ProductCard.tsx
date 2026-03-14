@@ -170,41 +170,15 @@ export function ProductCard({
         <button
           onClick={handleAddToCart}
           disabled={isPending || !stock || stock <= 0}
-          className={`w-full py-2 px-4 rounded font-medium transition-all duration-300 ${
+          className={`w-full py-1.5 px-3 rounded-full text-sm font-medium transition-all duration-300 ${
             isPending
-              ? 'bg-gray-400 cursor-wait'
+              ? 'bg-gray-400 cursor-wait text-white'
               : stock && stock > 0
-              ? 'bg-[#14B8A6] hover:bg-[#0d9488] text-white'
+              ? 'bg-[#2563eb] hover:bg-[#1d4ed8] text-white'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           } ${isPending ? 'animate-pulse' : ''}`}
         >
-          {isPending ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              Adding...
-            </span>
-          ) : showSuccess ? (
-            '✓ Added to Cart'
-          ) : stock && stock > 0 ? (
-            'Add to Cart'
-          ) : (
-            'Out of Stock'
-          )}
+          {isPending ? 'Adding...' : showSuccess ? '✓ Added' : stock && stock > 0 ? 'Add to Cart' : 'Out of Stock'}
         </button>
       </div>
     </Link>

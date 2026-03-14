@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react';
 import { addToCart } from '@/features/cart/actions';
-import { useRouter } from 'next/navigation';
 import { ButtonSpinner } from '@/components/ui/spinner';
 import { toast } from '@/lib/toast';
 
@@ -13,7 +12,6 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCartButtonProps) {
-  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -30,22 +28,6 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
         setSuccess(true);
         toast.success('Added to cart', `${quantity} item${quantity > 1 ? 's' : ''} added successfully`);
         setTimeout(() => setSuccess(false), 3000);
-      } else {
-        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to add to cart';
-        setError(errorMsg);
-        toast.error('Could not add to cart', errorMsg);
-      }
-    });
-  };
-
-  const handleBuyNow = async () => {
-    setError(null);
-
-    startTransition(async () => {
-      const result = await addToCart({ productId, quantity });
-      
-      if (result.success) {
-        router.push('/cart');
       } else {
         const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to add to cart';
         setError(errorMsg);
@@ -125,27 +107,16 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <button
-          onClick={handleAddToCart}
-          disabled={isPending}
-          className="flex-1 bg-teal-600 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-          aria-label={isPending ? 'Adding to cart' : 'Add to cart'}
-        >
-          {isPending && <ButtonSpinner />}
-          {isPending ? 'Adding...' : 'Add to Cart'}
-        </button>
-        <button
-          onClick={handleBuyNow}
-          disabled={isPending}
-          className="flex-1 bg-gray-900 text-white px-6 py-3 min-h-[44px] rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2"
-          aria-label={isPending ? 'Processing purchase' : 'Buy now'}
-        >
-          {isPending && <ButtonSpinner />}
-          {isPending ? 'Processing...' : 'Buy Now'}
-        </button>
-      </div>
+      {/* Add to Cart Button */}
+      <button
+        onClick={handleAddToCart}
+        disabled={isPending}
+        className="w-full bg-[#2563eb] text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-[#1d4ed8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        aria-label={isPending ? 'Adding to cart' : 'Add to cart'}
+      >
+        {isPending && <ButtonSpinner />}
+        {isPending ? 'Adding...' : 'Add to Cart'}
+      </button>
     </div>
   );
 }
