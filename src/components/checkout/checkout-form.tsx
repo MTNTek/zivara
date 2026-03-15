@@ -31,9 +31,6 @@ export function CheckoutForm({ cartItems, subtotal, tax, shipping, total }: Chec
     state: '',
     postalCode: '',
     country: 'United States',
-    cardNumber: '',
-    cardExpiry: '',
-    cardCvc: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,54 +247,16 @@ export function CheckoutForm({ cartItems, subtotal, tax, shipping, total }: Chec
       {/* Payment Information */}
       <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Information</h2>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-2">
-              Card Number
-            </label>
-            <input
-              type="text"
-              id="cardNumber"
-              name="cardNumber"
-              required
-              value={formData.cardNumber}
-              onChange={handleChange}
-              placeholder="1234 5678 9012 3456"
-              className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
-            />
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span className="font-medium text-blue-900">Secure Payment</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="cardExpiry" className="block text-sm font-medium text-gray-700 mb-2">
-                Expiry Date
-              </label>
-              <input
-                type="text"
-                id="cardExpiry"
-                name="cardExpiry"
-                required
-                value={formData.cardExpiry}
-                onChange={handleChange}
-                placeholder="MM/YY"
-                className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
-              />
-            </div>
-            <div>
-              <label htmlFor="cardCvc" className="block text-sm font-medium text-gray-700 mb-2">
-                CVC
-              </label>
-              <input
-                type="text"
-                id="cardCvc"
-                name="cardCvc"
-                required
-                value={formData.cardCvc}
-                onChange={handleChange}
-                placeholder="123"
-                className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
-              />
-            </div>
-          </div>
+          <p className="text-sm text-blue-800">
+            Payment will be processed securely. Your order will be confirmed upon successful payment.
+          </p>
         </div>
       </div>
 

@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import { addToCart } from '@/features/cart/actions';
+import { toast } from '@/lib/toast';
 
 interface ProductCardProps {
   id: string;
@@ -34,13 +36,19 @@ export function ProductCard({
     
     setIsAdding(true);
     
-    // Simulate add to cart
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    setIsAdding(false);
-    setShowSuccess(true);
-    
-    setTimeout(() => setShowSuccess(false), 2000);
+    try {
+      const result = await addToCart({ productId: id, quantity: 1 });
+      if (result.success) {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+      } else {
+        toast.error('Could not add to cart', result.error?.message || 'Something went wrong');
+      }
+    } catch (err: any) {
+      toast.error('Could not add to cart', err?.message || 'Please sign in first');
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const discountPercentage = discountPrice

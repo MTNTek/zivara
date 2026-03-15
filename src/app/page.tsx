@@ -36,10 +36,10 @@ export default async function HomePage() {
       <section className="w-full px-4 -mt-16 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { name: 'Electronics', icon: '💻', href: '/products?category=electronics' },
-            { name: 'Fashion', icon: '👕', href: '/products?category=fashion' },
-            { name: 'Home & Kitchen', icon: '🏠', href: '/products?category=home' },
-            { name: 'Books', icon: '📚', href: '/products?category=books' },
+            { name: 'Electronics', icon: '💻', href: '/products/category/electronics' },
+            { name: 'Fashion', icon: '👕', href: '/products/category/mens-fashion' },
+            { name: 'Home & Kitchen', icon: '🏠', href: '/products/category/home-kitchen' },
+            { name: 'Books', icon: '📚', href: '/products/category/books' },
           ].map((category) => (
             <Link
               key={category.name}
