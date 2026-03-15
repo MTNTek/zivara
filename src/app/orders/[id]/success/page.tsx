@@ -23,7 +23,7 @@ export default async function OrderSuccessPage({ params }: SuccessPageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-12 max-w-2xl">
+      <div className="px-4 sm:px-6 lg:px-10 py-12 max-w-2xl">
         {/* Success Icon */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">

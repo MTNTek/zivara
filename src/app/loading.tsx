@@ -5,7 +5,7 @@ export default function HomeLoading() {
       <div className="h-[400px] bg-gray-200" />
 
       {/* Category cards skeleton */}
-      <div className="max-w-[1500px] mx-auto px-[15px] -mt-16 relative z-10">
+      <div className="px-4 sm:px-6 lg:px-10 -mt-16 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-[14px]">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="bg-white p-6">
@@ -21,7 +21,7 @@ export default function HomeLoading() {
       </div>
 
       {/* Product row skeleton */}
-      <div className="max-w-[1500px] mx-auto px-[15px] mt-[14px]">
+      <div className="px-4 sm:px-6 lg:px-10 mt-[14px]">
         <div className="bg-white p-5">
           <div className="h-6 w-48 bg-gray-200 rounded mb-4" />
           <div className="flex gap-2">

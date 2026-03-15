@@ -63,7 +63,7 @@ export function OrderListSkeleton({ count = 5 }: { count?: number }) {
 
 export function ProductDetailSkeleton() {
   return (
-    <div className="max-w-[1500px] mx-auto px-4 py-8">
+    <div className="px-4 sm:px-6 lg:px-10 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-4">
           <Skeleton className="w-full h-96" />

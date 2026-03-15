@@ -1,7 +1,7 @@
 export default function ProductDetailLoading() {
   return (
     <div className="min-h-screen bg-white animate-pulse">
-      <div className="container mx-auto px-4 py-8">
+      <div className="px-4 sm:px-6 lg:px-10 py-8">
         {/* Breadcrumbs skeleton */}
         <div className="mb-6 flex gap-2">
           <div className="h-4 w-12 bg-gray-200 rounded" />

@@ -43,7 +43,7 @@ export async function RelatedProducts({ productId, categoryId }: RelatedProducts
                     src={product.images[0].imageUrl}
                     alt={product.name}
                     fill
-                    className="object-contain p-3"
+                    className="object-cover"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                   />
                 ) : (

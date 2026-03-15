@@ -16,7 +16,7 @@ export function Footer() {
 
       {/* Main Footer Content */}
       <div className="bg-white">
-        <div className="container mx-auto px-4 py-12">
+        <div className="px-4 sm:px-6 lg:px-10 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Get to Know Us */}
             <div>
@@ -114,7 +114,7 @@ export function Footer() {
 
       {/* Bottom Footer */}
       <div className="bg-gray-50 border-t border-gray-200">
-        <div className="container mx-auto px-4 py-6">
+        <div className="px-4 sm:px-6 lg:px-10 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <Logo variant="dark" size="sm" />
             

@@ -1,7 +1,7 @@
 export default function ReviewsLoading() {
   return (
     <div className="min-h-screen bg-gray-50 animate-pulse">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-4xl">
         <div className="mb-6 flex gap-2">
           <div className="h-4 w-12 bg-gray-200 rounded" />
           <div className="h-4 w-4 bg-gray-200 rounded" />

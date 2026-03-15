@@ -90,7 +90,7 @@ export function ProductRow({ title, products, seeMoreHref }: ProductRowProps) {
                     src={product.imageUrl}
                     alt={product.name}
                     fill
-                    className="object-contain p-4"
+                    className="object-cover"
                     sizes="200px"
                   />
                 ) : (

@@ -53,14 +53,14 @@ export default async function HomePage() {
       </div>
 
       {/* Category Cards — Amazon 4-col grid */}
-      <div className="max-w-[1500px] mx-auto px-[15px] sm:px-[20px] mt-4">
+      <div className="px-4 sm:px-6 lg:px-10 mt-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[14px]">
           <CategoryCardsGrid categories={categories} />
         </div>
       </div>
 
       {/* Main content */}
-      <div className="max-w-[1500px] mx-auto px-[15px] sm:px-[20px] mt-[14px] space-y-[14px] pb-8">
+      <div className="px-4 sm:px-6 lg:px-10 mt-[14px] space-y-[14px] pb-8">
         <div className="lg:hidden">
           <SignInCard />
         </div>

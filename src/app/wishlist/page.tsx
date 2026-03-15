@@ -19,7 +19,7 @@ export default async function WishlistPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="px-4 sm:px-6 lg:px-10 py-8">
         <Breadcrumbs items={[{ label: 'Wishlist' }]} />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           My Wishlist {items.length > 0 && <span className="text-lg font-normal text-gray-500">({items.length})</span>}

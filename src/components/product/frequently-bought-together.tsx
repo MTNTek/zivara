@@ -61,7 +61,7 @@ export function FrequentlyBoughtTogether({ currentProduct, relatedProducts }: Fr
               <Link href={`/products/${product.id}`} className="block">
                 <div className="w-[120px] h-[120px] bg-gray-50 rounded border border-gray-200 relative overflow-hidden">
                   {product.imageUrl ? (
-                    <Image src={product.imageUrl} alt={product.name} fill className="object-contain p-2" sizes="120px" />
+                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover" sizes="120px" />
                   ) : (
                     <div className="flex items-center justify-center h-full text-gray-400 text-xs">No Image</div>
                   )}

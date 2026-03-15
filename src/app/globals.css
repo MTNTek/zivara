@@ -33,11 +33,6 @@ body {
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
-/* Amazon-style container width */
-.container {
-  max-width: 1500px !important;
-}
-
 /* Ensure proper touch target sizes on mobile */
 @media (max-width: 767px) {
   button,
