@@ -14,6 +14,8 @@ interface ProductCardProps {
   reviewCount?: number;
   stock?: number;
   isWishlisted?: boolean;
+  supplierLabel?: string | null;
+  supplierUnavailable?: boolean;
 }
 
 export function ProductCard({
@@ -26,6 +28,8 @@ export function ProductCard({
   reviewCount,
   stock,
   isWishlisted,
+  supplierLabel,
+  supplierUnavailable,
 }: ProductCardProps) {
   const discountPercentage = discountPrice
     ? Math.round(((Number(price) - Number(discountPrice)) / Number(price)) * 100)
@@ -118,6 +122,18 @@ export function ProductCard({
 
           {/* Delivery text */}
           <p className="text-[12px] text-[#565959] mt-0.5">FREE delivery</p>
+
+          {/* Supplier attribution */}
+          {supplierLabel && (
+            <p className="text-[11px] text-[#565959] mt-0.5">
+              Fulfilled by <span className="text-[#007185]">{supplierLabel}</span>
+            </p>
+          )}
+
+          {/* Supplier unavailable */}
+          {supplierUnavailable && (
+            <p className="text-[12px] text-orange-600 font-medium mt-0.5">Temporarily unavailable</p>
+          )}
 
           {/* Stock */}
           {stock !== undefined && stock <= 0 && (

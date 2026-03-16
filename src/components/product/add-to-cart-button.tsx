@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { addToCart } from '@/features/cart/actions';
+import { useState } from 'react';
+import { useAddToCart } from '@/hooks/use-cart';
 import { ButtonSpinner } from '@/components/ui/spinner';
 import { toast } from '@/lib/toast';
 
@@ -13,27 +13,25 @@ interface AddToCartButtonProps {
 
 export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCartButtonProps) {
   const [quantity, setQuantity] = useState(1);
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const addToCart = useAddToCart();
 
-  const handleAddToCart = async () => {
-    setError(null);
+  const handleAddToCart = () => {
     setSuccess(false);
 
-    startTransition(async () => {
-      const result = await addToCart({ productId, quantity });
-      
-      if (result.success) {
-        setSuccess(true);
-        toast.success('Added to cart', `${quantity} item${quantity > 1 ? 's' : ''} added successfully`);
-        setTimeout(() => setSuccess(false), 3000);
-      } else {
-        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to add to cart';
-        setError(errorMsg);
-        toast.error('Could not add to cart', errorMsg);
+    addToCart.mutate(
+      { productId, quantity },
+      {
+        onSuccess: () => {
+          setSuccess(true);
+          toast.success('Added to cart', `${quantity} item${quantity > 1 ? 's' : ''} added successfully`);
+          setTimeout(() => setSuccess(false), 3000);
+        },
+        onError: (error) => {
+          toast.error('Could not add to cart', error.message);
+        },
       }
-    });
+    );
   };
 
   if (!isInStock) {
@@ -61,7 +59,7 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
           <button
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
             className="w-12 h-12 min-w-[44px] min-h-[44px] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isPending || quantity <= 1}
+            disabled={addToCart.isPending || quantity <= 1}
             aria-label="Decrease quantity"
           >
             -
@@ -79,13 +77,13 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
               }
             }}
             className="w-20 text-center border border-gray-300 rounded-md py-3 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2 text-lg"
-            disabled={isPending}
+            disabled={addToCart.isPending}
             aria-label="Product quantity"
           />
           <button
             onClick={() => setQuantity(Math.min(Math.min(maxQuantity, 99), quantity + 1))}
             className="w-12 h-12 min-w-[44px] min-h-[44px] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isPending || quantity >= Math.min(maxQuantity, 99)}
+            disabled={addToCart.isPending || quantity >= Math.min(maxQuantity, 99)}
             aria-label="Increase quantity"
           >
             +
@@ -94,9 +92,9 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
       </div>
 
       {/* Error Message */}
-      {error && (
+      {addToCart.isError && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert" aria-live="assertive">
-          {error}
+          {addToCart.error.message}
         </div>
       )}
 
@@ -110,12 +108,12 @@ export function AddToCartButton({ productId, isInStock, maxQuantity }: AddToCart
       {/* Add to Cart Button */}
       <button
         onClick={handleAddToCart}
-        disabled={isPending}
+        disabled={addToCart.isPending}
         className="max-w-[260px] bg-[#2563eb] text-white px-4 py-1.5 rounded-full text-xs font-medium hover:bg-[#1d4ed8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        aria-label={isPending ? 'Adding to cart' : 'Add to cart'}
+        aria-label={addToCart.isPending ? 'Adding to cart' : 'Add to cart'}
       >
-        {isPending && <ButtonSpinner />}
-        {isPending ? 'Adding...' : 'Add to Cart'}
+        {addToCart.isPending && <ButtonSpinner />}
+        {addToCart.isPending ? 'Adding...' : 'Add to Cart'}
       </button>
     </div>
   );

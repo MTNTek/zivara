@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { SkipLink } from "@/components/ui/skip-link";
+import { QueryProvider } from "@/providers/query-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,11 +55,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <SkipLink />
-        <Header />
-        <main id="main-content" tabIndex={-1}>{children}</main>
-        <Footer />
-        <Toaster />
+        <QueryProvider>
+          <SkipLink />
+          <Header />
+          <main id="main-content" tabIndex={-1}>{children}</main>
+          <Footer />
+          <Toaster />
+        </QueryProvider>
       </body>
     </html>
   );

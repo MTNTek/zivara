@@ -118,7 +118,7 @@ body {
   opacity: 0.9;
 }
 
-/* Mega Menu Animations */
+/* General Animations */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -145,6 +145,58 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.15s ease-in;
+}
+
+/* Mega Menu Sidebar Scrollbar */
+.mega-menu-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mega-menu-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mega-menu-sidebar::-webkit-scrollbar-thumb {
+  background: #c4c4c4;
+  border-radius: 3px;
+}
+
+.mega-menu-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+.mega-menu-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #c4c4c4 transparent;
+}
+
+/* Mega Menu Sidebar Animations */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.25s ease-out;
+}
+
+@keyframes fadeInFast {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-fast {
+  animation: fadeInFast 0.15s ease-out;
 }
 
 /* Product Card Animations */

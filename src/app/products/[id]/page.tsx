@@ -19,6 +19,7 @@ import { products } from '@/db/schema';
 import { eq, ne, and, sql } from 'drizzle-orm';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getProductSupplier } from '@/features/suppliers/queries';
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string }>;
@@ -61,6 +62,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const isLowStock = product.inventory && product.inventory.quantity > 0 &&
     product.inventory.quantity <= product.inventory.lowStockThreshold;
   const primaryImage = product.images?.find((img) => img.isPrimary) || product.images?.[0];
+
+  // Fetch supplier info
+  const supplierInfo = await getProductSupplier(product.id);
 
   // Fetch related products for "Frequently Bought Together"
   const relatedForFBT = await db.query.products.findMany({
@@ -145,6 +149,18 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <Link href={`/products/category/${product.category.slug}`} className="text-sm text-[#007185] hover:text-[#c7511f] hover:underline">
                 Visit the {product.category.name} Store
               </Link>
+
+              {/* Supplier attribution */}
+              {supplierInfo && (
+                <div className="mt-1">
+                  <span className="text-xs text-[#565959]">
+                    Fulfilled by <span className="text-[#007185]">{supplierInfo.displayLabel}</span>
+                  </span>
+                  {supplierInfo.supplierStatus === 'unavailable' && (
+                    <span className="ml-2 text-xs text-orange-600 font-medium">Temporarily unavailable</span>
+                  )}
+                </div>
+              )}
 
               {/* Rating */}
               {rating > 0 && (

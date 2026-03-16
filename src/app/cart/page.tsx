@@ -7,6 +7,7 @@ import { CartRecommendations } from '@/components/cart/cart-recommendations';
 import { RecentlyViewed } from '@/components/product/recently-viewed';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Suspense } from 'react';
+import { getProductsSuppliers } from '@/features/suppliers/queries';
 
 export const metadata: Metadata = {
   title: 'Shopping Cart - Zivara',
@@ -15,6 +16,30 @@ export const metadata: Metadata = {
 
 export default async function CartPage() {
   const cartData = await getCartSummary();
+
+  // Fetch supplier info for cart items
+  const productIds = cartData.items.map((i) => i.product.id);
+  const supplierMap = await getProductsSuppliers(productIds);
+
+  // Group items by supplier
+  type CartItem = typeof cartData.items[number];
+  const grouped = new Map<string, { label: string; items: CartItem[] }>();
+  const noSupplierItems: CartItem[] = [];
+
+  for (const item of cartData.items) {
+    const info = supplierMap.get(item.product.id);
+    if (info) {
+      const key = info.supplierId;
+      if (!grouped.has(key)) {
+        grouped.set(key, { label: info.displayLabel, items: [] });
+      }
+      grouped.get(key)!.items.push(item);
+    } else {
+      noSupplierItems.push(item);
+    }
+  }
+
+  const hasSupplierGroups = grouped.size > 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -27,14 +52,36 @@ export default async function CartPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-lg shadow-sm">
-                  <div className="p-6 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      Cart Items ({cartData.totalQuantity})
-                    </h2>
+                {hasSupplierGroups ? (
+                  <div className="space-y-4">
+                    {Array.from(grouped.entries()).map(([supplierId, group]) => (
+                      <div key={supplierId} className="bg-white rounded-lg shadow-sm">
+                        <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                          <span className="text-sm text-[#565959]">Fulfilled by </span>
+                          <span className="text-sm font-medium text-[#007185]">{group.label}</span>
+                        </div>
+                        <CartItemsList items={group.items} />
+                      </div>
+                    ))}
+                    {noSupplierItems.length > 0 && (
+                      <div className="bg-white rounded-lg shadow-sm">
+                        <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                          <span className="text-sm font-medium text-gray-700">Fulfilled by Zivara</span>
+                        </div>
+                        <CartItemsList items={noSupplierItems} />
+                      </div>
+                    )}
                   </div>
-                  <CartItemsList items={cartData.items} />
-                </div>
+                ) : (
+                  <div className="bg-white rounded-lg shadow-sm">
+                    <div className="p-6 border-b border-gray-200">
+                      <h2 className="text-lg font-semibold text-gray-900">
+                        Cart Items ({cartData.totalQuantity})
+                      </h2>
+                    </div>
+                    <CartItemsList items={cartData.items} />
+                  </div>
+                )}
               </div>
 
               {/* Cart Summary */}

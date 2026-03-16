@@ -309,6 +309,171 @@ export const wishlistItems = pgTable('wishlist_items', {
   userProductIdx: index('wishlist_items_user_product_idx').on(table.userId, table.productId),
 }));
 
+// Suppliers Table
+export const suppliers = pgTable('suppliers', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull().unique(),
+  type: varchar('type', { length: 50 }).notNull(), // SupplierType enum
+  displayLabel: varchar('display_label', { length: 255 }),
+  baseUrl: text('base_url'),
+  status: varchar('status', { length: 50 }).notNull().default('inactive'),
+  // 'active' | 'inactive' | 'error' | 'credential_error' | 'unavailable'
+  currency: varchar('currency', { length: 10 }).notNull().default('USD'),
+  lastError: text('last_error'),
+  lastHealthCheck: timestamp('last_health_check'),
+  consecutiveFailures: integer('consecutive_failures').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  nameIdx: index('suppliers_name_idx').on(table.name),
+  typeIdx: index('suppliers_type_idx').on(table.type),
+  statusIdx: index('suppliers_status_idx').on(table.status),
+}));
+
+// Supplier Credentials Table
+export const supplierCredentials = pgTable('supplier_credentials', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  supplierId: uuid('supplier_id').notNull().references(() => suppliers.id, { onDelete: 'cascade' }),
+  credentialType: varchar('credential_type', { length: 50 }).notNull(),
+  // 'api_key' | 'oauth_token' | 'affiliate_id'
+  encryptedValue: text('encrypted_value').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  supplierIdx: index('supplier_credentials_supplier_idx').on(table.supplierId),
+}));
+
+// Product-Supplier Links Table
+export const productSupplierLinks = pgTable('product_supplier_links', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  productId: uuid('product_id').notNull().references(() => products.id, { onDelete: 'cascade' }),
+  supplierId: uuid('supplier_id').notNull().references(() => suppliers.id, { onDelete: 'cascade' }),
+  supplierProductId: varchar('supplier_product_id', { length: 255 }).notNull(),
+  costPrice: decimal('cost_price', { precision: 10, scale: 2 }).notNull(),
+  costCurrency: varchar('cost_currency', { length: 10 }).notNull(),
+  convertedCostPrice: decimal('converted_cost_price', { precision: 10, scale: 2 }),
+  markupAmount: decimal('markup_amount', { precision: 10, scale: 2 }),
+  displayPrice: decimal('display_price', { precision: 10, scale: 2 }),
+  supplierProductUrl: text('supplier_product_url'),
+  isPrimary: boolean('is_primary').notNull().default(false),
+  lastSyncedAt: timestamp('last_synced_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  productIdx: index('psl_product_idx').on(table.productId),
+  supplierIdx: index('psl_supplier_idx').on(table.supplierId),
+  supplierProductIdx: index('psl_supplier_product_idx').on(table.supplierId, table.supplierProductId),
+  primaryIdx: index('psl_primary_idx').on(table.productId, table.isPrimary),
+}));
+
+// Markup Rules Table
+export const markupRules = pgTable('markup_rules', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  supplierId: uuid('supplier_id').references(() => suppliers.id, { onDelete: 'cascade' }),
+  categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'cascade' }),
+  productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }),
+  markupType: varchar('markup_type', { length: 20 }).notNull(), // 'percentage' | 'fixed'
+  markupValue: decimal('markup_value', { precision: 10, scale: 2 }).notNull(),
+  priority: integer('priority').notNull().default(0),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  supplierIdx: index('markup_rules_supplier_idx').on(table.supplierId),
+  categoryIdx: index('markup_rules_category_idx').on(table.categoryId),
+  productIdx: index('markup_rules_product_idx').on(table.productId),
+}));
+
+// Exchange Rates Table
+export const exchangeRates = pgTable('exchange_rates', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  sourceCurrency: varchar('source_currency', { length: 10 }).notNull(),
+  targetCurrency: varchar('target_currency', { length: 10 }).notNull(),
+  rate: decimal('rate', { precision: 16, scale: 8 }).notNull(),
+  fetchedAt: timestamp('fetched_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  currencyPairIdx: index('exchange_rates_pair_idx').on(table.sourceCurrency, table.targetCurrency),
+  fetchedAtIdx: index('exchange_rates_fetched_idx').on(table.fetchedAt),
+}));
+
+// Sub-Orders Table
+export const subOrders = pgTable('sub_orders', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: uuid('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+  supplierId: uuid('supplier_id').notNull().references(() => suppliers.id),
+  supplierOrderId: varchar('supplier_order_id', { length: 255 }),
+  status: varchar('status', { length: 50 }).notNull().default('pending'),
+  // 'pending' | 'placed' | 'processing' | 'shipped' | 'delivered' | 'failed' | 'cancelled'
+  costTotal: decimal('cost_total', { precision: 10, scale: 2 }).notNull(),
+  exchangeRateUsed: decimal('exchange_rate_used', { precision: 16, scale: 8 }),
+  exchangeRateId: uuid('exchange_rate_id').references(() => exchangeRates.id),
+  trackingNumber: varchar('tracking_number', { length: 255 }),
+  carrierName: varchar('carrier_name', { length: 100 }),
+  trackingStatus: varchar('tracking_status', { length: 50 }),
+  trackingUpdatedAt: timestamp('tracking_updated_at'),
+  estimatedDelivery: timestamp('estimated_delivery'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  orderIdx: index('sub_orders_order_idx').on(table.orderId),
+  supplierIdx: index('sub_orders_supplier_idx').on(table.supplierId),
+  statusIdx: index('sub_orders_status_idx').on(table.status),
+}));
+
+// Sub-Order Items Table (links order items to sub-orders)
+export const subOrderItems = pgTable('sub_order_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  subOrderId: uuid('sub_order_id').notNull().references(() => subOrders.id, { onDelete: 'cascade' }),
+  orderItemId: uuid('order_item_id').notNull().references(() => orderItems.id),
+  supplierProductId: varchar('supplier_product_id', { length: 255 }).notNull(),
+  costPriceAtOrder: decimal('cost_price_at_order', { precision: 10, scale: 2 }).notNull(),
+  quantity: integer('quantity').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  subOrderIdx: index('sub_order_items_sub_order_idx').on(table.subOrderId),
+  orderItemIdx: index('sub_order_items_order_item_idx').on(table.orderItemId),
+}));
+
+// Sync Jobs Table
+export const syncJobs = pgTable('sync_jobs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  supplierId: uuid('supplier_id').notNull().references(() => suppliers.id, { onDelete: 'cascade' }),
+  jobType: varchar('job_type', { length: 20 }).notNull(), // 'inventory' | 'price'
+  status: varchar('status', { length: 20 }).notNull().default('pending'),
+  // 'pending' | 'running' | 'completed' | 'failed'
+  productsChecked: integer('products_checked').default(0),
+  productsUpdated: integer('products_updated').default(0),
+  errorCount: integer('error_count').default(0),
+  resultSummary: text('result_summary'),
+  retryCount: integer('retry_count').notNull().default(0),
+  startedAt: timestamp('started_at'),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  supplierIdx: index('sync_jobs_supplier_idx').on(table.supplierId),
+  statusIdx: index('sync_jobs_status_idx').on(table.status),
+  typeIdx: index('sync_jobs_type_idx').on(table.jobType),
+  supplierTypeStatusIdx: index('sync_jobs_supplier_type_status_idx').on(
+    table.supplierId, table.jobType, table.status
+  ),
+}));
+
+// Supplier Price History Table
+export const supplierPriceHistory = pgTable('supplier_price_history', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  productSupplierLinkId: uuid('product_supplier_link_id').notNull()
+    .references(() => productSupplierLinks.id, { onDelete: 'cascade' }),
+  oldCostPrice: decimal('old_cost_price', { precision: 10, scale: 2 }).notNull(),
+  newCostPrice: decimal('new_cost_price', { precision: 10, scale: 2 }).notNull(),
+  oldDisplayPrice: decimal('old_display_price', { precision: 10, scale: 2 }),
+  newDisplayPrice: decimal('new_display_price', { precision: 10, scale: 2 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  linkIdx: index('supplier_price_history_link_idx').on(table.productSupplierLinkId),
+  createdAtIdx: index('supplier_price_history_created_idx').on(table.createdAt),
+}));
+
 // Define relationships between tables
 export const usersRelations = relations(users, ({ many }) => ({
   cartItems: many(cartItems),
@@ -330,6 +495,7 @@ export const categoriesRelations = relations(categories, ({ one, many }) => ({
     relationName: 'categoryToParent',
   }),
   products: many(products),
+  markupRules: many(markupRules),
 }));
 
 export const productsRelations = relations(products, ({ one, many }) => ({
@@ -344,6 +510,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   reviews: many(reviews),
   priceHistory: many(priceHistory),
   wishlistItems: many(wishlistItems),
+  supplierLinks: many(productSupplierLinks),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -378,9 +545,10 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   }),
   items: many(orderItems),
   statusHistory: many(orderStatusHistory),
+  subOrders: many(subOrders),
 }));
 
-export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+export const orderItemsRelations = relations(orderItems, ({ one, many }) => ({
   order: one(orders, {
     fields: [orderItems.orderId],
     references: [orders.id],
@@ -389,6 +557,7 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
     fields: [orderItems.productId],
     references: [products.id],
   }),
+  subOrderItems: many(subOrderItems),
 }));
 
 export const orderStatusHistoryRelations = relations(orderStatusHistory, ({ one }) => ({
@@ -463,5 +632,93 @@ export const wishlistItemsRelations = relations(wishlistItems, ({ one }) => ({
   product: one(products, {
     fields: [wishlistItems.productId],
     references: [products.id],
+  }),
+}));
+
+// Supplier Relations
+export const suppliersRelations = relations(suppliers, ({ many }) => ({
+  credentials: many(supplierCredentials),
+  productLinks: many(productSupplierLinks),
+  subOrders: many(subOrders),
+  syncJobs: many(syncJobs),
+  markupRules: many(markupRules),
+}));
+
+export const supplierCredentialsRelations = relations(supplierCredentials, ({ one }) => ({
+  supplier: one(suppliers, {
+    fields: [supplierCredentials.supplierId],
+    references: [suppliers.id],
+  }),
+}));
+
+export const productSupplierLinksRelations = relations(productSupplierLinks, ({ one, many }) => ({
+  product: one(products, {
+    fields: [productSupplierLinks.productId],
+    references: [products.id],
+  }),
+  supplier: one(suppliers, {
+    fields: [productSupplierLinks.supplierId],
+    references: [suppliers.id],
+  }),
+  priceHistory: many(supplierPriceHistory),
+}));
+
+export const markupRulesRelations = relations(markupRules, ({ one }) => ({
+  supplier: one(suppliers, {
+    fields: [markupRules.supplierId],
+    references: [suppliers.id],
+  }),
+  category: one(categories, {
+    fields: [markupRules.categoryId],
+    references: [categories.id],
+  }),
+  product: one(products, {
+    fields: [markupRules.productId],
+    references: [products.id],
+  }),
+}));
+
+export const exchangeRatesRelations = relations(exchangeRates, ({ many }) => ({
+  subOrders: many(subOrders),
+}));
+
+export const subOrdersRelations = relations(subOrders, ({ one, many }) => ({
+  order: one(orders, {
+    fields: [subOrders.orderId],
+    references: [orders.id],
+  }),
+  supplier: one(suppliers, {
+    fields: [subOrders.supplierId],
+    references: [suppliers.id],
+  }),
+  exchangeRate: one(exchangeRates, {
+    fields: [subOrders.exchangeRateId],
+    references: [exchangeRates.id],
+  }),
+  items: many(subOrderItems),
+}));
+
+export const subOrderItemsRelations = relations(subOrderItems, ({ one }) => ({
+  subOrder: one(subOrders, {
+    fields: [subOrderItems.subOrderId],
+    references: [subOrders.id],
+  }),
+  orderItem: one(orderItems, {
+    fields: [subOrderItems.orderItemId],
+    references: [orderItems.id],
+  }),
+}));
+
+export const syncJobsRelations = relations(syncJobs, ({ one }) => ({
+  supplier: one(suppliers, {
+    fields: [syncJobs.supplierId],
+    references: [suppliers.id],
+  }),
+}));
+
+export const supplierPriceHistoryRelations = relations(supplierPriceHistory, ({ one }) => ({
+  productSupplierLink: one(productSupplierLinks, {
+    fields: [supplierPriceHistory.productSupplierLinkId],
+    references: [productSupplierLinks.id],
   }),
 }));

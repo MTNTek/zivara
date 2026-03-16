@@ -1,11 +1,12 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useTransition } from 'react';
 
 export function SortDropdown({ currentSort }: { currentSort?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   const handleChange = (value: string) => {
@@ -16,8 +17,9 @@ export function SortDropdown({ currentSort }: { currentSort?: string }) {
       params.delete('sortBy');
     }
     params.delete('page');
+    const qs = params.toString();
     startTransition(() => {
-      router.push(`/products?${params.toString()}`);
+      router.push(`${pathname}${qs ? `?${qs}` : ''}`);
     });
   };
 

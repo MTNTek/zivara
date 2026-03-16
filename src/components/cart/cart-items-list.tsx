@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useTransition, useOptimistic } from 'react';
+import { useState, useOptimistic } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { updateCartItemQuantity, removeFromCart } from '@/features/cart/actions';
+import { useUpdateCartItem, useRemoveCartItem } from '@/hooks/use-cart';
 import type { CartItemWithProduct } from '@/features/cart/queries';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from '@/lib/toast';
@@ -12,16 +12,17 @@ interface CartItemsListProps {
   items: CartItemWithProduct[];
 }
 
-type OptimisticAction = 
+type OptimisticAction =
   | { type: 'update'; itemId: string; quantity: number }
   | { type: 'remove'; itemId: string };
 
 export function CartItemsList({ items: initialItems }: CartItemsListProps) {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
+  const updateMutation = useUpdateCartItem();
+  const removeMutation = useRemoveCartItem();
 
-  // Use optimistic updates for immediate UI feedback
+  const isPending = updateMutation.isPending || removeMutation.isPending;
+
   const [optimisticItems, updateOptimisticItems] = useOptimistic(
     initialItems,
     (state, action: OptimisticAction) => {
@@ -36,53 +37,50 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
     }
   );
 
-  const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
+  const handleUpdateQuantity = (itemId: string, oldQuantity: number, newQuantity: number) => {
     if (newQuantity < 1 || newQuantity > 99) return;
-
     setPendingItemId(itemId);
-    setError(null);
+    updateOptimisticItems({ type: 'update', itemId, quantity: newQuantity });
 
-    startTransition(async () => {
-      // Optimistic update
-      updateOptimisticItems({ type: 'update', itemId, quantity: newQuantity });
-
-      const result = await updateCartItemQuantity({ cartItemId: itemId, quantity: newQuantity });
-      if (!result.success) {
-        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to update quantity';
-        setError(errorMsg);
-        toast.error('Could not update quantity', errorMsg);
-      } else {
-        toast.success('Cart updated');
+    updateMutation.mutate(
+      { cartItemId: itemId, quantity: newQuantity, oldQuantity },
+      {
+        onSuccess: () => {
+          toast.success('Cart updated');
+          setPendingItemId(null);
+        },
+        onError: (error) => {
+          toast.error('Could not update quantity', error.message);
+          setPendingItemId(null);
+        },
       }
-      setPendingItemId(null);
-    });
+    );
   };
 
-  const handleRemove = (itemId: string) => {
+  const handleRemove = (itemId: string, itemQuantity: number) => {
     setPendingItemId(itemId);
-    setError(null);
+    updateOptimisticItems({ type: 'remove', itemId });
 
-    startTransition(async () => {
-      // Optimistic update
-      updateOptimisticItems({ type: 'remove', itemId });
-
-      const result = await removeFromCart({ cartItemId: itemId });
-      if (!result.success) {
-        const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to remove item';
-        setError(errorMsg);
-        toast.error('Could not remove item', errorMsg);
-      } else {
-        toast.success('Item removed from cart');
+    removeMutation.mutate(
+      { cartItemId: itemId, itemQuantity },
+      {
+        onSuccess: () => {
+          toast.success('Item removed from cart');
+          setPendingItemId(null);
+        },
+        onError: (error) => {
+          toast.error('Could not remove item', error.message);
+          setPendingItemId(null);
+        },
       }
-      setPendingItemId(null);
-    });
+    );
   };
 
   return (
     <div>
-      {error && (
+      {(updateMutation.isError || removeMutation.isError) && (
         <div className="p-4 bg-red-50 border-b border-red-200 text-red-700">
-          {error}
+          {updateMutation.error?.message || removeMutation.error?.message}
         </div>
       )}
       <div className="divide-y divide-gray-200">
@@ -117,7 +115,7 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
 
                 {/* Product Info */}
                 <div className="flex-1 min-w-0">
-                  <Link 
+                  <Link
                     href={`/products/${item.product.id}`}
                     className="font-semibold text-gray-900 hover:text-black transition-colors"
                   >
@@ -130,7 +128,7 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-3 mt-4">
                     <button
-                      onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => handleUpdateQuantity(item.id, item.quantity, item.quantity - 1)}
                       disabled={isPending || item.quantity <= 1}
                       className="w-8 h-8 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
@@ -138,14 +136,14 @@ export function CartItemsList({ items: initialItems }: CartItemsListProps) {
                     </button>
                     <span className="w-12 text-center font-medium">{item.quantity}</span>
                     <button
-                      onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => handleUpdateQuantity(item.id, item.quantity, item.quantity + 1)}
                       disabled={isPending || item.quantity >= 99}
                       className="w-8 h-8 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                       {isItemPending ? <Spinner size="sm" /> : '+'}
                     </button>
                     <button
-                      onClick={() => handleRemove(item.id)}
+                      onClick={() => handleRemove(item.id, item.quantity)}
                       disabled={isPending}
                       className="ml-4 text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50 flex items-center gap-1"
                     >

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getOrderById } from '@/features/orders/queries';
 import { getCurrentUserId } from '@/lib/auth';
 import { OrderTimeline } from '@/components/orders/order-timeline';
+import { getOrderSubOrders } from '@/features/suppliers/queries';
 
 interface OrderDetailPageProps {
   params: Promise<{
@@ -24,6 +25,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
   if (!order || order.userId !== userId) {
     notFound();
   }
+
+  // Fetch sub-orders for supplier tracking
+  const subOrdersList = await getOrderSubOrders(id);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -125,6 +129,56 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                 {order.shippingCountry}
               </address>
             </div>
+
+            {/* Sub-order tracking */}
+            {subOrdersList.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipment Details</h2>
+                <div className="space-y-4">
+                  {subOrdersList.map((sub, idx) => (
+                    <div key={sub.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <span className="text-sm font-medium text-gray-900">
+                            Shipment {idx + 1}
+                          </span>
+                          <span className="text-xs text-[#565959] ml-2">
+                            Fulfilled by <span className="text-[#007185]">{sub.supplier?.displayLabel || sub.supplier?.name || 'Unknown'}</span>
+                          </span>
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(sub.status)}`}>
+                          {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+                        </span>
+                      </div>
+                      {sub.trackingNumber && (
+                        <div className="text-sm text-gray-600 mb-2">
+                          <span className="font-medium">Tracking:</span> {sub.trackingNumber}
+                          {sub.carrierName && <span className="ml-2">({sub.carrierName})</span>}
+                        </div>
+                      )}
+                      {sub.estimatedDelivery && (
+                        <div className="text-sm text-gray-600 mb-2">
+                          <span className="font-medium">Est. delivery:</span>{' '}
+                          {new Date(sub.estimatedDelivery).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </div>
+                      )}
+                      {sub.items && sub.items.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-gray-100">
+                          <p className="text-xs text-gray-500 mb-1">Items in this shipment:</p>
+                          <ul className="text-sm text-gray-700 space-y-0.5">
+                            {sub.items.map((item) => (
+                              <li key={item.id}>
+                                {item.orderItem?.productName || 'Product'} × {item.quantity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Order Summary */}
