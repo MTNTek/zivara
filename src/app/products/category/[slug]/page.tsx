@@ -20,6 +20,7 @@ interface CategoryPageProps {
     maxPrice?: string;
     minRating?: string;
     sortBy?: string;
+    subcategories?: string;
   }>;
 }
 
@@ -48,6 +49,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   const page = Number(sp.page) || 1;
   const limit = 24;
+  const subcategorySlugs = sp.subcategories?.split(',').filter(Boolean) || [];
 
   const queryParams = {
     page,
@@ -56,6 +58,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
     minRating: sp.minRating ? Number(sp.minRating) : undefined,
     sortBy: sp.sortBy,
+    subcategorySlugs: subcategorySlugs.length > 0 ? subcategorySlugs : undefined,
   };
 
   const [{ products, total }, allCategories, wishlistedIds] = await Promise.all([
@@ -90,6 +93,17 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     .filter((c) => c.parentId === category.id)
     .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
 
+  // Build grandchildren map: childId -> grandchildren[]
+  const grandchildrenMap: Record<string, { id: string; name: string; slug: string; parentId: string | null }[]> = {};
+  for (const child of childCategories) {
+    const grandchildren = allCategories
+      .filter((c) => c.parentId === child.id)
+      .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
+    if (grandchildren.length > 0) {
+      grandchildrenMap[child.id] = grandchildren.map((c) => ({ id: c.id, name: c.name, slug: c.slug, parentId: c.parentId }));
+    }
+  }
+
   // Get sibling categories (same parent)
   const siblingCategories = allCategories
     .filter((c) => c.parentId === category.parentId && c.id !== category.id)
@@ -100,6 +114,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
     minRating: sp.minRating ? Number(sp.minRating) : undefined,
     sortBy: sp.sortBy,
+    subcategories: subcategorySlugs.length > 0 ? subcategorySlugs : undefined,
   };
 
   return (
@@ -141,6 +156,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 parentCategory={parentCategory ? { id: parentCategory.id, name: parentCategory.name, slug: parentCategory.slug, parentId: parentCategory.parentId } : null}
                 siblingCategories={siblingCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug, parentId: c.parentId }))}
                 childCategories={childCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug, parentId: c.parentId }))}
+                grandchildrenMap={grandchildrenMap}
                 ancestors={ancestors.map((c) => ({ id: c.id, name: c.name, slug: c.slug, parentId: c.parentId }))}
                 currentFilters={currentFilters}
                 totalResults={total}

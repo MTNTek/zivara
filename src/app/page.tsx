@@ -8,6 +8,7 @@ import { CategoryCardsGrid } from '@/components/home/category-cards';
 import { ProductRow } from '@/components/home/product-row';
 import { SignInCard } from '@/components/home/sign-in-card';
 import { CategoryStrip } from '@/components/home/category-strip';
+import { PromoBanner } from '@/components/home/promo-banner';
 
 export default async function HomePage() {
   const [
@@ -48,11 +49,12 @@ export default async function HomePage() {
     <div className="min-h-screen bg-[#EAEDED]">
       <HeroCarousel />
 
+      {/* Category Strip — overlaps hero */}
       <div className="relative z-10 -mt-10 sm:-mt-16">
-        <CategoryStrip categories={categories} />
+        <CategoryStrip />
       </div>
 
-      {/* Category Cards — Amazon 4-col grid */}
+      {/* Category Cards — 4-col grid */}
       <div className="px-4 sm:px-6 lg:px-10 mt-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[14px]">
           <CategoryCardsGrid categories={categories} />
@@ -65,11 +67,32 @@ export default async function HomePage() {
           <SignInCard />
         </div>
 
+        {/* Promo Banner 1 */}
+        <PromoBanner
+          href="/products/category/electronics"
+          imageUrl="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1600&h=400&fit=crop"
+          alt="Electronics Sale"
+          title="Top Electronics Deals"
+          subtitle="Up to 40% off on smartphones, laptops & more"
+          cta="Shop Now"
+        />
+
+        {/* Today's Deals */}
         {dealProducts.length > 0 && (
           <ProductRow title="Today&apos;s Deals" products={dealProducts.map(toRowItem)} seeMoreHref="/products?sortBy=price_asc" />
         )}
 
         <ProductRow title="Top Rated Products" products={topRated.map(toRowItem)} seeMoreHref="/products?sortBy=rating" />
+
+        {/* Promo Banner 2 */}
+        <PromoBanner
+          href="/products/category/home-kitchen"
+          imageUrl="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600&h=400&fit=crop"
+          alt="Home & Kitchen"
+          title="Refresh Your Home"
+          subtitle="New arrivals in furniture, kitchen & decor"
+          cta="Shop Home"
+        />
 
         {budgetPicks.length > 0 && (
           <ProductRow title="Under $50" products={budgetPicks.map(toRowItem)} seeMoreHref="/products?sortBy=price_asc" />
@@ -101,30 +124,11 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Promo banners */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-[14px]">
-          <Link href="/products" className="bg-white p-5 hover:shadow-sm transition-shadow">
-            <h3 className="text-[16px] font-bold text-[#0f1111] mb-1">Free Shipping</h3>
-            <p className="text-[13px] text-[#565959] mb-2">On orders over $50</p>
-            <span className="text-[13px] text-[#007185] hover:text-[#c7511f]">Shop now</span>
-          </Link>
-          <Link href="/products?sortBy=newest" className="bg-white p-5 hover:shadow-sm transition-shadow">
-            <h3 className="text-[16px] font-bold text-[#0f1111] mb-1">New Arrivals</h3>
-            <p className="text-[13px] text-[#565959] mb-2">Check out the latest products</p>
-            <span className="text-[13px] text-[#007185] hover:text-[#c7511f]">Explore</span>
-          </Link>
-          <Link href="/products?sortBy=rating" className="bg-white p-5 hover:shadow-sm transition-shadow">
-            <h3 className="text-[16px] font-bold text-[#0f1111] mb-1">Best Sellers</h3>
-            <p className="text-[13px] text-[#565959] mb-2">Most popular items this week</p>
-            <span className="text-[13px] text-[#007185] hover:text-[#c7511f]">View all</span>
-          </Link>
-        </div>
-
-        {/* More categories */}
+        {/* More category cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[14px]">
           <CategoryCardsGrid
             categories={categories.filter(
-              (c) => !['electronics', 'fashion', 'home-kitchen', 'beauty-health'].includes(c.slug)
+              (c) => !['electronics', 'mens-fashion', 'womens-fashion', 'home-kitchen', 'beauty-health'].includes(c.slug)
             )}
           />
         </div>

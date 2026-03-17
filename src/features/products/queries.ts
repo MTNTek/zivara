@@ -231,7 +231,7 @@ export async function getProductBySlug(slug: string): Promise<ProductWithDetails
  */
 export async function getProductsByCategory(
   categoryId: string,
-  params: { page?: number; limit?: number; sortBy?: string; minPrice?: number; maxPrice?: number; minRating?: number; search?: string } = {}
+  params: { page?: number; limit?: number; sortBy?: string; minPrice?: number; maxPrice?: number; minRating?: number; search?: string; subcategorySlugs?: string[] } = {}
 ) {
   const { page = 1, limit = 24, sortBy = 'newest' } = params;
   
@@ -257,16 +257,37 @@ export async function getProductsByCategory(
     };
   }
 
-  // Collect all category IDs (current + children + grandchildren)
-  const categoryIds = [category.id];
-  category.children.forEach((child) => {
-    categoryIds.push(child.id);
-    if (child.children) {
-      child.children.forEach((grandchild) => {
-        categoryIds.push(grandchild.id);
-      });
+  // Collect category IDs to filter by
+  let categoryIds: string[];
+
+  if (params.subcategorySlugs && params.subcategorySlugs.length > 0) {
+    // Filter to only the selected grandchild slugs
+    const slugSet = new Set(params.subcategorySlugs);
+    categoryIds = [];
+    category.children.forEach((child) => {
+      if (child.children) {
+        child.children.forEach((grandchild) => {
+          if (slugSet.has(grandchild.slug)) {
+            categoryIds.push(grandchild.id);
+          }
+        });
+      }
+    });
+    if (categoryIds.length === 0) {
+      return { products: [], total: 0, page, limit, totalPages: 0 };
     }
-  });
+  } else {
+    // Default: current + all children + grandchildren
+    categoryIds = [category.id];
+    category.children.forEach((child) => {
+      categoryIds.push(child.id);
+      if (child.children) {
+        child.children.forEach((grandchild) => {
+          categoryIds.push(grandchild.id);
+        });
+      }
+    });
+  }
 
   const offset = (page - 1) * limit;
 

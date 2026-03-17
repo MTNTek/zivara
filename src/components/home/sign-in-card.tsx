@@ -1,12 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { useSession } from '@/lib/auth-client';
 
 export function SignInCard() {
   const { data: session } = useSession();
+  const [mounted, setMounted] = useState(false);
 
-  if (session?.user) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (mounted && session?.user) {
     return (
       <div className="bg-white p-5">
         <h2 className="text-xl font-bold text-[#0f1111] mb-2">

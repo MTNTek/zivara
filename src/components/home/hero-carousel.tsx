@@ -2,31 +2,35 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const slides = [
   {
     id: 1,
-    href: '/products?category=electronics',
+    href: '/products/category/electronics',
     title: 'Shop the Latest Electronics',
     subtitle: 'Smartphones, laptops, headphones & more',
     cta: 'Shop Now',
-    bg: 'linear-gradient(135deg, #0f2027 0%, #203a43 40%, #2c5364 100%)',
+    image: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=1600&h=500&fit=crop',
+    align: 'left' as const,
   },
   {
     id: 2,
-    href: '/products?category=fashion',
+    href: '/products/category/mens-fashion',
     title: 'New Season Fashion',
     subtitle: 'Trending styles for everyone',
     cta: 'Explore',
-    bg: 'linear-gradient(135deg, #3c1053 0%, #ad5389 100%)',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&h=500&fit=crop',
+    align: 'left' as const,
   },
   {
     id: 3,
-    href: '/products?category=home-kitchen',
+    href: '/products/category/home-kitchen',
     title: 'Home & Kitchen Essentials',
     subtitle: 'Upgrade your space with top picks',
     cta: 'Shop Home',
-    bg: 'linear-gradient(135deg, #134e5e 0%, #71b280 100%)',
+    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600&h=500&fit=crop',
+    align: 'left' as const,
   },
   {
     id: 4,
@@ -34,15 +38,17 @@ const slides = [
     title: 'Deals of the Day',
     subtitle: 'Limited-time offers — save big today',
     cta: 'See Deals',
-    bg: 'linear-gradient(135deg, #c94b4b 0%, #4b134f 100%)',
+    image: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1600&h=500&fit=crop',
+    align: 'left' as const,
   },
   {
     id: 5,
-    href: '/products?category=beauty-health',
+    href: '/products/category/beauty-health',
     title: 'Beauty & Wellness',
     subtitle: 'Skincare, makeup & self-care essentials',
     cta: 'Shop Beauty',
-    bg: 'linear-gradient(135deg, #614385 0%, #516395 100%)',
+    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1600&h=500&fit=crop',
+    align: 'left' as const,
   },
 ];
 
@@ -70,30 +76,32 @@ export function HeroCarousel() {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Slides */}
-      <div className="relative w-full h-[220px] sm:h-[280px] md:h-[360px] overflow-hidden">
+      <div className="relative w-full h-[220px] sm:h-[280px] md:h-[400px] overflow-hidden">
         {slides.map((slide, i) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
               i === current ? 'opacity-100 z-[1]' : 'opacity-0 z-0'
             }`}
-            style={{ background: slide.bg }}
           >
-            {/* Decorative circles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute -right-20 -top-20 w-[400px] h-[400px] rounded-full bg-white/5" />
-              <div className="absolute -right-10 top-20 w-[300px] h-[300px] rounded-full bg-white/5" />
-              <div className="absolute left-1/2 -bottom-32 w-[500px] h-[500px] rounded-full bg-white/3" />
-            </div>
+            <Image
+              src={slide.image}
+              alt={slide.title}
+              fill
+              className="object-cover"
+              priority={i === 0}
+              sizes="100vw"
+              unoptimized
+            />
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
 
-            {/* Content */}
             <Link href={slide.href} className="relative h-full flex items-center px-8 sm:px-16 lg:px-24">
               <div className="max-w-xl">
-                <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-2 sm:mb-3 leading-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white mb-2 sm:mb-3 leading-tight drop-shadow-lg">
                   {slide.title}
                 </h2>
-                <p className="text-sm sm:text-base md:text-lg text-white/80 mb-4 sm:mb-6">
+                <p className="text-sm sm:text-base md:text-lg text-white/90 mb-4 sm:mb-6 drop-shadow">
                   {slide.subtitle}
                 </p>
                 <span className="inline-block bg-[#febd69] hover:bg-[#f3a847] text-[#0f1111] text-sm font-semibold px-6 py-2.5 rounded-sm transition-colors">
@@ -106,7 +114,7 @@ export function HeroCarousel() {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-[#e3e6e6] to-transparent z-[2] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-[#EAEDED] to-transparent z-[2] pointer-events-none" />
 
       {/* Left arrow */}
       <button
@@ -114,7 +122,7 @@ export function HeroCarousel() {
         className="absolute left-0 top-0 z-[3] h-[calc(100%-64px)] sm:h-[calc(100%-96px)] w-10 sm:w-14 flex items-center justify-center group"
         aria-label="Previous slide"
       >
-        <svg className="w-5 h-10 sm:w-6 sm:h-12 text-white/50 group-hover:text-white transition-colors" viewBox="0 0 20 40" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-5 h-10 sm:w-6 sm:h-12 text-white/60 group-hover:text-white transition-colors drop-shadow" viewBox="0 0 20 40" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="15 5 5 20 15 35" />
         </svg>
       </button>
@@ -125,7 +133,7 @@ export function HeroCarousel() {
         className="absolute right-0 top-0 z-[3] h-[calc(100%-64px)] sm:h-[calc(100%-96px)] w-10 sm:w-14 flex items-center justify-center group"
         aria-label="Next slide"
       >
-        <svg className="w-5 h-10 sm:w-6 sm:h-12 text-white/50 group-hover:text-white transition-colors" viewBox="0 0 20 40" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-5 h-10 sm:w-6 sm:h-12 text-white/60 group-hover:text-white transition-colors drop-shadow" viewBox="0 0 20 40" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="5 5 15 20 5 35" />
         </svg>
       </button>

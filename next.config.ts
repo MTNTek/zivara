@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'logos.hunter.io',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   async headers() {
@@ -43,7 +49,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://placehold.co https://images.unsplash.com",
+              "img-src 'self' data: blob: https://placehold.co https://images.unsplash.com https://logos.hunter.io",
               "font-src 'self'",
               "frame-src https://js.stripe.com",
               "connect-src 'self' https://api.stripe.com",
