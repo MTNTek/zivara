@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { SkipLink } from "@/components/ui/skip-link";
 import { QueryProvider } from "@/providers/query-provider";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,8 +59,9 @@ export default function RootLayout({
         <QueryProvider>
           <SkipLink />
           <Header />
-          <main id="main-content" tabIndex={-1}>{children}</main>
+          <main id="main-content" tabIndex={-1} className="pb-14 md:pb-0">{children}</main>
           <Footer />
+          <MobileBottomNav />
           <Toaster />
         </QueryProvider>
       </body>

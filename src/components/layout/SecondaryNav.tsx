@@ -991,7 +991,7 @@ export function SecondaryNav() {
   const activeLink = activeIndex !== null ? navLinks[activeIndex] : null;
 
   return (
-    <nav className="bg-blue-800 text-white text-sm relative" ref={navRef}>
+    <nav className="bg-blue-800 text-white text-sm relative hidden md:block" ref={navRef}>
       <div className="w-full px-4">
         <div className="flex items-center gap-6 h-[41px] overflow-x-auto scrollbar-hide">
           <MegaMenu />
