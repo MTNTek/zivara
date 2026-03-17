@@ -722,3 +722,17 @@ export const supplierPriceHistoryRelations = relations(supplierPriceHistory, ({ 
     references: [productSupplierLinks.id],
   }),
 }));
+
+// Contact Messages Table
+export const contactMessages = pgTable('contact_messages', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  subject: varchar('subject', { length: 255 }).notNull(),
+  message: text('message').notNull(),
+  status: varchar('status', { length: 50 }).notNull().default('new'), // 'new' | 'read' | 'replied' | 'archived'
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  statusIdx: index('contact_messages_status_idx').on(table.status),
+  createdAtIdx: index('contact_messages_created_at_idx').on(table.createdAt),
+}));

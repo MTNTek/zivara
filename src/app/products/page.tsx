@@ -79,8 +79,17 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <Breadcrumbs items={[{ label: 'Products' }]} />
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+        <div className="mb-6">
+          {params.search ? (
+            <>
+              <h1 className="text-xl font-bold text-[#0F1111]">
+                Results for &ldquo;<span className="text-[#c7511f]">{params.search}</span>&rdquo;
+              </h1>
+              <p className="text-sm text-[#565959] mt-1">{total} result{total !== 1 ? 's' : ''}</p>
+            </>
+          ) : (
+            <h1 className="text-2xl font-bold text-[#0F1111]">All Products</h1>
+          )}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -107,9 +116,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             {/* Results Header */}
             <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
               <div className="flex items-center justify-between">
-                <p className="text-gray-600 text-sm sm:text-base">
-                  Showing {products.length > 0 ? (page - 1) * limit + 1 : 0} -{' '}
-                  {Math.min(page * limit, total)} of {total} products
+                <p className="text-gray-600 text-sm">
+                  {params.search ? (
+                    <>{(page - 1) * limit + 1}-{Math.min(page * limit, total)} of {total} results</>
+                  ) : (
+                    <>Showing {products.length > 0 ? (page - 1) * limit + 1 : 0}-{Math.min(page * limit, total)} of {total} products</>
+                  )}
                 </p>
                 <SortDropdown currentSort={params.sortBy} />
               </div>
