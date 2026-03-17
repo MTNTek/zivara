@@ -65,6 +65,10 @@ export function MobileMenu() {
               {/* Shop by Category */}
               <div className="py-3">
                 <p className="px-4 py-1.5 text-xs font-bold text-[#565959] uppercase tracking-wider">Shop by Category</p>
+                <Link href="/deals" onClick={close} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#c7511f] font-medium hover:bg-gray-50">
+                  <span className="text-lg w-6 text-center">🔥</span>
+                  <span>Today&apos;s Deals</span>
+                </Link>
                 <Link href="/products" onClick={close} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#0F1111] hover:bg-gray-50">
                   <span className="text-lg w-6 text-center">🛍️</span>
                   <span className="font-medium">All Products</span>
