@@ -144,6 +144,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 ancestors={ancestors.map((c) => ({ id: c.id, name: c.name, slug: c.slug, parentId: c.parentId }))}
                 currentFilters={currentFilters}
                 totalResults={total}
+                showBrands={category.slug === 'electronics' || ancestors.some((a) => a.slug === 'electronics')}
               />
             </Suspense>
           </div>

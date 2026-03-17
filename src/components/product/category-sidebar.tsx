@@ -24,6 +24,7 @@ interface CategorySidebarProps {
     sortBy?: string;
   };
   totalResults: number;
+  showBrands?: boolean;
 }
 
 export function CategorySidebar({
@@ -34,6 +35,7 @@ export function CategorySidebar({
   ancestors,
   currentFilters,
   totalResults,
+  showBrands = false,
 }: CategorySidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -118,25 +120,6 @@ export function CategorySidebar({
 
       <div className="border-t border-[#e7e7e7] my-3" />
 
-      {/* ── Delivery Day ── */}
-      <div className="mb-1">
-        <h3 className="font-bold text-[#0F1111] text-[13px] mb-1.5">Delivery Day</h3>
-        <div className="space-y-1.5">
-          {['Get it in 2 Hours', 'Get It Today', 'Get It by Tomorrow'].map((label) => (
-            <label key={label} className="flex items-center gap-2 cursor-pointer group">
-              <input
-                type="checkbox"
-                className="w-[15px] h-[15px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer"
-                disabled
-              />
-              <span className="text-[#0F1111] group-hover:text-[#c7511f]">{label}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="border-t border-[#e7e7e7] my-3" />
-
       {/* ── Eligible for free delivery ── */}
       <div className="mb-1">
         <h3 className="font-bold text-[#0F1111] text-[13px] mb-1.5">Eligible for free delivery</h3>
@@ -155,7 +138,8 @@ export function CategorySidebar({
 
       <div className="border-t border-[#e7e7e7] my-3" />
 
-      {/* ── Brands ── */}
+      {/* ── Brands (electronics only) ── */}
+      {showBrands && (
       <div className="mb-1">
         <h3 className="font-bold text-[#0F1111] text-[13px] mb-1.5">Brands</h3>
         <div className="space-y-1.5">
@@ -171,8 +155,75 @@ export function CategorySidebar({
           ))}
         </div>
       </div>
+      )}
 
+      {showBrands && <div className="border-t border-[#e7e7e7] my-3" />}
+
+      {/* ── Seller (electronics only) ── */}
+      {showBrands && (
+      <>
+      <div className="mb-1">
+        <h3 className="font-bold text-[#0F1111] text-[13px] mb-1.5">Seller</h3>
+        <div className="space-y-1.5">
+          {['Zivara', 'Third-party Sellers'].map((seller) => (
+            <label key={seller} className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-[15px] h-[15px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer"
+                disabled
+              />
+              <span className="text-[#0F1111] group-hover:text-[#c7511f]">{seller}</span>
+            </label>
+          ))}
+        </div>
+      </div>
       <div className="border-t border-[#e7e7e7] my-3" />
+      </>
+      )}
+
+      {/* ── Availability (electronics only) ── */}
+      {showBrands && (
+      <>
+      <div className="mb-1">
+        <h3 className="font-bold text-[#0F1111] text-[13px] mb-1.5">Availability</h3>
+        <div className="space-y-1.5">
+          {['In Stock', 'Include Out of Stock'].map((option) => (
+            <label key={option} className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-[15px] h-[15px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer"
+                disabled
+              />
+              <span className="text-[#0F1111] group-hover:text-[#c7511f]">{option}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="border-t border-[#e7e7e7] my-3" />
+      </>
+      )}
+
+      {/* ── Condition (electronics only) ── */}
+      {showBrands && (
+      <>
+      <div className="mb-1">
+        <h3 className="font-bold text-[#0F1111] text-[13px] mb-1.5">Condition</h3>
+        <div className="space-y-1.5">
+          {['New', 'Renewed', 'Used'].map((condition) => (
+            <label key={condition} className="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-[15px] h-[15px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer"
+                disabled
+              />
+              <span className="text-[#0F1111] group-hover:text-[#c7511f]">{condition}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="border-t border-[#e7e7e7] my-3" />
+      </>
+      )}
 
       {/* ── Price ── */}
       <div className="mb-1">
