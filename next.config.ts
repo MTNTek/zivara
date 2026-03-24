@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Compress responses
+  compress: true,
+
+  // Strict powered-by header removal
+  poweredByHeader: false,
+
   images: {
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
@@ -12,25 +18,46 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'placehold.co',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'logos.hunter.io',
-        port: '',
         pathname: '/**',
       },
+      // S3 / CDN bucket — add your production image host here
+      ...(process.env.CDN_HOSTNAME
+        ? [{ protocol: 'https' as const, hostname: process.env.CDN_HOSTNAME, pathname: '/**' }]
+        : []),
     ],
   },
+
   async headers() {
+    const cdnHost = process.env.CDN_HOSTNAME;
+    const imgSrc = [
+      "'self'",
+      "data:",
+      "blob:",
+      "https://placehold.co",
+      "https://images.unsplash.com",
+      "https://logos.hunter.io",
+      ...(cdnHost ? [`https://${cdnHost}`] : []),
+    ].join(' ');
+
     return [
+      // Cache static assets aggressively
+      {
+        source: '/logo.svg',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // Security headers for all routes
       {
         source: '/(.*)',
         headers: [
@@ -49,10 +76,10 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://placehold.co https://images.unsplash.com https://logos.hunter.io",
+              `img-src ${imgSrc}`,
               "font-src 'self'",
               "frame-src https://js.stripe.com",
-              "connect-src 'self' https://api.stripe.com",
+              "connect-src 'self' https://api.stripe.com https://api.resend.com",
             ].join('; '),
           },
         ],

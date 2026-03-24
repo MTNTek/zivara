@@ -7,18 +7,20 @@ interface BreadcrumbItem {
 
 export function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav className="mb-4 text-sm" aria-label="Breadcrumb">
-      <ol className="flex items-center space-x-2 text-gray-600">
+    <nav className="mb-4 text-xs" aria-label="Breadcrumb">
+      <ol className="flex items-center flex-wrap text-[#565959]">
         <li>
-          <Link href="/" className="hover:text-black">Home</Link>
+          <Link href="/" className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline">Home</Link>
         </li>
         {items.map((item, i) => (
-          <li key={i} className="flex items-center space-x-2">
-            <span>/</span>
+          <li key={i} className="flex items-center">
+            <svg className="w-3 h-3 mx-1.5 text-[#999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
             {item.href ? (
-              <Link href={item.href} className="hover:text-black">{item.label}</Link>
+              <Link href={item.href} className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline">{item.label}</Link>
             ) : (
-              <span className="text-gray-900 font-medium">{item.label}</span>
+              <span className="text-[#0F1111]">{item.label}</span>
             )}
           </li>
         ))}

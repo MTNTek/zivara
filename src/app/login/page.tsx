@@ -8,6 +8,7 @@ import { loginSchema } from '@/features/auth/schemas';
 import { validateWithSchema } from '@/lib/form-validation';
 import { ButtonSpinner } from '@/components/ui/spinner';
 import { toast } from '@/lib/toast';
+import { Logo } from '@/components/ui/logo';
 import { hasAnyUsers } from '@/features/auth/actions';
 
 function LoginForm() {
@@ -101,21 +102,15 @@ function LoginForm() {
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-black" aria-label="Zivara home">
-            Zivara
+          <Link href="/" className="inline-block" aria-label="Zivara home">
+            <Logo variant="dark" size="lg" />
           </Link>
-          <h1 className="mt-6 text-3xl font-bold text-gray-900">
-            Sign in to your account
+          <h1 className="mt-6 text-2xl font-bold text-gray-900">
+            Sign in
           </h1>
-          <p className="mt-2 text-gray-600">
-            Or{' '}
-            <Link href="/register" className="text-black hover:text-blue-800 font-medium">
-              create a new account
-            </Link>
-          </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-white rounded-lg border border-gray-300 p-8">
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -213,6 +208,32 @@ function LoginForm() {
               {isPending ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500 text-center">
+              New to Zivara?{' '}
+              <Link href="/register" className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline font-medium">
+                Create your account
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Trust indicators */}
+        <div className="mt-8 flex items-center justify-center gap-6 text-xs text-gray-400">
+          <div className="flex items-center gap-1.5">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span>Secure login</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>256-bit encryption</span>
+          </div>
         </div>
       </div>
     </div>

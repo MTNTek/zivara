@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -34,7 +34,7 @@ const slides = [
   },
   {
     id: 4,
-    href: '/products?sortBy=price_asc',
+    href: '/deals',
     title: 'Deals of the Day',
     subtitle: 'Limited-time offers — save big today',
     cta: 'See Deals',
@@ -55,6 +55,8 @@ const slides = [
 export function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % slides.length);
@@ -70,13 +72,47 @@ export function HeroCarousel() {
     return () => clearInterval(timer);
   }, [isPaused, next]);
 
+  // Keyboard navigation (arrow keys)
+  const carouselRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    };
+    el.addEventListener('keydown', handleKeyDown);
+    return () => el.removeEventListener('keydown', handleKeyDown);
+  }, [prev, next]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) next();
+      else prev();
+    }
+  };
+
   return (
     <div
-      className="relative w-full"
+      ref={carouselRef}
+      className="relative w-full outline-none"
+      tabIndex={0}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured promotions"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="relative w-full h-[220px] sm:h-[280px] md:h-[400px] overflow-hidden">
+      <div className="relative w-full h-[220px] sm:h-[280px] md:h-[400px] overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {slides.map((slide, i) => (
           <div
             key={slide.id}
@@ -91,7 +127,8 @@ export function HeroCarousel() {
               className="object-cover"
               priority={i === 0}
               sizes="100vw"
-              unoptimized
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI2MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzFmMjkzNyIvPjwvc3ZnPg=="
             />
             {/* Dark overlay for text readability */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
@@ -104,7 +141,7 @@ export function HeroCarousel() {
                 <p className="text-sm sm:text-base md:text-lg text-white/90 mb-4 sm:mb-6 drop-shadow">
                   {slide.subtitle}
                 </p>
-                <span className="inline-block bg-[#febd69] hover:bg-[#f3a847] text-[#0f1111] text-sm font-semibold px-6 py-2.5 rounded-sm transition-colors">
+                <span className="inline-block bg-[#fbbf24] hover:bg-[#f59e0b] text-[#0f1111] text-sm font-semibold px-6 py-2.5 rounded-full transition-colors shadow-lg">
                   {slide.cta}
                 </span>
               </div>

@@ -62,14 +62,15 @@ export function CategoryStrip() {
             href={cat.href}
             className="flex flex-col items-center gap-2 flex-shrink-0 group"
           >
-            <div className="w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] rounded-lg overflow-hidden bg-[#f7f7f7] border border-[#e7e7e7] group-hover:border-[#c7511f] transition-colors">
+            <div className="w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] rounded-lg overflow-hidden bg-[#f7f7f7] border border-[#e7e7e7] group-hover:border-[#1d4ed8] transition-colors">
               <Image
                 src={cat.img}
                 alt={cat.label}
                 width={140}
                 height={140}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                unoptimized
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTVlN2ViIi8+PC9zdmc+"
               />
             </div>
             <span className="text-[13px] text-[#0f1111] font-medium text-center">

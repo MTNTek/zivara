@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { Toaster } from "@/components/ui/toaster";
 import { SkipLink } from "@/components/ui/skip-link";
 import { QueryProvider } from "@/providers/query-provider";
-import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
+import { LayoutShell } from "@/components/layout/layout-shell";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,10 +56,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <QueryProvider>
           <SkipLink />
-          <Header />
-          <main id="main-content" tabIndex={-1} className="pb-14 md:pb-0">{children}</main>
-          <Footer />
-          <MobileBottomNav />
+          <LayoutShell>{children}</LayoutShell>
           <Toaster />
         </QueryProvider>
       </body>

@@ -116,7 +116,7 @@ export function CategorySidebar({
                     {hasGrandchildren && (
                       <button
                         onClick={() => toggleChildExpanded(child.id)}
-                        className="text-[#0F1111] hover:text-[#c7511f] flex-shrink-0"
+                        className="text-[#0F1111] hover:text-[#1d4ed8] flex-shrink-0"
                         aria-label={isExpanded ? `Collapse ${child.name}` : `Expand ${child.name}`}
                       >
                         <svg
@@ -129,7 +129,7 @@ export function CategorySidebar({
                     )}
                     <Link
                       href={`/products/category/${child.slug}`}
-                      className="text-[#0F1111] hover:text-[#c7511f] font-bold text-[12px] leading-[20px]"
+                      className="text-[#0F1111] hover:text-[#1d4ed8] font-bold text-[12px] leading-[20px]"
                     >
                       {child.name}
                     </Link>
@@ -140,7 +140,7 @@ export function CategorySidebar({
                       {selectedSubs.size > 0 && grandchildren.some((gc) => selectedSubs.has(gc.slug)) && (
                         <button
                           onClick={clearGrandchildSelections}
-                          className="text-[#007185] hover:text-[#c7511f] hover:underline text-[12px] leading-[20px] flex items-center gap-[2px] mb-[2px]"
+                          className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline text-[12px] leading-[20px] flex items-center gap-[2px] mb-[2px]"
                         >
                           <span>‹</span> Clear
                         </button>
@@ -157,7 +157,7 @@ export function CategorySidebar({
                             />
                             <Link
                               href={`/products/category/${gc.slug}`}
-                              className={`text-[12px] hover:text-[#c7511f] ${isChecked ? 'font-bold text-[#0F1111]' : 'text-[#0F1111]'}`}
+                              className={`text-[12px] hover:text-[#1d4ed8] ${isChecked ? 'font-bold text-[#0F1111]' : 'text-[#0F1111]'}`}
                             >
                               {gc.name}
                             </Link>
@@ -180,7 +180,7 @@ export function CategorySidebar({
           {parentCategory && (
             <Link
               href={`/products/category/${parentCategory.slug}`}
-              className="text-[#007185] hover:text-[#c7511f] hover:underline text-[12px] leading-[20px] flex items-center gap-[2px] mb-[4px]"
+              className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline text-[12px] leading-[20px] flex items-center gap-[2px] mb-[4px]"
             >
               <span>‹</span> {parentCategory.name}
             </Link>
@@ -192,7 +192,7 @@ export function CategorySidebar({
                 <div key={sibling.id} className="leading-[20px]">
                   <Link
                     href={`/products/category/${sibling.slug}`}
-                    className={`hover:text-[#c7511f] ${isCurrentSibling ? 'font-bold text-[#0F1111]' : 'text-[#0F1111]'}`}
+                    className={`hover:text-[#1d4ed8] ${isCurrentSibling ? 'font-bold text-[#0F1111]' : 'text-[#0F1111]'}`}
                   >
                     {sibling.name}
                   </Link>
@@ -215,7 +215,7 @@ export function CategorySidebar({
               className="w-[16px] h-[16px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer"
               disabled
             />
-            <span className="group-hover:text-[#c7511f]">Free Shipping</span>
+            <span className="group-hover:text-[#1d4ed8]">Free Shipping</span>
           </label>
           <p className="text-[11px] text-[#565959] mt-[4px] leading-[15px]">
             All customers get FREE Shipping on orders over $100 shipped by Zivara
@@ -232,7 +232,7 @@ export function CategorySidebar({
         {['Apple', 'Samsung', 'HONOR', 'XIAOMI', 'OnePlus', 'Motorola', 'Nothing', 'HUAWEI', 'OPPO', 'realme'].map((brand) => (
           <label key={brand} className="flex items-center gap-[7px] cursor-pointer group leading-[20px]">
             <input type="checkbox" className="w-[16px] h-[16px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer" disabled />
-            <span className="group-hover:text-[#c7511f]">{brand}</span>
+            <span className="group-hover:text-[#1d4ed8]">{brand}</span>
           </label>
         ))}
       </div>
@@ -247,7 +247,7 @@ export function CategorySidebar({
         {['Zivara', 'Third-party Sellers'].map((seller) => (
           <label key={seller} className="flex items-center gap-[7px] cursor-pointer group leading-[20px]">
             <input type="checkbox" className="w-[16px] h-[16px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer" disabled />
-            <span className="group-hover:text-[#c7511f]">{seller}</span>
+            <span className="group-hover:text-[#1d4ed8]">{seller}</span>
           </label>
         ))}
       </div>
@@ -263,7 +263,7 @@ export function CategorySidebar({
         {['In Stock', 'Include Out of Stock'].map((option) => (
           <label key={option} className="flex items-center gap-[7px] cursor-pointer group leading-[20px]">
             <input type="checkbox" className="w-[16px] h-[16px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer" disabled />
-            <span className="group-hover:text-[#c7511f]">{option}</span>
+            <span className="group-hover:text-[#1d4ed8]">{option}</span>
           </label>
         ))}
       </div>
@@ -279,7 +279,7 @@ export function CategorySidebar({
         {['New', 'Renewed', 'Used'].map((condition) => (
           <label key={condition} className="flex items-center gap-[7px] cursor-pointer group leading-[20px]">
             <input type="checkbox" className="w-[16px] h-[16px] rounded border-[#888] text-[#e77600] focus:ring-[#e77600] cursor-pointer" disabled />
-            <span className="group-hover:text-[#c7511f]">{condition}</span>
+            <span className="group-hover:text-[#1d4ed8]">{condition}</span>
           </label>
         ))}
       </div>
@@ -317,7 +317,7 @@ export function CategorySidebar({
                   router.push(`/products/category/${currentCategory.slug}?${params.toString()}`);
                 });
               }}
-              className={`block w-full text-left leading-[20px] ${isActive ? 'font-bold text-[#c7511f]' : 'hover:text-[#c7511f]'}`}
+              className={`block w-full text-left leading-[20px] ${isActive ? 'font-bold text-[#1d4ed8]' : 'hover:text-[#1d4ed8]'}`}
             >
               {range.label}
             </button>
@@ -396,7 +396,7 @@ export function CategorySidebar({
           <div className="border-t border-[#e7e7e7] my-[16px]" />
           <button
             onClick={clearFilters}
-            className="text-[#007185] hover:text-[#c7511f] hover:underline text-[12px] leading-[20px]"
+            className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline text-[12px] leading-[20px]"
           >
             Clear all filters
           </button>

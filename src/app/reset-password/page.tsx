@@ -6,6 +6,7 @@ import { requestPasswordReset } from '@/features/auth/actions';
 import { passwordResetRequestSchema } from '@/features/auth/schemas';
 import { validateWithSchema } from '@/lib/form-validation';
 import { ButtonSpinner } from '@/components/ui/spinner';
+import { Logo } from '@/components/ui/logo';
 
 export default function ResetPasswordPage() {
   const [isPending, startTransition] = useTransition();
@@ -50,8 +51,8 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-black">
-            Zivara
+          <Link href="/" className="inline-block">
+            <Logo variant="dark" size="lg" />
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Reset your password

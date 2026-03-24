@@ -2,6 +2,7 @@ import { eq, and } from 'drizzle-orm';
 import { db } from '@/db';
 import { syncJobs } from '@/db/schema';
 import { syncInventory, syncPrices } from './importer';
+import { logger } from '@/lib/logger';
 
 /**
  * Schedule a sync job for a supplier.
@@ -91,10 +92,7 @@ export async function runPendingSyncJobs(): Promise<void> {
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Unknown error';
-      console.error(
-        `Sync job ${job.id} failed for supplier ${job.supplierId}:`,
-        errorMessage
-      );
+      logger.error(`Sync job ${job.id} failed for supplier ${job.supplierId}`, { error: errorMessage });
       await retrySyncJob(job.id);
     }
   }

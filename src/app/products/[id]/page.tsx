@@ -12,6 +12,7 @@ import { ShareButton } from '@/components/product/share-button';
 import { TrackView } from '@/components/product/track-view';
 import { RecentlyViewed } from '@/components/product/recently-viewed';
 import { FrequentlyBoughtTogether } from '@/components/product/frequently-bought-together';
+import { AlsoViewed } from '@/components/product/also-viewed';
 import { getSession } from '@/lib/auth';
 import { getWishlistProductIds } from '@/features/wishlist/actions';
 import { db } from '@/db';
@@ -20,6 +21,12 @@ import { eq, ne, and, sql } from 'drizzle-orm';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProductSupplier } from '@/features/suppliers/queries';
+import { DeliveryEstimate } from '@/components/product/delivery-estimate';
+import { BackToResults } from '@/components/product/back-to-results';
+import { NotifyStockButton } from '@/components/product/notify-stock-button';
+import { PriceHistoryHint } from '@/components/product/price-history-hint';
+import { TrustBadges } from '@/components/product/trust-badges';
+import { StickyMobileCTA } from '@/components/product/sticky-mobile-cta';
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string }>;
@@ -101,7 +108,43 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const rating = product.averageRating ? Number(product.averageRating) : 0;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen bg-[#EAEDED]">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            description: product.description?.slice(0, 500),
+            image: product.images?.map((img) => img.imageUrl) || [],
+            sku: product.sku || product.id,
+            brand: { '@type': 'Brand', name: 'Zivara' },
+            category: product.category.name,
+            offers: {
+              '@type': 'Offer',
+              url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://zivara.com'}/products/${product.id}`,
+              priceCurrency: 'USD',
+              price: Number(product.discountPrice || product.price).toFixed(2),
+              availability: isInStock
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+              seller: { '@type': 'Organization', name: 'Zivara' },
+            },
+            ...(rating > 0 && {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: rating.toFixed(1),
+                reviewCount: product.reviewCount || 0,
+                bestRating: '5',
+                worstRating: '1',
+              },
+            }),
+          }),
+        }}
+      />
+
       <TrackView
         id={product.id}
         name={product.name}
@@ -112,14 +155,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-200">
-        <nav className="px-4 sm:px-6 lg:px-10 py-2 text-xs text-[#007185]">
+        <nav className="px-4 sm:px-6 lg:px-10 py-2 text-xs text-[#2563eb]">
           <ol className="flex items-center gap-1 flex-wrap">
-            <li><Link href="/" className="hover:text-[#c7511f] hover:underline">Home</Link></li>
+            <li><Link href="/" className="hover:text-[#1d4ed8] hover:underline">Home</Link></li>
             <li className="text-gray-400">›</li>
-            <li><Link href="/products" className="hover:text-[#c7511f] hover:underline">Products</Link></li>
+            <li><Link href="/products" className="hover:text-[#1d4ed8] hover:underline">Products</Link></li>
             <li className="text-gray-400">›</li>
             <li>
-              <Link href={`/products/category/${product.category.slug}`} className="hover:text-[#c7511f] hover:underline">
+              <Link href={`/products/category/${product.category.slug}`} className="hover:text-[#1d4ed8] hover:underline">
                 {product.category.name}
               </Link>
             </li>
@@ -130,6 +173,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       </div>
 
       <div className="px-4 sm:px-6 lg:px-10 py-6">
+        {/* Back to results link */}
+        <Suspense fallback={null}>
+          <BackToResults />
+        </Suspense>
+
         {/* Main product section: 3-column Amazon layout */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -146,7 +194,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               </h1>
 
               {/* Brand / Category */}
-              <Link href={`/products/category/${product.category.slug}`} className="text-sm text-[#007185] hover:text-[#c7511f] hover:underline">
+              <Link href={`/products/category/${product.category.slug}`} className="text-sm text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
                 Visit the {product.category.name} Store
               </Link>
 
@@ -154,7 +202,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               {supplierInfo && (
                 <div className="mt-1">
                   <span className="text-xs text-[#565959]">
-                    Fulfilled by <span className="text-[#007185]">{supplierInfo.displayLabel}</span>
+                    Fulfilled by <span className="text-[#2563eb]">{supplierInfo.displayLabel}</span>
                   </span>
                   {supplierInfo.supplierStatus === 'unavailable' && (
                     <span className="ml-2 text-xs text-orange-600 font-medium">Temporarily unavailable</span>
@@ -173,9 +221,13 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                       </svg>
                     ))}
                   </div>
-                  <Link href={`/products/${product.id}/reviews`} className="text-sm text-[#007185] hover:text-[#c7511f] hover:underline">
+                  <Link href={`/products/${product.id}/reviews`} className="text-sm text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
                     {product.reviewCount || 0} ratings
                   </Link>
+                  <span className="text-[#ccc]">|</span>
+                  <a href="#customer-reviews" className="text-sm text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
+                    See all reviews
+                  </a>
                 </div>
               )}
 
@@ -220,6 +272,43 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   <span className="font-medium text-[#0f1111]">SKU:</span> {product.sku}
                 </div>
               )}
+
+              {/* Product Details Table */}
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                <h3 className="text-sm font-bold text-[#0f1111] mb-2">Product Details</h3>
+                <table className="w-full text-sm">
+                  <tbody>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-1.5 pr-4 text-[#565959] w-1/3">Category</td>
+                      <td className="py-1.5 text-[#0f1111]">{product.category.name}</td>
+                    </tr>
+                    {product.sku && (
+                      <tr className="border-b border-gray-100">
+                        <td className="py-1.5 pr-4 text-[#565959]">Item Model</td>
+                        <td className="py-1.5 text-[#0f1111]">{product.sku}</td>
+                      </tr>
+                    )}
+                    <tr className="border-b border-gray-100">
+                      <td className="py-1.5 pr-4 text-[#565959]">Availability</td>
+                      <td className="py-1.5">
+                        {isInStock ? (
+                          <span className="text-[#007600]">In Stock</span>
+                        ) : (
+                          <span className="text-red-600">Out of Stock</span>
+                        )}
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-1.5 pr-4 text-[#565959]">Shipping</td>
+                      <td className="py-1.5 text-[#0f1111]">Free delivery</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 pr-4 text-[#565959]">Return Policy</td>
+                      <td className="py-1.5 text-[#0f1111]">30-day returns</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Right: Buy box */}
@@ -230,26 +319,38 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   <span className="text-lg font-medium text-[#0f1111]">
                     ${Number(product.discountPrice || product.price).toFixed(2)}
                   </span>
+                  {product.discountPrice && (
+                    <div className="text-xs text-[#565959] mt-0.5">
+                      List: <span className="line-through">${Number(product.price).toFixed(2)}</span>
+                      <span className="text-[#cc0c39] ml-1.5 font-medium">
+                        You save ${(Number(product.price) - Number(product.discountPrice)).toFixed(2)} ({discountPct}%)
+                      </span>
+                    </div>
+                  )}
+                  {discountPct >= 15 && <PriceHistoryHint discountPct={discountPct} />}
                 </div>
 
                 {/* Delivery info */}
-                <div className="text-sm text-[#0f1111] mb-3">
-                  <span className="text-[#007185]">FREE delivery</span>{' '}
-                  <span className="font-bold">
-                    {new Date(Date.now() + 5 * 86400000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                  </span>
-                </div>
+                <DeliveryEstimate isInStock={isInStock} />
 
                 {/* Stock */}
                 <div className="mb-4">
                   {isInStock ? (
                     <span className="text-lg text-[#007600] font-medium">In Stock</span>
                   ) : (
-                    <span className="text-lg text-red-600 font-medium">Out of Stock</span>
+                    <>
+                      <span className="text-lg text-red-600 font-medium">Out of Stock</span>
+                      <div className="mt-2">
+                        <NotifyStockButton productName={product.name} productId={product.id} />
+                      </div>
+                    </>
                   )}
                   {isLowStock && (
-                    <p className="text-sm text-[#c7511f] mt-0.5">
-                      Only {product.inventory?.quantity} left in stock - order soon.
+                    <p className="text-sm text-[#cc0c39] mt-0.5 flex items-center gap-1">
+                      <svg className="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                      Only {product.inventory?.quantity} left in stock — order soon
                     </p>
                   )}
                 </div>
@@ -266,6 +367,48 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   <WishlistButton productId={product.id} initialWishlisted={isWishlisted} size="md" />
                   <ShareButton productName={product.name} productId={product.id} />
                 </div>
+
+                {/* Secure transaction */}
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200 text-xs text-[#565959]">
+                  <svg className="w-4 h-4 text-[#007600]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Secure transaction</span>
+                </div>
+
+                {/* Return policy */}
+                <div className="flex items-center gap-2 mt-2 text-xs text-[#565959]">
+                  <svg className="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                  </svg>
+                  <Link href="/shipping" className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
+                    30-day returnable
+                  </Link>
+                </div>
+
+                {/* Gift option */}
+                <div className="flex items-center gap-2 mt-2 text-xs text-[#565959]">
+                  <svg className="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                  </svg>
+                  <span>Gift wrap available</span>
+                </div>
+
+                {/* Report issue */}
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <Link
+                    href={`/contact`}
+                    className="flex items-center gap-1.5 text-xs text-[#565959] hover:text-[#1d4ed8] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                    </svg>
+                    Report an issue with this product
+                  </Link>
+                </div>
+
+                {/* Trust Badges */}
+                <TrustBadges />
               </div>
             </div>
           </div>
@@ -285,7 +428,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         )}
 
         {/* Reviews Section */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
+        <div id="customer-reviews" className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
           <h2 className="text-lg font-bold text-[#0f1111] mb-6">Customer Reviews</h2>
 
           {/* Rating summary */}
@@ -319,7 +462,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <ReviewForm productId={product.id} />
           ) : (
             <p className="text-sm text-[#565959]">
-              <Link href="/login" className="text-[#007185] hover:text-[#c7511f] hover:underline">
+              <Link href="/login" className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
                 Sign in
               </Link>{' '}
               to leave a review.
@@ -332,9 +475,23 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           <RelatedProductsSection productId={product.id} categoryId={product.categoryId} />
         </Suspense>
 
+        {/* Customers who viewed this also viewed */}
+        <Suspense fallback={null}>
+          <AlsoViewed productId={product.id} categoryId={product.categoryId} />
+        </Suspense>
+
         {/* Recently Viewed */}
         <RecentlyViewed excludeId={product.id} />
       </div>
+
+      {/* Sticky mobile Add to Cart */}
+      <StickyMobileCTA
+        productId={product.id}
+        price={product.price}
+        discountPrice={product.discountPrice}
+        isInStock={isInStock}
+        productName={product.name}
+      />
     </div>
   );
 }
@@ -370,7 +527,7 @@ async function RelatedProductsSection({ productId, categoryId }: { productId: st
                 <div className="flex items-center justify-center h-full text-gray-300 text-xs">No Image</div>
               )}
             </div>
-            <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#c7511f] transition-colors">{p.name}</p>
+            <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#1d4ed8] transition-colors">{p.name}</p>
             <span className="text-[#0F1111]">
               <sup className="text-[11px] font-medium" style={{ top: '-0.5em' }}>$</sup>
               <span className="text-[21px] font-light">{d}</span>

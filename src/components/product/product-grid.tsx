@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { ProductWithImages } from '@/types';
 import { WishlistButton } from './wishlist-button';
+import { QuickViewButton } from './quick-view-button';
 
 interface ProductGridProps {
   products: ProductWithImages[];
@@ -58,6 +59,7 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
                     <span className="text-[13px] text-[#565959] font-medium">Currently unavailable</span>
                   </div>
                 )}
+                <QuickViewButton product={{ id: product.id, name: product.name, price: product.price, discountPrice: product.discountPrice, imageUrl: product.images?.[0]?.imageUrl, averageRating: product.averageRating, reviewCount: product.reviewCount }} />
               </div>
 
               {/* Info */}
@@ -76,7 +78,7 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
                         </svg>
                       ))}
                     </div>
-                    <span className="text-[12px] text-[#007185]">{product.reviewCount || 0}</span>
+                    <span className="text-[12px] text-[#2563eb]">{product.reviewCount || 0}</span>
                   </div>
                 )}
 
@@ -106,6 +108,14 @@ export function ProductGrid({ products, wishlistedIds = [] }: ProductGridProps) 
                 </div>
 
                 <p className="text-[12px] text-[#565959] mt-0.5">FREE delivery</p>
+
+                {/* Stock warnings */}
+                {product.inventory && product.inventory.quantity === 0 && (
+                  <p className="text-[12px] text-red-600 mt-0.5">Currently unavailable</p>
+                )}
+                {product.inventory && product.inventory.quantity > 0 && product.inventory.quantity <= 5 && (
+                  <p className="text-[12px] text-orange-600 mt-0.5">Only {product.inventory.quantity} left in stock</p>
+                )}
               </div>
             </Link>
           </div>

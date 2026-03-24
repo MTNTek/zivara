@@ -9,6 +9,7 @@ interface SearchParams {
   page?: string;
   limit?: string;
   search?: string;
+  role?: string;
   sortBy?: 'name' | 'email' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
 }
@@ -27,6 +28,7 @@ export default async function AdminUsersPage({
   const page = parseInt(resolvedParams.page || '1');
   const limit = parseInt(resolvedParams.limit || '20');
   const search = resolvedParams.search || '';
+  const role = resolvedParams.role || '';
   const sortBy = resolvedParams.sortBy || 'createdAt';
   const sortOrder = resolvedParams.sortOrder || 'desc';
 
@@ -34,6 +36,7 @@ export default async function AdminUsersPage({
     page,
     limit,
     search,
+    role,
     sortBy,
     sortOrder,
   });
@@ -60,8 +63,32 @@ export default async function AdminUsersPage({
         </div>
 
         {/* Search */}
-        <div className="mb-6">
+        <div className="mb-4">
           <UserSearch initialSearch={search} />
+        </div>
+
+        {/* Role Filter Tabs */}
+        <div className="mb-6 flex gap-2">
+          {[
+            { label: 'All Users', value: '' },
+            { label: 'Admins', value: 'admin' },
+            { label: 'Customers', value: 'customer' },
+          ].map((tab) => (
+            <Link
+              key={tab.value}
+              href={`/admin/users?${new URLSearchParams({
+                ...(search ? { search } : {}),
+                ...(tab.value ? { role: tab.value } : {}),
+              }).toString()}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                role === tab.value
+                  ? 'bg-blue-800 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
         </div>
 
         {/* Users Table */}
@@ -136,7 +163,12 @@ export default async function AdminUsersPage({
                   users.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                            {user.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
+                          </div>
+                          <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{user.email}</div>

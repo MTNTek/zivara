@@ -54,7 +54,15 @@ export function SearchSuggestions({ query, visible, onSelect }: SearchSuggestion
         <div className="p-4 text-sm text-gray-500">Searching...</div>
       )}
       {data && !hasResults && (
-        <div className="p-4 text-sm text-gray-500">No results for &quot;{query}&quot;</div>
+        <div className="p-4 text-center">
+          <p className="text-sm text-gray-500 mb-2">No results for &quot;{query}&quot;</p>
+          <div className="flex flex-wrap justify-center gap-2 text-xs">
+            <span className="text-gray-400">Try:</span>
+            <Link href="/deals" className="text-[#2563eb] hover:underline" onMouseDown={(e) => e.preventDefault()}>Today&apos;s Deals</Link>
+            <Link href="/bestsellers" className="text-[#2563eb] hover:underline" onMouseDown={(e) => e.preventDefault()}>Best Sellers</Link>
+            <Link href="/new-arrivals" className="text-[#2563eb] hover:underline" onMouseDown={(e) => e.preventDefault()}>New Arrivals</Link>
+          </div>
+        </div>
       )}
       {data?.suggestions && data.suggestions.length > 0 && (
         <div className="p-2 border-b border-gray-100">

@@ -50,7 +50,7 @@ export async function RelatedProducts({ productId, categoryId }: RelatedProducts
                   <div className="flex items-center justify-center h-full text-gray-300 text-xs">No Image</div>
                 )}
               </div>
-              <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#c7511f] transition-colors min-h-[36px]">
+              <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#1d4ed8] transition-colors min-h-[36px]">
                 {product.name}
               </p>
               <span className="text-[#0F1111]">

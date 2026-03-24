@@ -8,6 +8,7 @@ import { eq } from 'drizzle-orm';
 import { productSchema, updateProductSchema } from './schemas';
 import { requireAdmin } from '@/lib/auth';
 import { invalidateProductCache } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 import type { ProductInput, UpdateProductInput } from './schemas';
 
 /**
@@ -31,7 +32,7 @@ async function createAuditLog(
       userAgent: null,
     });
   } catch (error) {
-    console.error('Failed to create audit log:', error);
+    logger.error('Failed to create audit log', { error: error instanceof Error ? error.message : String(error) });
     // Don't throw - audit logging failure shouldn't break the operation
   }
 }
@@ -83,7 +84,7 @@ export async function createProduct(data: ProductInput) {
 
     return { success: true, data: product };
   } catch (error) {
-    console.error('Error creating product:', error);
+    logger.error('Error creating product', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -168,7 +169,7 @@ export async function updateProduct(data: UpdateProductInput) {
 
     return { success: true, data: product };
   } catch (error) {
-    console.error('Error updating product:', error);
+    logger.error('Error updating product', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -221,7 +222,7 @@ export async function deleteProduct(id: string) {
 
     return { success: true, data: product };
   } catch (error) {
-    console.error('Error deleting product:', error);
+    logger.error('Error deleting product', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -274,7 +275,7 @@ export async function restoreProduct(id: string) {
 
     return { success: true, data: product };
   } catch (error) {
-    console.error('Error restoring product:', error);
+    logger.error('Error restoring product', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -356,7 +357,7 @@ export async function bulkUpdateProducts(
       };
     }
     
-    console.error('Error bulk updating products:', error);
+    logger.error('Error bulk updating products', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };

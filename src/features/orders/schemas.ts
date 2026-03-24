@@ -21,6 +21,9 @@ export const checkoutSchema = z.object({
   paymentMethod: z.string().min(1, 'Payment method is required'),
   paymentIntentId: z.string().optional(),
   guestEmail: z.string().email('Invalid email format').optional(),
+  couponId: z.string().uuid().optional(),
+  couponCode: z.string().optional(),
+  couponDiscount: z.number().min(0).optional(),
 });
 
 /**

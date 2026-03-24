@@ -2,6 +2,7 @@ import { eq, and, or } from 'drizzle-orm';
 import { db } from '@/db';
 import { markupRules, productSupplierLinks, products } from '@/db/schema';
 import { convert, getExchangeRate } from './currency';
+import { logger } from '@/lib/logger';
 
 export interface MarkupCalculation {
   costPrice: number;
@@ -193,7 +194,7 @@ export async function recalculateAllPrices(
 
       updated++;
     } catch (err) {
-      console.error(`Failed to recalculate price for link ${link.id}:`, err);
+      logger.error(`Failed to recalculate price for link ${link.id}`, { error: err instanceof Error ? err.message : String(err) });
       errors++;
     }
   }

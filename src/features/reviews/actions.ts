@@ -9,6 +9,7 @@ import {
   deleteReviewSchema,
   markReviewHelpfulSchema,
 } from './schemas';
+import { logger } from '@/lib/logger';
 
 export type ActionResult<T = void> = {
   success: boolean;
@@ -86,7 +87,7 @@ export async function createReview(
       data: { reviewId: newReview.id },
     };
   } catch (error) {
-    console.error('Error creating review:', error);
+    logger.error('Error creating review', { error: error instanceof Error ? error.message : String(error) });
     if (error instanceof Error) {
       return {
         success: false,
@@ -166,7 +167,7 @@ export async function updateReview(
       success: true,
     };
   } catch (error) {
-    console.error('Error updating review:', error);
+    logger.error('Error updating review', { error: error instanceof Error ? error.message : String(error) });
     if (error instanceof Error) {
       return {
         success: false,
@@ -226,7 +227,7 @@ export async function deleteReview(
       success: true,
     };
   } catch (error) {
-    console.error('Error deleting review:', error);
+    logger.error('Error deleting review', { error: error instanceof Error ? error.message : String(error) });
     if (error instanceof Error) {
       return {
         success: false,
@@ -278,7 +279,7 @@ export async function markReviewHelpful(
       success: true,
     };
   } catch (error) {
-    console.error('Error marking review as helpful:', error);
+    logger.error('Error marking review as helpful', { error: error instanceof Error ? error.message : String(error) });
     if (error instanceof Error) {
       return {
         success: false,

@@ -11,6 +11,8 @@ import { CategorySidebar } from '@/components/product/category-sidebar';
 import { Pagination } from '@/components/ui/pagination';
 import { SortDropdown } from '@/components/product/sort-dropdown';
 import { getWishlistProductIds } from '@/features/wishlist/actions';
+import { BackToTop } from '@/components/ui/back-to-top';
+import { ScrollRestore } from '@/components/ui/scroll-restore';
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -35,6 +37,11 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   return {
     title: `${category.name} - Zivara`,
     description: category.description || `Shop ${category.name} products at Zivara.`,
+    openGraph: {
+      title: `${category.name} - Zivara`,
+      description: category.description || `Shop ${category.name} products at Zivara.`,
+      type: 'website',
+    },
   };
 }
 
@@ -117,19 +124,44 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     subcategories: subcategorySlugs.length > 0 ? subcategorySlugs : undefined,
   };
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://zivara.com';
+  const breadcrumbItems = [
+    { name: 'Home', url: baseUrl },
+    { name: 'Products', url: `${baseUrl}/products` },
+    ...ancestors.map((a) => ({ name: a.name, url: `${baseUrl}/products/category/${a.slug}` })),
+    { name: category.name, url: `${baseUrl}/products/category/${category.slug}` },
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#EAEDED]">
+      {/* BreadcrumbList JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: breadcrumbItems.map((item, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: item.name,
+              item: item.url,
+            })),
+          }),
+        }}
+      />
+
       <div className="px-4 sm:px-6 lg:px-10 py-4">
         {/* Breadcrumb */}
         <nav className="text-[12px] text-[#565959] mb-3" aria-label="Breadcrumb">
           <ol className="flex items-center flex-wrap gap-1">
             <li>
-              <a href="/products" className="hover:text-[#c7511f] hover:underline">All Products</a>
+              <a href="/products" className="hover:text-[#1d4ed8] hover:underline">All Products</a>
             </li>
             {ancestors.map((a) => (
               <li key={a.id} className="flex items-center gap-1">
                 <span className="text-[#949494]">›</span>
-                <a href={`/products/category/${a.slug}`} className="hover:text-[#c7511f] hover:underline">{a.name}</a>
+                <a href={`/products/category/${a.slug}`} className="hover:text-[#1d4ed8] hover:underline">{a.name}</a>
               </li>
             ))}
             <li className="flex items-center gap-1">
@@ -173,10 +205,10 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 {total > 0 ? (
                   <>
                     {(page - 1) * limit + 1}-{Math.min(page * limit, total)} of over {total} results for{' '}
-                    <span className="font-bold text-[#c7511f]">&quot;{category.name}&quot;</span>
+                    <span className="font-bold text-[#1d4ed8]">&quot;{category.name}&quot;</span>
                   </>
                 ) : (
-                  <>No results for <span className="font-bold text-[#c7511f]">&quot;{category.name}&quot;</span></>
+                  <>No results for <span className="font-bold text-[#1d4ed8]">&quot;{category.name}&quot;</span></>
                 )}
               </p>
               <SortDropdown currentSort={sp.sortBy} />
@@ -194,16 +226,41 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               </>
             ) : (
               <div className="py-16 text-center">
-                <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
+                <div className="text-5xl mb-4">📦</div>
                 <h3 className="text-lg font-medium text-[#0F1111] mb-1">No products found</h3>
-                <p className="text-[13px] text-[#565959]">Try adjusting your filters or browse a different category</p>
+                <p className="text-[13px] text-[#565959] mb-6">Try adjusting your filters or browse a different category</p>
+                {(sp.minPrice || sp.maxPrice || sp.minRating) && (
+                  <a
+                    href={`/products/category/${slug}`}
+                    className="inline-block bg-[#fbbf24] text-[#0F1111] px-5 py-2 rounded-full text-sm font-medium hover:bg-[#f59e0b] transition-colors"
+                  >
+                    Clear All Filters
+                  </a>
+                )}
+                {childCategories.length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <p className="text-sm text-[#565959] mb-3">Browse subcategories</p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {childCategories.slice(0, 8).map((child) => (
+                        <a
+                          key={child.id}
+                          href={`/products/category/${child.slug}`}
+                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                        >
+                          {child.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <BackToTop />
+      <ScrollRestore />
     </div>
   );
 }

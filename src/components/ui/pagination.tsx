@@ -83,7 +83,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
               href={createPageUrl(pageNum)}
               className={`px-4 py-3 min-h-[44px] min-w-[44px] border rounded-md transition-colors flex items-center justify-center ${
                 isActive
-                  ? 'bg-blue-800 text-white border-blue-800'
+                  ? 'bg-[#2563eb] text-white border-[#2563eb]'
                   : 'border-gray-300 hover:bg-gray-50 text-black'
               }`}
               aria-current={isActive ? 'page' : undefined}

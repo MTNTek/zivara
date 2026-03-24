@@ -2,22 +2,25 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { registerSchema } from '@/features/auth/schemas';
 import { validateWithSchema } from '@/lib/form-validation';
 import { ButtonSpinner } from '@/components/ui/spinner';
 import { toast } from '@/lib/toast';
 import { hasAnyUsers, promoteToAdmin } from '@/features/auth/actions';
+import { PasswordStrength } from '@/components/auth/password-strength';
+import { Logo } from '@/components/ui/logo';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    email: searchParams.get('email') || '',
     password: '',
     confirmPassword: '',
   });
@@ -110,8 +113,8 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-black" aria-label="Zivara home">
-            Zivara
+          <Link href="/" className="inline-block" aria-label="Zivara home">
+            <Logo variant="dark" size="lg" />
           </Link>
           <h1 className="mt-6 text-3xl font-bold text-gray-900">
             Create your account
@@ -212,6 +215,7 @@ export default function RegisterPage() {
               <p id="password-hint" className="mt-1 text-xs text-gray-600">
                 Must be at least 8 characters
               </p>
+              <PasswordStrength password={formData.password} />
               {fieldErrors.password && (
                 <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
                   {fieldErrors.password}
@@ -282,6 +286,30 @@ export default function RegisterPage() {
               <Link href="/privacy" className="text-black hover:underline">Privacy Policy</Link>
             </p>
           </form>
+
+          {/* Benefits */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500 text-center mb-3">Why create an account?</p>
+            <div className="space-y-2">
+              {[
+                { icon: '🚚', text: 'Track orders and get delivery updates' },
+                { icon: '❤️', text: 'Save items to your wishlist' },
+                { icon: '⭐', text: 'Write reviews and earn rewards' },
+              ].map((benefit) => (
+                <div key={benefit.text} className="flex items-center gap-2 text-xs text-gray-600">
+                  <span>{benefit.icon}</span>
+                  <span>{benefit.text}</span>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-gray-500 text-center mt-4">
+              Already have an account?{' '}
+              <a href="/login" className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline font-medium">
+                Sign in
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>

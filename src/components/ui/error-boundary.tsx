@@ -25,7 +25,7 @@ export function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
         </p>
         <button
           onClick={reset}
-          className="rounded-md bg-blue-800 px-4 py-2 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2"
+          className="rounded-full bg-[#fbbf24] px-6 py-2.5 text-[#0F1111] font-medium hover:bg-[#f59e0b] focus:outline-none focus:ring-2 focus:ring-[#f59e0b] focus:ring-offset-2 transition-colors border border-[#FCD200]"
         >
           Try again
         </button>

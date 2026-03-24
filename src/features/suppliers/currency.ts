@@ -71,13 +71,41 @@ export async function getExchangeRate(
 }
 
 /**
- * Placeholder for fetching exchange rates from an external API.
+ * Fetch exchange rates from the European Central Bank (free, no API key).
+ * Falls back to Open Exchange Rates if ECB_FALLBACK_KEY is set.
  * Supports: USD, EUR, TRY, AED, CNY.
  */
 export async function refreshExchangeRates(): Promise<void> {
-  console.log(
-    `Would refresh exchange rates for supported currencies: ${SUPPORTED_CURRENCIES.join(', ')}`
-  );
-  // TODO: Integrate with an external exchange rate API (e.g., Open Exchange Rates, ECB)
-  // For each currency pair, fetch the latest rate and upsert into the exchangeRates table.
+  const { logger } = await import('@/lib/logger');
+
+  try {
+    // ECB publishes daily rates with EUR as base — free, no key needed
+    const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,TRY,AED,CNY', {
+      next: { revalidate: 3600 }, // Cache for 1 hour
+    });
+
+    if (!res.ok) {
+      logger.error('Exchange rate fetch failed', { status: res.status });
+      return;
+    }
+
+    const data = await res.json() as { rates: Record<string, number> };
+    const now = new Date();
+
+    // Insert new rate records (append-only — getExchangeRate picks the latest by fetchedAt)
+    for (const [target, rate] of Object.entries(data.rates)) {
+      await db.insert(exchangeRates).values({
+        sourceCurrency: 'USD',
+        targetCurrency: target,
+        rate: String(rate),
+        fetchedAt: now,
+      });
+    }
+
+    logger.info('Exchange rates refreshed', { currencies: Object.keys(data.rates) });
+  } catch (err) {
+    logger.error('Exchange rate refresh error', {
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { MegaMenu } from './MegaMenu';
 import Image from 'next/image';
 
@@ -946,7 +947,7 @@ function NavDropdown({ link, onClose }: { link: NavLink; onClose: () => void }) 
           <Link
             href={sub.href}
             onClick={onClose}
-            className="block text-[13px] font-bold text-[#0F1111] hover:text-[#c7511f] transition-colors mb-1"
+            className="block text-[13px] font-bold text-[#0F1111] hover:text-[#1d4ed8] transition-colors mb-1"
           >
             {sub.name}
           </Link>
@@ -956,7 +957,7 @@ function NavDropdown({ link, onClose }: { link: NavLink; onClose: () => void }) 
                 key={child.name}
                 href={child.href}
                 onClick={onClose}
-                className="block text-[13px] text-[#565959] hover:text-[#c7511f] transition-colors leading-[24px]"
+                className="block text-[13px] text-[#565959] hover:text-[#1d4ed8] transition-colors leading-[24px]"
               >
                 {child.name}
               </Link>
@@ -988,6 +989,12 @@ export function SecondaryNav() {
     setActiveIndex(null);
   }, []);
 
+  // Close dropdown on route change
+  const pathname = usePathname();
+  useEffect(() => {
+    setActiveIndex(null);
+  }, [pathname]);
+
   const activeLink = activeIndex !== null ? navLinks[activeIndex] : null;
 
   return (
@@ -995,8 +1002,14 @@ export function SecondaryNav() {
       <div className="w-full px-4">
         <div className="flex items-center gap-6 h-[41px] overflow-x-auto scrollbar-hide">
           <MegaMenu />
-          <Link href="/deals" className="whitespace-nowrap py-2 text-[#FFD814] font-bold hover:text-[#F7CA00] transition-colors flex-shrink-0">
+          <Link href="/deals" className="whitespace-nowrap py-2 text-[#fbbf24] font-bold hover:text-[#f59e0b] transition-colors flex-shrink-0">
             Today&apos;s Deals
+          </Link>
+          <Link href="/bestsellers" className="whitespace-nowrap py-2 hover:text-white/80 transition-colors flex-shrink-0">
+            Best Sellers
+          </Link>
+          <Link href="/new-arrivals" className="whitespace-nowrap py-2 hover:text-white/80 transition-colors flex-shrink-0">
+            New Arrivals
           </Link>
           {navLinks.map((link, index) => (
             <div
@@ -1007,6 +1020,7 @@ export function SecondaryNav() {
             >
               <Link
                 href={link.href}
+                onClick={handleClose}
                 className="whitespace-nowrap py-2 hover:text-white/80 transition-colors block"
               >
                 {link.name}
@@ -1043,14 +1057,13 @@ export function SecondaryNav() {
                         onClick={handleClose}
                         className="flex flex-col items-center gap-1"
                       >
-                        <div className="flex items-center justify-center w-[90px] h-[50px] rounded-md border border-[#e7e7e7] bg-white hover:border-[#c7511f] transition-colors overflow-hidden p-2">
+                        <div className="flex items-center justify-center w-[90px] h-[50px] rounded-md border border-[#e7e7e7] bg-white hover:border-[#1d4ed8] transition-colors overflow-hidden p-2">
                           <Image
                             src={brand.logo}
                             alt={brand.name}
                             width={60}
                             height={30}
                             className="object-contain max-w-full max-h-full"
-                            unoptimized
                           />
                         </div>
                         <span className="text-[10px] text-[#565959]">{brand.name}</span>
@@ -1070,7 +1083,6 @@ export function SecondaryNav() {
                     alt={activeLink.name}
                     fill
                     className="object-cover"
-                    unoptimized
                   />
                 </div>
               </div>

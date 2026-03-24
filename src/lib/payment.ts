@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { logger } from '@/lib/logger';
 
 // Initialize Stripe with secret key (optional for tests)
 let stripe: Stripe | null = null;
@@ -164,7 +165,7 @@ export async function getCardLast4Digits(paymentMethodId: string): Promise<strin
     
     return null;
   } catch (error) {
-    console.error('Failed to retrieve payment method:', error);
+    logger.error('Failed to retrieve payment method', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }

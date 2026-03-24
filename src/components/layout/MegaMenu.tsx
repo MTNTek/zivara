@@ -308,7 +308,7 @@ export function MegaMenu() {
                     <Link
                       href={activeCategory.href}
                       onClick={handleClose}
-                      className="font-bold text-[#111] text-[15px] hover:text-[#c7511f] transition-colors"
+                      className="font-bold text-[#111] text-[15px] hover:text-[#1d4ed8] transition-colors"
                     >
                       {activeCategory.name}
                     </Link>
@@ -331,7 +331,7 @@ export function MegaMenu() {
                     <Link
                       href={activeCategory.href}
                       onClick={handleClose}
-                      className="block px-5 py-2.5 text-sm font-medium text-[#007185] hover:text-[#c7511f] hover:underline transition-colors"
+                      className="block px-5 py-2.5 text-sm font-medium text-[#2563eb] hover:text-[#1d4ed8] hover:underline transition-colors"
                     >
                       See all {activeCategory.name}
                     </Link>

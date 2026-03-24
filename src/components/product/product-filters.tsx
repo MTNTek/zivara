@@ -75,7 +75,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
         <select
           value={currentFilters.sortBy || ''}
           onChange={(e) => updateFilter('sortBy', e.target.value || null)}
-          className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA] text-base"
+          className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563eb] text-base"
           disabled={isPending}
         >
           <option value="">Default</option>
@@ -96,8 +96,8 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             className="flex items-center min-h-[44px] w-full text-left"
             disabled={isPending}
           >
-            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.categoryId ? 'border-blue-800' : 'border-gray-300'}`}>
-              {!currentFilters.categoryId && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.categoryId ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+              {!currentFilters.categoryId && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
             </span>
             <span className="ml-3 text-sm text-gray-700">All Categories</span>
           </button>
@@ -109,8 +109,8 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
               className="flex items-center min-h-[44px] w-full text-left"
               disabled={isPending}
             >
-              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.categoryId === category.id ? 'border-blue-800' : 'border-gray-300'}`}>
-                {currentFilters.categoryId === category.id && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.categoryId === category.id ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+                {currentFilters.categoryId === category.id && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
               </span>
               <span className="ml-3 text-sm text-gray-700">{category.name}</span>
             </button>
@@ -127,7 +127,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             placeholder="Min price"
             value={currentFilters.minPrice || ''}
             onChange={(e) => updateFilter('minPrice', e.target.value || null)}
-            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA] text-base"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563eb] text-base"
             min="0"
             step="0.01"
             disabled={isPending}
@@ -137,7 +137,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             placeholder="Max price"
             value={currentFilters.maxPrice || ''}
             onChange={(e) => updateFilter('maxPrice', e.target.value || null)}
-            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA] text-base"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563eb] text-base"
             min="0"
             step="0.01"
             disabled={isPending}
@@ -157,12 +157,12 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
               className="flex items-center min-h-[44px] w-full text-left"
               disabled={isPending}
             >
-              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.minRating === rating ? 'border-blue-800' : 'border-gray-300'}`}>
-                {currentFilters.minRating === rating && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.minRating === rating ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+                {currentFilters.minRating === rating && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
               </span>
               <span className="ml-3 text-sm text-gray-700 flex items-center">
                 {[...Array(rating)].map((_, i) => (
-                  <span key={i} className="text-[#14B8A6]">★</span>
+                  <span key={i} className="text-[#de7921]">★</span>
                 ))}
                 <span className="ml-1">& up</span>
               </span>
@@ -174,8 +174,8 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             className="flex items-center min-h-[44px] w-full text-left"
             disabled={isPending}
           >
-            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.minRating ? 'border-blue-800' : 'border-gray-300'}`}>
-              {!currentFilters.minRating && <span className="w-2.5 h-2.5 rounded-full bg-blue-800" />}
+            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.minRating ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+              {!currentFilters.minRating && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
             </span>
             <span className="ml-3 text-sm text-gray-700">All Ratings</span>
           </button>

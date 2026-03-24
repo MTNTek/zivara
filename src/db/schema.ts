@@ -126,6 +126,8 @@ export const orders = pgTable('orders', {
   shippingState: varchar('shipping_state', { length: 100 }).notNull(),
   shippingPostalCode: varchar('shipping_postal_code', { length: 20 }).notNull(),
   shippingCountry: varchar('shipping_country', { length: 100 }).notNull(),
+  couponId: uuid('coupon_id').references(() => coupons.id, { onDelete: 'set null' }),
+  discount: decimal('discount', { precision: 10, scale: 2 }).default('0.00'),
   paymentMethod: varchar('payment_method', { length: 50 }).notNull(),
   paymentIntentId: varchar('payment_intent_id', { length: 255 }),
   lastFourDigits: varchar('last_four_digits', { length: 4 }),
@@ -543,6 +545,10 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
     fields: [orders.userId],
     references: [users.id],
   }),
+  coupon: one(coupons, {
+    fields: [orders.couponId],
+    references: [coupons.id],
+  }),
   items: many(orderItems),
   statusHistory: many(orderStatusHistory),
   subOrders: many(subOrders),
@@ -736,3 +742,105 @@ export const contactMessages = pgTable('contact_messages', {
   statusIdx: index('contact_messages_status_idx').on(table.status),
   createdAtIdx: index('contact_messages_created_at_idx').on(table.createdAt),
 }));
+
+// Coupons Table
+export const coupons = pgTable('coupons', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  code: varchar('code', { length: 50 }).notNull().unique(),
+  description: text('description'),
+  discountType: varchar('discount_type', { length: 20 }).notNull(), // 'percentage' | 'fixed'
+  discountValue: decimal('discount_value', { precision: 10, scale: 2 }).notNull(),
+  minOrderAmount: decimal('min_order_amount', { precision: 10, scale: 2 }),
+  maxDiscountAmount: decimal('max_discount_amount', { precision: 10, scale: 2 }),
+  usageLimit: integer('usage_limit'), // null = unlimited
+  usedCount: integer('used_count').notNull().default(0),
+  perUserLimit: integer('per_user_limit').default(1),
+  isActive: boolean('is_active').notNull().default(true),
+  startsAt: timestamp('starts_at'),
+  expiresAt: timestamp('expires_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  codeIdx: index('coupons_code_idx').on(table.code),
+  activeIdx: index('coupons_active_idx').on(table.isActive),
+}));
+
+// Coupon Usage Table
+export const couponUsages = pgTable('coupon_usages', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  couponId: uuid('coupon_id').notNull().references(() => coupons.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  orderId: uuid('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  discountApplied: decimal('discount_applied', { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  couponIdx: index('coupon_usages_coupon_idx').on(table.couponId),
+  userIdx: index('coupon_usages_user_idx').on(table.userId),
+}));
+
+// Stock Notification Requests Table
+export const stockNotifications = pgTable('stock_notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  productId: uuid('product_id').notNull().references(() => products.id, { onDelete: 'cascade' }),
+  email: varchar('email', { length: 255 }).notNull(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  notified: boolean('notified').notNull().default(false),
+  notifiedAt: timestamp('notified_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => ({
+  productIdx: index('stock_notifications_product_idx').on(table.productId),
+  emailIdx: index('stock_notifications_email_idx').on(table.email),
+}));
+
+// Coupon Relations
+export const couponsRelations = relations(coupons, ({ many }) => ({
+  usages: many(couponUsages),
+}));
+
+export const couponUsagesRelations = relations(couponUsages, ({ one }) => ({
+  coupon: one(coupons, {
+    fields: [couponUsages.couponId],
+    references: [coupons.id],
+  }),
+  user: one(users, {
+    fields: [couponUsages.userId],
+    references: [users.id],
+  }),
+  order: one(orders, {
+    fields: [couponUsages.orderId],
+    references: [orders.id],
+  }),
+}));
+
+export const stockNotificationsRelations = relations(stockNotifications, ({ one }) => ({
+  product: one(products, {
+    fields: [stockNotifications.productId],
+    references: [products.id],
+  }),
+  user: one(users, {
+    fields: [stockNotifications.userId],
+    references: [users.id],
+  }),
+}));
+
+// Newsletter Subscribers Table
+export const newsletterSubscribers = pgTable('newsletter_subscribers', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  isActive: boolean('is_active').notNull().default(true),
+  subscribedAt: timestamp('subscribed_at').notNull().defaultNow(),
+  unsubscribedAt: timestamp('unsubscribed_at'),
+}, (table) => ({
+  emailIdx: index('newsletter_email_idx').on(table.email),
+}));
+
+// Store Settings Table (key-value pairs)
+export const storeSettings = pgTable('store_settings', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  key: varchar('key', { length: 100 }).notNull().unique(),
+  value: text('value').notNull(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const newsletterSubscribersRelations = relations(newsletterSubscribers, ({}) => ({}));
+export const storeSettingsRelations = relations(storeSettings, ({}) => ({}));

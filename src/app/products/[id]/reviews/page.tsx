@@ -38,7 +38,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
   const avgRating = product.averageRating ? Number(product.averageRating) : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#EAEDED]">
       <div className="px-4 sm:px-6 lg:px-10 py-8 max-w-4xl">
         {/* Breadcrumbs */}
         <nav className="mb-6 text-sm">
@@ -62,7 +62,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
             <div className="flex items-center gap-3">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className={i < Math.round(avgRating) ? 'text-[#14B8A6] text-xl' : 'text-gray-300 text-xl'}>
+                  <span key={i} className={i < Math.round(avgRating) ? 'text-[#de7921] text-xl' : 'text-gray-300 text-xl'}>
                     ★
                   </span>
                 ))}
@@ -83,7 +83,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
                 href={`/products/${id}/reviews?sort=${option}`}
                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   sortBy === option
-                    ? 'bg-blue-800 text-white'
+                    ? 'bg-[#2563eb] text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                 }`}
               >
@@ -111,7 +111,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
                     <div className="flex items-center gap-2">
                       <div className="flex">
                         {[...Array(5)].map((_, i) => (
-                          <span key={i} className={i < review.rating ? 'text-[#14B8A6]' : 'text-gray-300'}>
+                          <span key={i} className={i < review.rating ? 'text-[#de7921]' : 'text-gray-300'}>
                             ★
                           </span>
                         ))}
@@ -159,7 +159,7 @@ export default async function ReviewsPage({ params, searchParams }: ReviewsPageP
                 href={`/products/${id}/reviews?page=${p}&sort=${sortBy}`}
                 className={`px-4 py-2 rounded-lg text-sm ${
                   p === page
-                    ? 'bg-blue-800 text-white'
+                    ? 'bg-[#2563eb] text-white'
                     : 'bg-white border border-gray-300 hover:bg-gray-50 text-black'
                 }`}
               >

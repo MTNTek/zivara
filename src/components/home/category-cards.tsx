@@ -9,7 +9,7 @@ interface CategoryCardProps {
 
 function CategoryCard({ title, items, seeMoreHref }: CategoryCardProps) {
   return (
-    <div className="bg-white p-5 flex flex-col h-full">
+    <div className="bg-white p-5 flex flex-col h-full hover:shadow-md transition-shadow duration-200">
       <h2 className="text-xl font-bold text-[#0f1111] mb-4">{title}</h2>
       <div className="grid grid-cols-2 gap-3 flex-1">
         {items.slice(0, 4).map((item) => (
@@ -21,7 +21,8 @@ function CategoryCard({ title, items, seeMoreHref }: CategoryCardProps) {
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 768px) 40vw, 150px"
-                unoptimized
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTVlN2ViIi8+PC9zdmc+"
               />
             </div>
             <p className="text-xs text-[#0f1111] leading-tight line-clamp-2">
@@ -32,7 +33,7 @@ function CategoryCard({ title, items, seeMoreHref }: CategoryCardProps) {
       </div>
       <Link
         href={seeMoreHref}
-        className="text-sm text-[#007185] hover:text-[#c7511f] hover:underline mt-4"
+        className="text-sm text-[#2563eb] hover:text-[#1d4ed8] hover:underline mt-4"
       >
         See more
       </Link>

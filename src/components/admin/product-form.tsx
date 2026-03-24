@@ -135,18 +135,27 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       }
 
       if (result.success) {
-        router.push('/admin/products');
-        router.refresh();
+        if (product) {
+          router.push('/admin/products');
+          router.refresh();
+        } else if (result.data?.id) {
+          // Product created — set ID so image upload section appears
+          setCreatedProductId(result.data.id);
+        }
       } else {
         setErrors({ general: result.error || 'Failed to save product' });
       }
     });
   };
 
+  // Track newly created product ID for image uploads during creation
+  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
+
   // Handle image upload
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !product) return;
+    const targetProductId = product?.id || createdProductId;
+    if (!file || !targetProductId) return;
 
     setUploadingImage(true);
     setErrors(prev => ({ ...prev, general: undefined }));
@@ -154,7 +163,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('productId', product.id);
+      formData.append('productId', targetProductId);
 
       const result = await uploadProductImage(formData);
 
@@ -186,9 +195,10 @@ export function ProductForm({ product, categories }: ProductFormProps) {
 
   // Handle set primary image
   const handleSetPrimary = async (imageId: string) => {
-    if (!product) return;
+    const targetProductId = product?.id || createdProductId;
+    if (!targetProductId) return;
 
-    const result = await setPrimaryImage(product.id, imageId);
+    const result = await setPrimaryImage(targetProductId, imageId);
 
     if (result.success) {
       setImages(prev => prev.map(img => ({
@@ -416,9 +426,15 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       </div>
 
       {/* Images */}
-      {product && (
+      {(product || createdProductId) && (
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Images</h2>
+          
+          {createdProductId && !product && (
+            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md mb-4">
+              Product created. You can now upload images, then click &quot;Done&quot; below to finish.
+            </div>
+          )}
           
           {/* Image Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -481,6 +497,19 @@ export function ProductForm({ product, categories }: ProductFormProps) {
               <p className="mt-2 text-sm text-black">Uploading...</p>
             )}
           </div>
+
+          {/* Done button for newly created products */}
+          {createdProductId && !product && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => { router.push('/admin/products'); router.refresh(); }}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900"
+              >
+                Done — Go to Products
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -503,6 +532,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       </div>
 
       {/* Form Actions */}
+      {!createdProductId && (
       <div className="flex items-center justify-end space-x-4">
         <button
           type="button"
@@ -520,6 +550,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
           {isPending ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
         </button>
       </div>
+      )}
     </form>
   );
 }

@@ -33,7 +33,7 @@ export function WishlistButton({ productId, initialWishlisted = false, size = 's
       disabled={isPending}
       aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
       className={`p-1.5 rounded-full transition-all ${
-        isPending ? 'opacity-50' : 'hover:scale-110'
+        isPending ? 'opacity-50 animate-pulse' : 'hover:scale-110 active:scale-95'
       } ${wishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`}
     >
       <svg

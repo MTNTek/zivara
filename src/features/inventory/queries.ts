@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { inventory, products } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
 
 /**
  * Get inventory for a specific product
@@ -16,7 +17,7 @@ export async function getInventoryByProductId(productId: string) {
 
     return inventoryRecord || null;
   } catch (error) {
-    console.error('Error fetching inventory:', error);
+    logger.error('Error fetching inventory', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -47,7 +48,7 @@ export async function getInventoryWithProduct(productId: string) {
 
     return result[0] || null;
   } catch (error) {
-    console.error('Error fetching inventory with product:', error);
+    logger.error('Error fetching inventory with product', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -78,7 +79,7 @@ export async function getAllInventory() {
 
     return results;
   } catch (error) {
-    console.error('Error fetching all inventory:', error);
+    logger.error('Error fetching all inventory', { error: error instanceof Error ? error.message : String(error) });
     return [];
   }
 }

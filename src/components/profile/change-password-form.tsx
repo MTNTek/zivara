@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { authClient } from '@/lib/auth-client';
+import { PasswordStrength } from '@/components/auth/password-strength';
 
 export function ChangePasswordForm() {
   const [isPending, startTransition] = useTransition();
@@ -59,7 +60,7 @@ export function ChangePasswordForm() {
             id="currentPassword"
             value={formData.currentPassword}
             onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
-            className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
+            className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
             required
             autoComplete="current-password"
           />
@@ -83,7 +84,7 @@ export function ChangePasswordForm() {
             id="newPassword"
             value={formData.newPassword}
             onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
-            className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
+            className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
             required
             minLength={8}
             autoComplete="new-password"
@@ -96,6 +97,7 @@ export function ChangePasswordForm() {
             )}
           </button>
         </div>
+        <PasswordStrength password={formData.newPassword} />
       </div>
 
       <div>
@@ -108,7 +110,7 @@ export function ChangePasswordForm() {
             id="confirmPassword"
             value={formData.confirmPassword}
             onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-            className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
+            className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
             required
             minLength={8}
             autoComplete="new-password"
@@ -138,7 +140,7 @@ export function ChangePasswordForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors disabled:opacity-50"
+        className="w-full bg-[#fbbf24] text-[#0F1111] px-6 py-3 rounded-lg font-semibold hover:bg-[#f59e0b] transition-colors disabled:opacity-50"
       >
         {isPending ? 'Changing...' : 'Change Password'}
       </button>

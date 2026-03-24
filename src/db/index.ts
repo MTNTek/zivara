@@ -3,7 +3,8 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 
-// Load environment variables
+// Load environment variables (.env.local takes precedence)
+config({ path: '.env.local', override: true });
 config();
 
 if (!process.env.DATABASE_URL) {

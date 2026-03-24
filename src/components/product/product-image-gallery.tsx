@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import type { ProductImage } from '@/types';
 
@@ -15,6 +15,13 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [showFullscreen, setShowFullscreen] = useState(false);
 
+  // Touch/swipe state
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchEndX = useRef(0);
+  const isSwiping = useRef(false);
+  const mainImageRef = useRef<HTMLDivElement>(null);
+
   const goToPrev = useCallback(() => {
     if (images && images.length > 1) {
       setSelectedIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -27,6 +34,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
     }
   }, [images]);
 
+  // Keyboard navigation + body scroll lock for fullscreen
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (showFullscreen && e.key === 'Escape') setShowFullscreen(false);
@@ -36,6 +44,43 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [goToPrev, goToNext, showFullscreen]);
+
+  useEffect(() => {
+    if (showFullscreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [showFullscreen]);
+
+  // Touch handlers for swipe
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isSwiping.current = false;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+    const diffX = Math.abs(touchEndX.current - touchStartX.current);
+    const diffY = Math.abs(e.touches[0].clientY - touchStartY.current);
+    // Only count as swipe if horizontal movement > vertical
+    if (diffX > 10 && diffX > diffY) {
+      isSwiping.current = true;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isSwiping.current) return;
+    const diff = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+    if (Math.abs(diff) >= minSwipeDistance) {
+      if (diff > 0) goToNext();
+      else goToPrev();
+    }
+    isSwiping.current = false;
+  }, [goToNext, goToPrev]);
 
   if (!images || images.length === 0) {
     return (
@@ -59,8 +104,8 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
   return (
     <>
       <div className="flex gap-3">
-        {/* Left: Vertical thumbnail strip */}
-        <div className="flex flex-col gap-2 w-[60px] flex-shrink-0">
+        {/* Left: Vertical thumbnail strip (hidden on mobile) */}
+        <div className="hidden sm:flex flex-col gap-2 w-[60px] flex-shrink-0">
           {images.map((image, index) => (
             <button
               key={image.id}
@@ -68,8 +113,8 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
               onClick={() => setSelectedIndex(index)}
               className={`w-[60px] h-[60px] relative bg-gray-50 rounded border-2 overflow-hidden transition-colors flex-shrink-0 ${
                 index === selectedIndex
-                  ? 'border-[#007185] shadow-sm'
-                  : 'border-gray-200 hover:border-[#007185]'
+                  ? 'border-[#2563eb] shadow-sm'
+                  : 'border-gray-200 hover:border-[#2563eb]'
               }`}
             >
               <Image
@@ -83,13 +128,17 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
           ))}
         </div>
 
-        {/* Right: Main image */}
+        {/* Right: Main image with touch support */}
         <div className="flex-1 relative group">
           <div
-            className="aspect-square relative bg-white rounded overflow-hidden cursor-crosshair"
+            ref={mainImageRef}
+            className="aspect-square relative bg-white rounded overflow-hidden cursor-crosshair touch-pan-y"
             onMouseEnter={() => setIsZoomed(true)}
             onMouseLeave={() => setIsZoomed(false)}
             onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <Image
               src={selectedImage.imageUrl}
@@ -99,6 +148,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
               style={isZoomed ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` } : undefined}
               priority
               sizes="(max-width: 1024px) 100vw, 40vw"
+              draggable={false}
             />
 
             {/* Navigation arrows */}
@@ -126,10 +176,28 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
             )}
           </div>
 
+          {/* Mobile dot indicators */}
+          {images.length > 1 && (
+            <div className="flex sm:hidden justify-center gap-1.5 mt-3">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedIndex(index)}
+                  className={`rounded-full transition-all ${
+                    index === selectedIndex
+                      ? 'w-6 h-2 bg-[#2563eb]'
+                      : 'w-2 h-2 bg-gray-300'
+                  }`}
+                  aria-label={`View image ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
           {/* View full image link */}
           <button
             onClick={() => setShowFullscreen(true)}
-            className="mt-2 text-xs text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-1"
+            className="mt-2 text-xs text-[#2563eb] hover:text-[#1d4ed8] hover:underline flex items-center gap-1"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -156,10 +224,13 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
             </svg>
           </button>
 
-          {/* Fullscreen image */}
+          {/* Fullscreen image with touch support */}
           <div
             className="relative w-[90vw] h-[90vh]"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <Image
               src={selectedImage.imageUrl}
@@ -167,6 +238,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
               fill
               className="object-contain"
               sizes="90vw"
+              draggable={false}
             />
           </div>
 

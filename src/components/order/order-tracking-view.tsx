@@ -131,9 +131,9 @@ export default function OrderTrackingView({ order }: { order: OrderData }) {
                   <div
                     className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full text-2xl ${
                       isCompleted
-                        ? 'bg-blue-800 text-white'
+                        ? 'bg-[#2563eb] text-white'
                         : 'bg-gray-200 text-gray-400'
-                    } ${isCurrent ? 'ring-4 ring-blue-100' : ''}`}
+                    } ${isCurrent ? 'ring-4 ring-[#eff6ff]' : ''}`}
                   >
                     {step.icon}
                   </div>
@@ -184,11 +184,11 @@ export default function OrderTrackingView({ order }: { order: OrderData }) {
 
       {/* Estimated Delivery */}
       {estimatedDelivery && order.status !== 'cancelled' && order.status !== 'delivered' && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+        <div className="bg-[#eff6ff] border border-[#2563eb]/20 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-[#0F1111] mb-2">
             Estimated Delivery
           </h3>
-          <p className="text-blue-800">
+          <p className="text-[#2563eb]">
             {estimatedDelivery.toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',

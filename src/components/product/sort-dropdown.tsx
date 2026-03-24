@@ -28,7 +28,7 @@ export function SortDropdown({ currentSort }: { currentSort?: string }) {
       value={currentSort || ''}
       onChange={(e) => handleChange(e.target.value)}
       disabled={isPending}
-      className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-black focus:outline-none focus:ring-2 focus:ring-[#0F52BA] bg-white"
+      className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-black focus:outline-none focus:ring-2 focus:ring-[#2563eb] bg-white"
       aria-label="Sort products"
     >
       <option value="">Sort: Default</option>
@@ -36,6 +36,7 @@ export function SortDropdown({ currentSort }: { currentSort?: string }) {
       <option value="price-desc">Price: High to Low</option>
       <option value="rating">Highest Rated</option>
       <option value="newest">Newest First</option>
+      <option value="bestselling">Best Selling</option>
     </select>
   );
 }

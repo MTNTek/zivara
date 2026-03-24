@@ -42,7 +42,9 @@ export async function requestPasswordReset(
         email: data.email,
         userId: user.id,
       });
-      // TODO: Implement via Better Auth's built-in password reset flow
+      const { sendPasswordResetEmail } = await import('@/lib/email');
+      const token = Buffer.from(`${user.id}:${Date.now()}`).toString('base64url');
+      sendPasswordResetEmail(data.email, token).catch(() => {});
     } else {
       logger.info('Password reset requested for non-existent or inactive user', {
         email: data.email,

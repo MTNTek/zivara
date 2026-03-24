@@ -1,4 +1,5 @@
 import { db, client } from './index';
+import { sql } from 'drizzle-orm';
 import * as schema from './schema';
 import bcrypt from 'bcryptjs';
 
@@ -7,19 +8,18 @@ async function seed() {
 
   try {
     console.log('Clearing existing data...');
-    await db.delete(schema.reviews);
-    await db.delete(schema.orderStatusHistory);
-    await db.delete(schema.orderItems);
-    await db.delete(schema.orders);
-    await db.delete(schema.cartItems);
-    await db.delete(schema.inventory);
-    await db.delete(schema.productImages);
-    await db.delete(schema.products);
-    await db.delete(schema.categories);
-    await db.delete(schema.userAddresses);
-    await db.delete(schema.accounts);
-    await db.delete(schema.sessions);
-    await db.delete(schema.users);
+    // Use TRUNCATE CASCADE to handle all FK dependencies cleanly
+    await db.execute(sql`
+      TRUNCATE TABLE 
+        supplier_price_history, sub_order_items, sub_orders,
+        markup_rules, product_supplier_links, sync_jobs, suppliers,
+        exchange_rates, wishlist_items, price_history, reviews,
+        order_status_history, order_items, orders,
+        cart_items, inventory, product_images, products,
+        categories, contact_messages, user_addresses,
+        accounts, sessions, verifications, users
+      CASCADE
+    `);
     console.log('✓ Existing data cleared');
 
     // 1. Create Users
@@ -393,25 +393,51 @@ async function seed() {
 
     console.log(`Inserting ${allProductSeeds.length} products...`);
     const createdProducts: Array<typeof schema.products.$inferSelect> = [];
-    for (const p of allProductSeeds) {
-      const [product] = await db.insert(schema.products).values({
-        name: p.name, slug: p.slug, description: p.description,
-        price: p.price, discountPrice: p.discountPrice,
-        categoryId: p.categoryId, sku: p.sku, isActive: true,
-        averageRating: (3.5 + Math.random() * 1.5).toFixed(2),
-        reviewCount: Math.floor(Math.random() * 50) + 5,
-      }).returning();
-      createdProducts.push(product);
-      for (let i = 0; i < p.images.length; i++) {
-        await db.insert(schema.productImages).values({
-          productId: product.id, imageUrl: p.images[i].url,
-          thumbnailUrl: p.images[i].url.replace('w=800&h=800', 'w=200&h=200'),
-          altText: p.images[i].alt, displayOrder: i, isPrimary: i === 0,
+    
+    // Batch insert products in chunks of 50 for performance
+    const CHUNK_SIZE = 50;
+    for (let i = 0; i < allProductSeeds.length; i += CHUNK_SIZE) {
+      const chunk = allProductSeeds.slice(i, i + CHUNK_SIZE);
+      const inserted = await db.insert(schema.products).values(
+        chunk.map(p => ({
+          name: p.name, slug: p.slug, description: p.description,
+          price: p.price, discountPrice: p.discountPrice,
+          categoryId: p.categoryId, sku: p.sku, isActive: true,
+          averageRating: (3.5 + Math.random() * 1.5).toFixed(2),
+          reviewCount: Math.floor(Math.random() * 50) + 5,
+        }))
+      ).returning();
+      createdProducts.push(...inserted);
+      console.log(`  Inserted ${Math.min(i + CHUNK_SIZE, allProductSeeds.length)}/${allProductSeeds.length} products...`);
+    }
+
+    // Batch insert images
+    const allImages: Array<{ productId: string; imageUrl: string; thumbnailUrl: string; altText: string; displayOrder: number; isPrimary: boolean }> = [];
+    for (let i = 0; i < createdProducts.length; i++) {
+      const p = allProductSeeds[i];
+      for (let j = 0; j < p.images.length; j++) {
+        allImages.push({
+          productId: createdProducts[i].id,
+          imageUrl: p.images[j].url,
+          thumbnailUrl: p.images[j].url.replace('w=800&h=800', 'w=200&h=200'),
+          altText: p.images[j].alt,
+          displayOrder: j,
+          isPrimary: j === 0,
         });
       }
-      await db.insert(schema.inventory).values({
-        productId: product.id, quantity: Math.floor(Math.random() * 200) + 10, lowStockThreshold: 10,
-      });
+    }
+    for (let i = 0; i < allImages.length; i += CHUNK_SIZE) {
+      await db.insert(schema.productImages).values(allImages.slice(i, i + CHUNK_SIZE));
+    }
+
+    // Batch insert inventory
+    const allInventory = createdProducts.map(p => ({
+      productId: p.id,
+      quantity: Math.floor(Math.random() * 200) + 10,
+      lowStockThreshold: 10,
+    }));
+    for (let i = 0; i < allInventory.length; i += CHUNK_SIZE) {
+      await db.insert(schema.inventory).values(allInventory.slice(i, i + CHUNK_SIZE));
     }
     console.log(`✓ Created ${createdProducts.length} products with images and inventory`);
 

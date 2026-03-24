@@ -7,6 +7,7 @@ import { eq, and } from 'drizzle-orm';
 import { requireAdmin } from '@/lib/auth';
 import { uploadImage, deleteImage, validateImageFile } from '@/lib/storage';
 import { invalidateProductCache } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 
 /**
  * Create audit log entry
@@ -29,7 +30,7 @@ async function createAuditLog(
       userAgent: null,
     });
   } catch (error) {
-    console.error('Failed to create audit log:', error);
+    logger.error('Failed to create audit log', { error: error instanceof Error ? error.message : String(error) });
   }
 }
 
@@ -112,7 +113,7 @@ export async function uploadProductImage(formData: FormData) {
 
     return { success: true, data: image };
   } catch (error) {
-    console.error('Error uploading product image:', error);
+    logger.error('Error uploading product image', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -149,7 +150,7 @@ export async function deleteProductImage(imageId: string) {
       await deleteImage(image.imageUrl);
       await deleteImage(image.thumbnailUrl);
     } catch (error) {
-      console.error('Error deleting image from storage:', error);
+      logger.error('Error deleting image from storage', { error: error instanceof Error ? error.message : String(error) });
       // Continue with database deletion even if storage deletion fails
     }
 
@@ -193,7 +194,7 @@ export async function deleteProductImage(imageId: string) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting product image:', error);
+    logger.error('Error deleting product image', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -263,7 +264,7 @@ export async function setPrimaryImage(productId: string, imageId: string) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error setting primary image:', error);
+    logger.error('Error setting primary image', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -327,7 +328,7 @@ export async function reorderProductImages(
 
     return { success: true };
   } catch (error) {
-    console.error('Error reordering product images:', error);
+    logger.error('Error reordering product images', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -383,7 +384,7 @@ export async function updateImageAltText(imageId: string, altText: string) {
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating image alt text:', error);
+    logger.error('Error updating image alt text', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };

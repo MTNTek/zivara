@@ -3,6 +3,7 @@
 import { db } from '@/db';
 import { orders } from '@/db/schema';
 import { eq, and, gte, lte, like } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
 
 interface OrderExportItem {
   productName: string;
@@ -206,7 +207,7 @@ export async function exportOrdersToCSV(filters?: {
       count: ordersData.length,
     };
   } catch (error) {
-    console.error('Error exporting orders to CSV:', error);
+    logger.error('Error exporting orders to CSV', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to export orders',

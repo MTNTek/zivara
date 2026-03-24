@@ -5,6 +5,7 @@ import { cartItems } from '@/db/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { getCurrentUserId } from '@/lib/auth';
 import { readGuestSessionId } from '@/lib/guest-session';
+import { logger } from '@/lib/logger';
 
 /**
  * Cart item with product details
@@ -74,7 +75,7 @@ export async function getCartItems(): Promise<CartItemWithProduct[]> {
 
     return items as CartItemWithProduct[];
   } catch (error) {
-    console.error('Error fetching cart items:', error);
+    logger.error('Error fetching cart items', { error: error instanceof Error ? error.message : String(error) });
     return [];
   }
 }
@@ -110,7 +111,7 @@ export async function getCartItemById(
 
     return item as CartItemWithProduct | null;
   } catch (error) {
-    console.error('Error fetching cart item:', error);
+    logger.error('Error fetching cart item', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -143,7 +144,7 @@ export async function getCartSummary(): Promise<CartSummary> {
       totalQuantity,
     };
   } catch (error) {
-    console.error('Error calculating cart summary:', error);
+    logger.error('Error calculating cart summary', { error: error instanceof Error ? error.message : String(error) });
     return {
       items: [],
       subtotal: 0,
@@ -195,7 +196,7 @@ export async function validateCartItems(): Promise<{
       unavailableItems,
     };
   } catch (error) {
-    console.error('Error validating cart items:', error);
+    logger.error('Error validating cart items', { error: error instanceof Error ? error.message : String(error) });
     return {
       valid: false,
       unavailableItems: [],
@@ -250,7 +251,7 @@ export async function checkPriceChange(cartItemId: string): Promise<{
       withinHonorPeriod,
     };
   } catch (error) {
-    console.error('Error checking price change:', error);
+    logger.error('Error checking price change', { error: error instanceof Error ? error.message : String(error) });
     throw error;
   }
 }
@@ -271,7 +272,7 @@ export async function getCartItemCount(): Promise<number> {
     const items = await db.query.cartItems.findMany({ where: whereClause });
     return items.reduce((total, item) => total + item.quantity, 0);
   } catch (error) {
-    console.error('Error getting cart item count:', error);
+    logger.error('Error getting cart item count', { error: error instanceof Error ? error.message : String(error) });
     return 0;
   }
 }
@@ -300,7 +301,7 @@ export async function cleanupOldCartItems(): Promise<{
       deletedCount: result.length,
     };
   } catch (error) {
-    console.error('Error cleaning up old cart items:', error);
+    logger.error('Error cleaning up old cart items', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       deletedCount: 0,

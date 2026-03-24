@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { reviews, orderItems, orders } from '@/db/schema';
 import { eq, desc, asc, sql, and } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
 
 export type ReviewSortOption = 'recent' | 'highest' | 'lowest';
 
@@ -95,7 +96,7 @@ export async function getProductReviews(
       },
     };
   } catch (error) {
-    console.error('Error fetching product reviews:', error);
+    logger.error('Error fetching product reviews', { error: error instanceof Error ? error.message : String(error) });
     return {
       reviews: [],
       pagination: {
@@ -131,7 +132,7 @@ export async function getReviewById(
 
     return review as ReviewWithUser | null;
   } catch (error) {
-    console.error('Error fetching review:', error);
+    logger.error('Error fetching review', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -161,7 +162,7 @@ export async function getUserReviewForProduct(
 
     return review as ReviewWithUser | null;
   } catch (error) {
-    console.error('Error fetching user review:', error);
+    logger.error('Error fetching user review', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -215,7 +216,7 @@ export async function getUserReviews(
       },
     };
   } catch (error) {
-    console.error('Error fetching user reviews:', error);
+    logger.error('Error fetching user reviews', { error: error instanceof Error ? error.message : String(error) });
     return {
       reviews: [],
       pagination: {
@@ -254,7 +255,7 @@ export async function hasUserPurchasedProduct(
 
     return purchase.length > 0;
   } catch (error) {
-    console.error('Error checking purchase:', error);
+    logger.error('Error checking purchase', { error: error instanceof Error ? error.message : String(error) });
     return false;
   }
 }

@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { users, orders } from '@/db/schema';
-import { sql, eq, or, ilike, desc, asc } from 'drizzle-orm';
+import { sql, eq, or, and, ilike, desc, asc } from 'drizzle-orm';
 
 export interface UserListItem {
   id: string;
@@ -33,6 +33,7 @@ export interface GetUsersParams {
   page?: number;
   limit?: number;
   search?: string;
+  role?: string;
   sortBy?: 'name' | 'email' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
 }
@@ -46,6 +47,7 @@ export async function getUsers(params: GetUsersParams = {}) {
     page = 1,
     limit = 20,
     search = '',
+    role = '',
     sortBy = 'createdAt',
     sortOrder = 'desc',
   } = params;
@@ -53,12 +55,19 @@ export async function getUsers(params: GetUsersParams = {}) {
   const offset = (page - 1) * limit;
 
   // Build where conditions
-  const whereConditions = search
-    ? or(
+  const conditions = [];
+  if (search) {
+    conditions.push(
+      or(
         ilike(users.email, `%${search}%`),
         ilike(users.name, `%${search}%`)
       )
-    : undefined;
+    );
+  }
+  if (role && (role === 'admin' || role === 'customer')) {
+    conditions.push(eq(users.role, role));
+  }
+  const whereConditions = conditions.length > 0 ? and(...conditions) : undefined;
 
   // Build order by
   const orderByColumn = sortBy === 'name' ? users.name : sortBy === 'email' ? users.email : users.createdAt;

@@ -9,6 +9,13 @@ import { ProductRow } from '@/components/home/product-row';
 import { SignInCard } from '@/components/home/sign-in-card';
 import { CategoryStrip } from '@/components/home/category-strip';
 import { PromoBanner } from '@/components/home/promo-banner';
+import { BuyAgain } from '@/components/home/buy-again';
+import { TrendingTicker } from '@/components/home/trending-ticker';
+import { Suspense } from 'react';
+import { SocialProofBanner } from '@/components/home/social-proof-banner';
+import { ShopByLifestyle } from '@/components/home/shop-by-lifestyle';
+import { FeaturedCollections } from '@/components/home/featured-collections';
+import { NewsletterInline } from '@/components/home/newsletter-inline';
 
 export default async function HomePage() {
   const [
@@ -47,12 +54,39 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#EAEDED]">
+      {/* Organization JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Zivara',
+            url: process.env.NEXT_PUBLIC_APP_URL || 'https://zivara.com',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || 'https://zivara.com'}/products?search={search_term_string}`,
+              },
+              'query-input': 'required name=search_term_string',
+            },
+          }),
+        }}
+      />
+
       <HeroCarousel />
 
       {/* Category Strip — overlaps hero */}
       <div className="relative z-10 -mt-10 sm:-mt-16">
         <CategoryStrip />
       </div>
+
+      {/* Trending ticker */}
+      <TrendingTicker />
+
+      {/* Social proof banner */}
+      <SocialProofBanner />
 
       {/* Category Cards — 4-col grid */}
       <div className="px-4 sm:px-6 lg:px-10 mt-4">
@@ -67,6 +101,11 @@ export default async function HomePage() {
           <SignInCard />
         </div>
 
+        {/* Buy Again — personalized for logged-in users */}
+        <Suspense fallback={null}>
+          <BuyAgain />
+        </Suspense>
+
         {/* Promo Banner 1 */}
         <PromoBanner
           href="/products/category/electronics"
@@ -79,10 +118,16 @@ export default async function HomePage() {
 
         {/* Today's Deals */}
         {dealProducts.length > 0 && (
-          <ProductRow title="Today&apos;s Deals" products={dealProducts.map(toRowItem)} seeMoreHref="/products?sortBy=price_asc" />
+          <ProductRow title="Today&apos;s Deals" products={dealProducts.map(toRowItem)} seeMoreHref="/deals" />
         )}
 
-        <ProductRow title="Top Rated Products" products={topRated.map(toRowItem)} seeMoreHref="/products?sortBy=rating" />
+        {/* Shop by Lifestyle */}
+        <ShopByLifestyle />
+
+        {/* Featured Collections */}
+        <FeaturedCollections />
+
+        <ProductRow title="Top Rated Products" products={topRated.map(toRowItem)} seeMoreHref="/bestsellers" />
 
         {/* Promo Banner 2 */}
         <PromoBanner
@@ -98,16 +143,24 @@ export default async function HomePage() {
           <ProductRow title="Under $50" products={budgetPicks.map(toRowItem)} seeMoreHref="/products?sortBy=price_asc" />
         )}
 
+        {/* Newsletter CTA */}
+        <NewsletterInline />
+
+        {/* New Arrivals — featuredProducts are already sorted by newest */}
+        {featuredProducts.length > 0 && (
+          <ProductRow title="New Arrivals" products={featuredProducts.slice(0, 12).map(toRowItem)} seeMoreHref="/new-arrivals" />
+        )}
+
         {/* Featured Products Grid */}
         <div className="bg-white p-5">
           <div className="flex items-baseline justify-between mb-3">
             <h2 className="text-[21px] font-bold text-[#0f1111]">Featured Products</h2>
-            <Link href="/products" className="text-[13px] text-[#007185] hover:text-[#c7511f] hover:underline">
+            <Link href="/products" className="text-[13px] text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
               Shop all products
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-5">
-            {featuredProducts.slice(0, 10).map((product) => (
+            {featuredProducts.slice(0, 10).map((product, idx) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
@@ -119,6 +172,12 @@ export default async function HomePage() {
                 reviewCount={product.reviewCount || 0}
                 stock={product.inventory?.quantity ?? 0}
                 isWishlisted={wishlistedIds.includes(product.id)}
+                badge={
+                  idx < 3 ? 'new' :
+                  topRated.some(t => t.id === product.id) ? 'bestseller' :
+                  dealProducts.some(d => d.id === product.id) ? 'deal' :
+                  null
+                }
               />
             ))}
           </div>

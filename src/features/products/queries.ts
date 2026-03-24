@@ -2,6 +2,7 @@ import { db } from '@/db';
 import { products, categories, searchQueries } from '@/db/schema';
 import { eq, and, gte, lte, or, desc, asc, sql, ilike, inArray } from 'drizzle-orm';
 import type { ProductWithDetails, ProductWithImages, Category, ProductQueryParams } from '@/types';
+import { logger } from '@/lib/logger';
 
 // Common stop words to filter out from search queries
 const STOP_WORDS = new Set([
@@ -538,7 +539,7 @@ export async function logSearchQuery(
     });
   } catch (error) {
     // Don't fail the search if logging fails
-    console.error('Failed to log search query:', error);
+    logger.error('Failed to log search query', { error: error instanceof Error ? error.message : String(error) });
   }
 }
 

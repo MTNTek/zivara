@@ -21,7 +21,8 @@ export function PromoBanner({ href, imageUrl, alt, title, subtitle, cta, align =
         fill
         className="object-cover group-hover:scale-[1.02] transition-transform duration-500"
         sizes="100vw"
-        unoptimized
+        placeholder="blur"
+        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI0MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2U1ZTdlYiIvPjwvc3ZnPg=="
       />
       <div className={`absolute inset-0 ${dark ? 'bg-gradient-to-r from-black/50 via-black/20 to-transparent' : 'bg-gradient-to-r from-white/70 via-white/30 to-transparent'}`} />
       <div className={`relative h-full flex items-center ${align === 'right' ? 'justify-end pr-8 sm:pr-16' : 'pl-8 sm:pl-16'}`}>
@@ -34,7 +35,7 @@ export function PromoBanner({ href, imageUrl, alt, title, subtitle, cta, align =
               {subtitle}
             </p>
           )}
-          <span className="inline-block bg-[#febd69] hover:bg-[#f3a847] text-[#0f1111] text-sm font-semibold px-5 py-2 rounded-sm transition-colors">
+          <span className="inline-block bg-[#fbbf24] hover:bg-[#f59e0b] text-[#0f1111] text-sm font-semibold px-5 py-2 rounded-full transition-colors shadow-md">
             {cta}
           </span>
         </div>

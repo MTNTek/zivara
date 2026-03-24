@@ -5,6 +5,7 @@ import {
   getRevenueByCategory,
   getTopProducts,
   getReviewStats,
+  getTopSearchQueries,
   type TimePeriod,
 } from '@/features/admin/analytics-queries';
 import AnalyticsClient from './analytics-client';
@@ -21,7 +22,7 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
     ? params.period
     : '30d') as TimePeriod;
 
-  const [stats, dailyRevenue, statusBreakdown, categoryRevenue, topProducts, reviewStats] =
+  const [stats, dailyRevenue, statusBreakdown, categoryRevenue, topProducts, reviewStats, topSearches] =
     await Promise.all([
       getOverviewStats(period),
       getDailyRevenue(period),
@@ -29,6 +30,7 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
       getRevenueByCategory(period),
       getTopProducts(period),
       getReviewStats(period),
+      getTopSearchQueries(period),
     ]);
 
   return (
@@ -40,6 +42,7 @@ export default async function AdminAnalyticsPage({ searchParams }: Props) {
       categoryRevenue={categoryRevenue}
       topProducts={topProducts}
       reviewStats={reviewStats}
+      topSearches={topSearches}
     />
   );
 }

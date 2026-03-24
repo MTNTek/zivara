@@ -76,6 +76,7 @@ export default function ContactForm() {
           <option value="">Select a topic</option>
           <option value="Order Issue">Order Issue</option>
           <option value="Product Question">Product Question</option>
+          <option value="Product Issue">Product Issue</option>
           <option value="Return / Refund">Return / Refund</option>
           <option value="Shipping Inquiry">Shipping Inquiry</option>
           <option value="Account Help">Account Help</option>
@@ -91,7 +92,7 @@ export default function ContactForm() {
           placeholder="Describe your issue or question..." />
       </div>
       <button type="submit" disabled={isPending}
-        className="bg-[#FFD814] text-[#0F1111] px-8 py-3 min-h-[44px] rounded-full font-semibold hover:bg-[#F7CA00] transition-colors disabled:opacity-50 border border-[#FCD200] shadow-sm">
+        className="bg-[#fbbf24] text-[#0F1111] px-8 py-3 min-h-[44px] rounded-full font-semibold hover:bg-[#f59e0b] transition-colors disabled:opacity-50 border border-[#FCD200] shadow-sm">
         {isPending ? 'Sending...' : 'Send Message'}
       </button>
     </form>

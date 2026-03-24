@@ -42,7 +42,7 @@ export function StripePaymentForm({ onSuccess, onError, isPending }: StripePayme
         type="button"
         onClick={handlePayment}
         disabled={disabled}
-        className="w-full bg-blue-800 text-white px-6 py-4 min-h-[44px] rounded-lg font-semibold hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center"
+        className="w-full bg-[#fbbf24] text-[#0F1111] px-6 py-4 min-h-[44px] rounded-lg font-semibold hover:bg-[#f59e0b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center"
       >
         {(isProcessing || isPending) && <ButtonSpinner />}
         {isProcessing ? 'Processing payment...' : isPending ? 'Placing order...' : 'Pay & Place Order'}

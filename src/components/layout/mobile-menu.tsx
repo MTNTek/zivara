@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from '@/lib/auth-client';
 
@@ -25,6 +25,21 @@ export function MobileMenu() {
 
   const close = () => setIsOpen(false);
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    // Lock body scroll when menu is open
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   return (
     <>
       <button
@@ -42,7 +57,7 @@ export function MobileMenu() {
           <div className="fixed inset-0 bg-black/50" onClick={close} />
           <div className="fixed left-0 top-0 bottom-0 w-[280px] bg-white shadow-xl overflow-y-auto flex flex-col">
             {/* Header */}
-            <div className="bg-blue-600 text-white px-4 py-4 flex items-center justify-between flex-shrink-0">
+            <div className="bg-blue-800 text-white px-4 py-4 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,9 +80,17 @@ export function MobileMenu() {
               {/* Shop by Category */}
               <div className="py-3">
                 <p className="px-4 py-1.5 text-xs font-bold text-[#565959] uppercase tracking-wider">Shop by Category</p>
-                <Link href="/deals" onClick={close} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#c7511f] font-medium hover:bg-gray-50">
+                <Link href="/deals" onClick={close} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#1d4ed8] font-medium hover:bg-gray-50">
                   <span className="text-lg w-6 text-center">🔥</span>
                   <span>Today&apos;s Deals</span>
+                </Link>
+                <Link href="/bestsellers" onClick={close} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#0F1111] hover:bg-gray-50">
+                  <span className="text-lg w-6 text-center">⭐</span>
+                  <span className="font-medium">Best Sellers</span>
+                </Link>
+                <Link href="/new-arrivals" onClick={close} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#0F1111] hover:bg-gray-50">
+                  <span className="text-lg w-6 text-center">🆕</span>
+                  <span className="font-medium">New Arrivals</span>
                 </Link>
                 <Link href="/products" onClick={close} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#0F1111] hover:bg-gray-50">
                   <span className="text-lg w-6 text-center">🛍️</span>
@@ -111,6 +134,9 @@ export function MobileMenu() {
               <div className="py-3">
                 <p className="px-4 py-1.5 text-xs font-bold text-[#565959] uppercase tracking-wider">Help & Settings</p>
                 <MenuLink href="/contact" icon="💬" label="Customer Service" onClick={close} />
+                <MenuLink href="/faq" icon="❓" label="FAQ" onClick={close} />
+                <MenuLink href="/shipping" icon="📦" label="Shipping & Returns" onClick={close} />
+                <MenuLink href="/track" icon="📍" label="Track Order" onClick={close} />
                 <MenuLink href="/terms" icon="📄" label="Terms of Service" onClick={close} />
                 <MenuLink href="/privacy" icon="🔒" label="Privacy Policy" onClick={close} />
               </div>

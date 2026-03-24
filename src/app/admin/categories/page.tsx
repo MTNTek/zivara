@@ -23,9 +23,32 @@ export default async function AdminCategoriesPage() {
     .from(categories)
     .orderBy(categories.name);
 
+  // Build hierarchy: top-level first, then children indented
+  const parentMap = new Map<string | null, typeof allCategories>();
+  for (const cat of allCategories) {
+    const key = cat.parentId;
+    if (!parentMap.has(key)) parentMap.set(key, []);
+    parentMap.get(key)!.push(cat);
+  }
+
+  type FlatCat = (typeof allCategories)[number] & { depth: number };
+  const flat: FlatCat[] = [];
+  function walk(parentId: string | null, depth: number) {
+    const children = parentMap.get(parentId) || [];
+    for (const c of children) {
+      flat.push({ ...c, depth });
+      walk(c.id, depth + 1);
+    }
+  }
+  walk(null, 0);
+
+  const totalProducts = allCategories.reduce((s, c) => s + c.productCount, 0);
+  const topLevel = allCategories.filter((c) => !c.parentId).length;
+  const subCategories = allCategories.length - topLevel;
+
   return (
     <div>
-      {/* Actions */}
+      {/* Header */}
       <div className="mb-6 flex justify-between items-center">
         <p className="text-gray-600">Manage product categories and hierarchy</p>
         <Link
@@ -37,6 +60,25 @@ export default async function AdminCategoriesPage() {
           </svg>
           Add Category
         </Link>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <p className="text-xs text-gray-500">Total Categories</p>
+          <p className="text-2xl font-bold text-gray-900">{allCategories.length}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{topLevel} top-level · {subCategories} sub</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <p className="text-xs text-gray-500">Total Products</p>
+          <p className="text-2xl font-bold text-gray-900">{totalProducts}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <p className="text-xs text-gray-500">Avg Products/Category</p>
+          <p className="text-2xl font-bold text-gray-900">
+            {allCategories.length > 0 ? Math.round(totalProducts / allCategories.length) : 0}
+          </p>
+        </div>
       </div>
 
       {/* Categories Table */}
@@ -54,7 +96,7 @@ export default async function AdminCategoriesPage() {
                 Products
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+                Type
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -62,30 +104,45 @@ export default async function AdminCategoriesPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {allCategories.length === 0 ? (
+            {flat.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                   No categories found
                 </td>
               </tr>
             ) : (
-              allCategories.map((category) => (
+              flat.map((category) => (
                 <tr key={category.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{category.name}</div>
-                    {category.description && (
-                      <div className="text-sm text-gray-500 truncate max-w-xs">{category.description}</div>
-                    )}
+                    <div className="flex items-center" style={{ paddingLeft: `${category.depth * 24}px` }}>
+                      {category.depth > 0 && (
+                        <span className="text-gray-300 mr-2">└</span>
+                      )}
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                        {category.description && (
+                          <div className="text-sm text-gray-500 truncate max-w-xs">{category.description}</div>
+                        )}
+                      </div>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {category.slug}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {category.productCount}
+                    {category.productCount > 0 ? (
+                      <span className="font-medium text-gray-900">{category.productCount}</span>
+                    ) : (
+                      <span className="text-gray-400">0</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      Active
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      category.depth === 0
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {category.depth === 0 ? 'Parent' : 'Sub'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

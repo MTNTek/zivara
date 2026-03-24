@@ -20,6 +20,8 @@ interface Order {
   tax: string;
   shipping: string;
   total: string;
+  discount?: string | null;
+  couponId?: string | null;
   shippingAddressLine1: string;
   shippingAddressLine2?: string | null;
   shippingCity: string;
@@ -86,6 +88,12 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
               <span className="text-gray-600">Subtotal</span>
               <span className="text-gray-900">${parseFloat(order.subtotal).toFixed(2)}</span>
             </div>
+            {order.discount && parseFloat(order.discount) > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-[#007600]">Coupon discount</span>
+                <span className="text-[#007600] font-medium">-${parseFloat(order.discount).toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Tax</span>
               <span className="text-gray-900">${parseFloat(order.tax).toFixed(2)}</span>

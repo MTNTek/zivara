@@ -8,6 +8,7 @@ import type {
   CategoryRevenue,
   TopProduct,
   RecentReviewStat,
+  TopSearchQuery,
   TimePeriod,
 } from '@/features/admin/analytics-queries';
 
@@ -43,6 +44,7 @@ interface Props {
   categoryRevenue: CategoryRevenue[];
   topProducts: TopProduct[];
   reviewStats: RecentReviewStat;
+  topSearches: TopSearchQuery[];
 }
 
 export default function AnalyticsClient({
@@ -53,6 +55,7 @@ export default function AnalyticsClient({
   categoryRevenue,
   topProducts,
   reviewStats,
+  topSearches,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,20 +82,46 @@ export default function AnalyticsClient({
       {/* Period Selector */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-        <div className="flex bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          {periods.map((p) => (
-            <button
-              key={p.value}
-              onClick={() => setPeriod(p.value)}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                period === p.value
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              const data = {
+                period,
+                stats,
+                topProducts,
+                categoryRevenue,
+                exportedAt: new Date().toISOString(),
+              };
+              const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `zivara-analytics-${period}-${new Date().toISOString().split('T')[0]}.json`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Export
+          </button>
+          <div className="flex bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            {periods.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setPeriod(p.value)}
+                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                  period === p.value
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -112,7 +141,15 @@ export default function AnalyticsClient({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Revenue Trend */}
         <div className="lg:col-span-2 bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Trend</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Revenue Trend</h2>
+            {dailyRevenue.length > 0 && (
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span>Peak: ${fmt(maxRevenue)}</span>
+                <span>Avg: ${fmt(dailyRevenue.reduce((s, d) => s + d.revenue, 0) / dailyRevenue.length)}/day</span>
+              </div>
+            )}
+          </div>
           {dailyRevenue.length === 0 ? (
             <p className="text-gray-500 text-center py-12">No revenue data for this period</p>
           ) : (
@@ -302,6 +339,37 @@ export default function AnalyticsClient({
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Top Search Queries */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Search Queries</h3>
+        {topSearches.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-6">No search data yet. Searches will appear here as customers use the search bar.</p>
+        ) : (
+          <div className="space-y-3">
+            {topSearches.map((s, i) => {
+              const maxCount = topSearches[0]?.count || 1;
+              return (
+                <div key={s.query} className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400 w-5 text-right">#{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-900 truncate">&ldquo;{s.query}&rdquo;</span>
+                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">{s.count} searches</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(s.count / maxCount) * 100}%` }} />
+                      </div>
+                      <span className="text-[10px] text-gray-400 flex-shrink-0">avg {s.avgResults} results</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

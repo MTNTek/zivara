@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { reviews, products } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { requireAdmin } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 import type { ActionResult } from './actions';
 
 /**
@@ -47,7 +48,7 @@ export async function adminDeleteReview(reviewId: string): Promise<ActionResult>
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting review:', error);
+    logger.error('Error deleting review', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to delete review',

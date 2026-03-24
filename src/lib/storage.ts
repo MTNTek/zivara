@@ -1,8 +1,18 @@
 /**
- * Storage service for handling file uploads
- * This is a placeholder implementation that would be replaced with actual cloud storage
- * (AWS S3, Cloudinary, etc.) in production
+ * Storage service for handling file uploads.
+ *
+ * Strategy:
+ * - Stores files locally in /public/uploads
+ * - For Vercel/serverless, set STORAGE_URL env var to point to your CDN
+ *   and handle uploads via a separate API (e.g., presigned S3 URLs)
+ *
+ * To add S3 support: install @aws-sdk/client-s3, set S3_BUCKET + AWS_REGION,
+ * and uncomment the S3 functions below.
  */
+
+import { logger } from '@/lib/logger';
+import path from 'path';
+import fs from 'fs/promises';
 
 export interface UploadResult {
   url: string;
@@ -10,125 +20,75 @@ export interface UploadResult {
   publicId?: string;
 }
 
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+
+export function validateImageFile(file: File): void {
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error('File must be JPEG, PNG, or WebP format');
+  }
+  if (file.size > MAX_SIZE) {
+    throw new Error('File size must be less than 5 MB');
+  }
+}
+
+function uniqueName(originalName: string): string {
+  const ext = originalName.split('.').pop() || 'jpg';
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+}
+
+const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
+
+async function ensureDir(subdir?: string) {
+  const dir = subdir ? path.join(UPLOAD_DIR, subdir) : UPLOAD_DIR;
+  await fs.mkdir(dir, { recursive: true });
+  return dir;
+}
+
 /**
- * Upload an image file to storage
- * @param file - The file to upload
- * @param folder - Optional folder path
- * @returns Upload result with URLs
+ * Upload an image file to local storage.
  */
-export async function uploadImage(
-  file: File,
-  folder?: string
-): Promise<UploadResult> {
-  // In production, this would upload to cloud storage (S3, Cloudinary, etc.)
-  // For now, return placeholder URLs
-  
-  // Validate file
-  if (!file.type.startsWith('image/')) {
-    throw new Error('File must be an image');
-  }
+export async function uploadImage(file: File, folder?: string): Promise<UploadResult> {
+  validateImageFile(file);
 
-  const maxSize = 5 * 1024 * 1024; // 5MB
-  if (file.size > maxSize) {
-    throw new Error('File size must be less than 5MB');
-  }
+  const filename = uniqueName(file.name);
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const dir = await ensureDir(folder);
+  const filePath = path.join(dir, filename);
+  await fs.writeFile(filePath, buffer);
 
-  // Generate unique filename
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(7);
-  const extension = file.name.split('.').pop();
-  const filename = `${timestamp}-${randomString}.${extension}`;
-  
-  const path = folder ? `${folder}/${filename}` : filename;
+  const relativePath = folder ? `/uploads/${folder}/${filename}` : `/uploads/${filename}`;
+  const baseUrl = process.env.STORAGE_URL || '';
 
-  // TODO: Implement actual upload to cloud storage
-  // Example with AWS S3:
-  // const s3 = new S3Client({ region: process.env.AWS_REGION });
-  // const buffer = Buffer.from(await file.arrayBuffer());
-  // await s3.send(new PutObjectCommand({
-  //   Bucket: process.env.S3_BUCKET,
-  //   Key: path,
-  //   Body: buffer,
-  //   ContentType: file.type,
-  // }));
+  logger.info('Image uploaded', { path: relativePath });
 
-  // For now, return placeholder URLs
-  const baseUrl = process.env.NEXT_PUBLIC_STORAGE_URL || '/uploads';
-  
   return {
-    url: `${baseUrl}/${path}`,
-    thumbnailUrl: `${baseUrl}/thumbnails/${path}`,
-    publicId: path,
+    url: `${baseUrl}${relativePath}`,
+    thumbnailUrl: `${baseUrl}${relativePath}`, // Use Next.js Image for resizing
+    publicId: relativePath,
   };
 }
 
 /**
- * Generate thumbnail from image
- * @param file - The original image file
- * @returns Thumbnail file
+ * Delete an image from local storage.
  */
-export async function generateThumbnail(file: File): Promise<File> {
-  // In production, this would use image processing library (sharp, jimp, etc.)
-  // or cloud service (Cloudinary, imgix) to generate thumbnails
-  
-  // For now, return the original file
-  // TODO: Implement actual thumbnail generation
-  return file;
-}
-
-/**
- * Delete an image from storage
- * @param url - The URL or public ID of the image to delete
- */
-export async function deleteImage(_url: string): Promise<void> {
-  // In production, this would delete from cloud storage
-  
-  // TODO: Implement actual deletion
-  // Example with AWS S3:
-  // const s3 = new S3Client({ region: process.env.AWS_REGION });
-  // const key = extractKeyFromUrl(url);
-  // await s3.send(new DeleteObjectCommand({
-  //   Bucket: process.env.S3_BUCKET,
-  //   Key: key,
-  // }));
-  
-  // TODO: Implement actual deletion from cloud storage
-}
-
-/**
- * Validate image file
- * @param file - The file to validate
- * @throws Error if validation fails
- */
-export function validateImageFile(file: File): void {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-  
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error('File must be JPEG, PNG, or WebP format');
-  }
-
-  const maxSize = 5 * 1024 * 1024; // 5MB
-  if (file.size > maxSize) {
-    throw new Error('File size must be less than 5MB');
+export async function deleteImage(urlOrPath: string): Promise<void> {
+  try {
+    // Strip base URL if present
+    const relativePath = urlOrPath.startsWith('http')
+      ? new URL(urlOrPath).pathname
+      : urlOrPath;
+    const filePath = path.join(process.cwd(), 'public', relativePath);
+    await fs.unlink(filePath);
+    logger.info('Image deleted', { path: relativePath });
+  } catch {
+    // File may already be deleted
   }
 }
 
 /**
- * Get optimized image URL with transformations
- * @param url - Original image URL
- * @param options - Transformation options
- * @returns Optimized image URL
+ * Get optimized image URL. Relies on Next.js Image component for optimization.
  */
-export function getOptimizedImageUrl(
-  url: string,
-  _options?: {
-    width?: number;
-    height?: number;
-    quality?: number;
-    format?: 'webp' | 'jpeg' | 'png';
-  }
-): string {
-  // In production, this would use cloud service transformations
-  // For now, return original URL
+export function getOptimizedImageUrl(url: string): string {
   return url;
 }

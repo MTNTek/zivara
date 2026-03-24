@@ -8,6 +8,7 @@ import { categorySchema, updateCategorySchema } from './schemas';
 import { requireAdmin } from '@/lib/auth';
 import { getCategoryDepth } from './queries';
 import { invalidateCategoryCache } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 import type { CategoryInput, UpdateCategoryInput } from './schemas';
 
 /**
@@ -31,7 +32,7 @@ async function createAuditLog(
       userAgent: null,
     });
   } catch (error) {
-    console.error('Failed to create audit log:', error);
+    logger.error('Failed to create audit log', { error: error instanceof Error ? error.message : String(error) });
   }
 }
 
@@ -137,7 +138,7 @@ export async function createCategory(data: CategoryInput) {
 
     return { success: true, data: category };
   } catch (error) {
-    console.error('Error creating category:', error);
+    logger.error('Error creating category', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -255,7 +256,7 @@ export async function updateCategory(data: UpdateCategoryInput) {
 
     return { success: true, data: category };
   } catch (error) {
-    console.error('Error updating category:', error);
+    logger.error('Error updating category', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -347,7 +348,7 @@ export async function deleteCategory(id: string) {
       },
     };
   } catch (error) {
-    console.error('Error deleting category:', error);
+    logger.error('Error deleting category', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -391,7 +392,7 @@ export async function reorderCategories(categoryOrders: { id: string; displayOrd
 
     return { success: true };
   } catch (error) {
-    console.error('Error reordering categories:', error);
+    logger.error('Error reordering categories', { error: error instanceof Error ? error.message : String(error) });
     
     if (error instanceof Error) {
       return { success: false, error: error.message };

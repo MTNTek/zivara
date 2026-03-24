@@ -35,10 +35,10 @@ export function SignInCard() {
             Your Wishlist
           </Link>
           <Link
-            href="/products"
+            href="/deals"
             className="text-center py-2 px-3 border border-gray-300 rounded-lg text-sm text-[#0f1111] hover:bg-gray-50 transition-colors"
           >
-            Keep Shopping
+            Today&apos;s Deals
           </Link>
           <Link
             href="/profile"
@@ -58,13 +58,13 @@ export function SignInCard() {
       </h2>
       <Link
         href="/login"
-        className="block w-full text-center py-2 px-4 bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] text-sm font-medium rounded-lg border border-[#fcd200] transition-colors"
+        className="block w-full text-center py-2 px-4 bg-[#fbbf24] hover:bg-[#f59e0b] text-[#0f1111] text-sm font-medium rounded-lg border border-[#fcd200] transition-colors"
       >
         Sign in securely
       </Link>
       <p className="text-xs text-gray-500 mt-3 text-center">
         New customer?{' '}
-        <Link href="/register" className="text-[#007185] hover:text-[#c7511f] hover:underline">
+        <Link href="/register" className="text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
           Start here
         </Link>
       </p>

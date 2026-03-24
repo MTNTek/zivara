@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { WishlistButton } from './wishlist-button';
+import { QuickViewButton } from './quick-view-button';
+import { CompareButton } from './compare-button';
+import { PriceHistoryHint } from './price-history-hint';
 
 interface ProductCardProps {
   id: string;
@@ -16,6 +19,9 @@ interface ProductCardProps {
   isWishlisted?: boolean;
   supplierLabel?: string | null;
   supplierUnavailable?: boolean;
+  badge?: 'bestseller' | 'new' | 'deal' | null;
+  /** Optional query string appended to the product link, e.g. "from=deals" */
+  linkQuery?: string;
 }
 
 export function ProductCard({
@@ -30,6 +36,8 @@ export function ProductCard({
   isWishlisted,
   supplierLabel,
   supplierUnavailable,
+  badge,
+  linkQuery,
 }: ProductCardProps) {
   const discountPercentage = discountPrice
     ? Math.round(((Number(price) - Number(discountPrice)) / Number(price)) * 100)
@@ -41,15 +49,24 @@ export function ProductCard({
   const cents = Math.round((Number(displayPrice) - dollars) * 100).toString().padStart(2, '0');
 
   return (
-    <div className="relative group">
+    <div className="relative group transition-transform duration-200 hover:-translate-y-1">
       {/* Wishlist Button */}
       <div className="absolute top-1 right-1 z-10">
         <WishlistButton productId={id} initialWishlisted={isWishlisted} />
       </div>
 
-      <Link href={`/products/${id}`} className="block">
+      <Link href={`/products/${id}${linkQuery ? `?${linkQuery}` : ''}`} className="block">
         {/* Image — square, white bg, object-contain like Amazon */}
-        <div className="relative aspect-square bg-white overflow-hidden mb-2">
+        <div className="relative aspect-square bg-white overflow-hidden mb-2 rounded-lg shadow-sm group-hover:shadow-md transition-shadow duration-200">
+          {badge && (
+            <span className={`absolute top-1.5 left-1.5 z-10 text-[10px] font-bold px-2 py-0.5 rounded-sm ${
+              badge === 'bestseller' ? 'bg-blue-800 text-white' :
+              badge === 'new' ? 'bg-[#2563eb] text-white' :
+              badge === 'deal' ? 'bg-[#CC0C39] text-white' : ''
+            }`}>
+              {badge === 'bestseller' ? 'Best Seller' : badge === 'new' ? 'New' : badge === 'deal' ? 'Deal' : ''}
+            </span>
+          )}
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -65,6 +82,7 @@ export function ProductCard({
               </svg>
             </div>
           )}
+          <QuickViewButton product={{ id, name, price, discountPrice, imageUrl, averageRating, reviewCount }} />
         </div>
 
         {/* Product info */}
@@ -91,7 +109,7 @@ export function ProductCard({
                   </svg>
                 ))}
               </div>
-              <span className="text-[12px] text-[#007185]">{reviewCount || 0}</span>
+              <span className="text-[12px] text-[#2563eb]">{reviewCount || 0}</span>
             </div>
           )}
 
@@ -123,10 +141,13 @@ export function ProductCard({
           {/* Delivery text */}
           <p className="text-[12px] text-[#565959] mt-0.5">FREE delivery</p>
 
+          {/* Price history hint */}
+          {discountPercentage >= 15 && <PriceHistoryHint discountPct={discountPercentage} />}
+
           {/* Supplier attribution */}
           {supplierLabel && (
             <p className="text-[11px] text-[#565959] mt-0.5">
-              Fulfilled by <span className="text-[#007185]">{supplierLabel}</span>
+              Fulfilled by <span className="text-[#2563eb]">{supplierLabel}</span>
             </p>
           )}
 
@@ -139,6 +160,14 @@ export function ProductCard({
           {stock !== undefined && stock <= 0 && (
             <p className="text-[12px] text-red-600 mt-0.5">Currently unavailable</p>
           )}
+          {stock !== undefined && stock > 0 && stock <= 5 && (
+            <p className="text-[12px] text-orange-600 mt-0.5">Only {stock} left in stock</p>
+          )}
+
+          {/* Compare */}
+          <div className="mt-1.5" onClick={(e) => e.preventDefault()}>
+            <CompareButton product={{ id, name, price, discountPrice: discountPrice || null, imageUrl }} />
+          </div>
         </div>
       </Link>
     </div>

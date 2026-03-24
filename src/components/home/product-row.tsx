@@ -32,14 +32,20 @@ export function ProductRow({ title, products, seeMoreHref }: ProductRowProps) {
     });
   };
 
+  // Keyboard arrow navigation when row is focused
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); scroll('left'); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); scroll('right'); }
+  };
+
   if (products.length === 0) return null;
 
   return (
-    <div className="bg-white p-5 relative">
+    <div className="bg-white p-5 relative" tabIndex={0} onKeyDown={handleKeyDown} role="region" aria-label={title}>
       <div className="flex items-baseline justify-between mb-3">
         <h2 className="text-[21px] font-bold text-[#0f1111]">{title}</h2>
         {seeMoreHref && (
-          <Link href={seeMoreHref} className="text-[13px] text-[#007185] hover:text-[#c7511f] hover:underline">
+          <Link href={seeMoreHref} className="text-[13px] text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
             See more
           </Link>
         )}
@@ -98,7 +104,7 @@ export function ProductRow({ title, products, seeMoreHref }: ProductRowProps) {
                 )}
               </div>
 
-              <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#c7511f] transition-colors mb-0.5">
+              <p className="text-[13px] leading-[18px] text-[#0f1111] line-clamp-2 group-hover:text-[#1d4ed8] transition-colors mb-0.5">
                 {product.name}
               </p>
 
@@ -111,7 +117,7 @@ export function ProductRow({ title, products, seeMoreHref }: ProductRowProps) {
                       </svg>
                     ))}
                   </div>
-                  <span className="text-[12px] text-[#007185]">{product.reviewCount || 0}</span>
+                  <span className="text-[12px] text-[#2563eb]">{product.reviewCount || 0}</span>
                 </div>
               )}
 

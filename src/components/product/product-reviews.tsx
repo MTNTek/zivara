@@ -31,7 +31,7 @@ export function ProductReviews({ productId, reviews, totalReviews, averageRating
                 {[...Array(5)].map((_, i) => (
                   <span
                     key={i}
-                    className={i < Math.round(averageRating) ? 'text-[#14B8A6] text-xl' : 'text-gray-300 text-xl'}
+                    className={i < Math.round(averageRating) ? 'text-[#de7921] text-xl' : 'text-gray-300 text-xl'}
                   >
                     ★
                   </span>
@@ -65,7 +65,7 @@ export function ProductReviews({ productId, reviews, totalReviews, averageRating
                       {[...Array(5)].map((_, i) => (
                         <span
                           key={i}
-                          className={i < review.rating ? 'text-[#14B8A6]' : 'text-gray-300'}
+                          className={i < review.rating ? 'text-[#de7921]' : 'text-gray-300'}
                         >
                           ★
                         </span>
@@ -97,7 +97,7 @@ export function ProductReviews({ productId, reviews, totalReviews, averageRating
         <div className="mt-6 text-center">
           <Link
             href={`/products/${productId}/reviews`}
-            className="text-black hover:text-blue-800 font-semibold"
+            className="text-[#2563eb] hover:text-[#1d4ed8] font-semibold"
           >
             View All {totalReviews} Reviews →
           </Link>

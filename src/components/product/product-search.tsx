@@ -51,7 +51,7 @@ export function ProductSearch({ initialValue = '' }: ProductSearchProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products..."
-          className="w-full px-4 py-3 pl-12 pr-24 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
+          className="w-full px-4 py-3 pl-12 pr-24 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
           disabled={isPending}
         />
         <svg
@@ -81,7 +81,7 @@ export function ProductSearch({ initialValue = '' }: ProductSearchProps) {
         )}
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-800 text-white px-4 py-2 rounded-md hover:bg-blue-900 transition-colors disabled:opacity-50"
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#2563eb] text-white px-4 py-2 rounded-md hover:bg-[#1d4ed8] transition-colors disabled:opacity-50"
           disabled={isPending}
         >
           {isPending ? 'Searching...' : 'Search'}

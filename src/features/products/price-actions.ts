@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { requireAdmin } from '@/lib/auth';
 import { invalidateProductCache } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 
 /**
  * Schema for price update
@@ -73,7 +74,7 @@ async function createAuditLog(
       userAgent: null,
     });
   } catch (error) {
-    console.error('Failed to create audit log:', error);
+    logger.error('Failed to create audit log', { error: error instanceof Error ? error.message : String(error) });
   }
 }
 
@@ -147,7 +148,7 @@ export async function updateProductPrice(data: UpdatePriceInput) {
       },
     };
   } catch (error) {
-    console.error('Error updating product price:', error);
+    logger.error('Error updating product price', { error: error instanceof Error ? error.message : String(error) });
 
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -238,7 +239,7 @@ export async function updateProductDiscount(data: UpdateDiscountInput) {
       data: product,
     };
   } catch (error) {
-    console.error('Error updating product discount:', error);
+    logger.error('Error updating product discount', { error: error instanceof Error ? error.message : String(error) });
 
     if (error instanceof Error) {
       return { success: false, error: error.message };
@@ -260,7 +261,7 @@ export async function getProductPriceHistory(productId: string) {
 
     return { success: true, data: history };
   } catch (error) {
-    console.error('Error fetching price history:', error);
+    logger.error('Error fetching price history', { error: error instanceof Error ? error.message : String(error) });
 
     if (error instanceof Error) {
       return { success: false, error: error.message };

@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { orders, orderItems, products, categories, users, reviews } from '@/db/schema';
+import { orders, orderItems, products, categories, users, reviews, searchQueries } from '@/db/schema';
 import { sql, desc, eq, gte, and } from 'drizzle-orm';
 
 export type TimePeriod = '7d' | '30d' | '90d' | 'all';
@@ -235,4 +235,33 @@ export async function getReviewStats(period: TimePeriod): Promise<RecentReviewSt
     twoStar: stats?.twoStar ?? 0,
     oneStar: stats?.oneStar ?? 0,
   };
+}
+
+export interface TopSearchQuery {
+  query: string;
+  count: number;
+  avgResults: number;
+}
+
+export async function getTopSearchQueries(period: TimePeriod, limit = 10): Promise<TopSearchQuery[]> {
+  const startDate = getStartDate(period);
+  const dateFilter = startDate ? gte(searchQueries.createdAt, startDate) : undefined;
+
+  const rows = await db
+    .select({
+      query: searchQueries.query,
+      count: sql<number>`COUNT(*)::int`,
+      avgResults: sql<number>`COALESCE(AVG(${searchQueries.resultsCount}), 0)::int`,
+    })
+    .from(searchQueries)
+    .where(dateFilter)
+    .groupBy(searchQueries.query)
+    .orderBy(desc(sql`COUNT(*)`))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    query: r.query,
+    count: r.count,
+    avgResults: r.avgResults,
+  }));
 }

@@ -102,7 +102,7 @@ export function FrequentlyBoughtTogether({ currentProduct, relatedProducts }: Fr
         <button
           onClick={handleAddAll}
           disabled={isPending || selectedItems.length === 0}
-          className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-sm font-medium px-5 py-2 rounded-full transition-colors disabled:opacity-50"
+          className="bg-[#fbbf24] hover:bg-[#f59e0b] text-[#0F1111] text-sm font-medium px-5 py-2 rounded-full transition-colors disabled:opacity-50"
         >
           {isPending ? 'Adding...' : `Add all ${selectedItems.length} to Cart`}
         </button>

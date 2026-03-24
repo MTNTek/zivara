@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { supplierCredentials, suppliers } from '@/db/schema';
+import { logger } from '@/lib/logger';
 
 export interface DecryptedCredential {
   type: 'api_key' | 'oauth_token' | 'affiliate_id';
@@ -101,10 +102,7 @@ export async function getDecryptedCredentials(
       value: decryptCredential(cred.encryptedValue, encryptionKey),
     }));
   } catch (error) {
-    console.error(
-      `Failed to decrypt credentials for supplier ${supplierId}:`,
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    logger.error(`Failed to decrypt credentials for supplier ${supplierId}`, { error: error instanceof Error ? error.message : 'Unknown error' });
 
     await db
       .update(suppliers)

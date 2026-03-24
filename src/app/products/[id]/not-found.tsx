@@ -14,13 +14,13 @@ export default function ProductNotFound() {
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/products"
-            className="rounded-lg bg-blue-800 px-6 py-3 text-white font-semibold hover:bg-blue-900 transition-colors"
+            className="rounded-full bg-[#fbbf24] px-6 py-3 text-[#0F1111] font-semibold hover:bg-[#f59e0b] transition-colors border border-[#FCD200]"
           >
             Browse products
           </Link>
           <Link
             href="/"
-            className="rounded-lg border border-gray-300 bg-white px-6 py-3 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+            className="rounded-full border border-[#D5D9D9] bg-white px-6 py-3 text-[#0F1111] font-semibold hover:bg-[#F7FAFA] transition-colors"
           >
             Go home
           </Link>

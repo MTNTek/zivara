@@ -12,6 +12,7 @@ import type { SupplierType, SupplierProduct } from './adapters/types';
 import { SupplierRegistry } from './registry';
 import { getDecryptedCredentials } from './credentials';
 import { calculateDisplayPrice } from './price-engine';
+import { logger } from '@/lib/logger';
 
 export interface ImportResult {
   supplierId: string;
@@ -253,7 +254,7 @@ export async function importProducts(
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.error(`Error importing product ${sp.supplierProductId}:`, errorMessage);
+      logger.error(`Error importing product ${sp.supplierProductId}`, { error: errorMessage });
       result.errors.push({
         supplierProductId: sp.supplierProductId,
         error: errorMessage,
@@ -347,10 +348,7 @@ export async function syncInventory(supplierId: string): Promise<SyncResult> {
         result.updated++;
       }
     } catch (err) {
-      console.error(
-        `Error syncing inventory for product ${link.supplierProductId}:`,
-        err instanceof Error ? err.message : 'Unknown error'
-      );
+      logger.error(`Error syncing inventory for product ${link.supplierProductId}`, { error: err instanceof Error ? err.message : 'Unknown error' });
       result.errors++;
     }
   }
@@ -465,10 +463,7 @@ export async function syncPrices(supplierId: string): Promise<SyncResult> {
 
       result.updated++;
     } catch (err) {
-      console.error(
-        `Error syncing price for product ${link.supplierProductId}:`,
-        err instanceof Error ? err.message : 'Unknown error'
-      );
+      logger.error(`Error syncing price for product ${link.supplierProductId}`, { error: err instanceof Error ? err.message : 'Unknown error' });
       result.errors++;
     }
   }

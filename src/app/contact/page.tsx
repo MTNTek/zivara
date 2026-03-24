@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ContactForm from '@/components/contact/contact-form';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Contact Us - Zivara',
@@ -10,21 +11,22 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       <div className="max-w-5xl mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ label: 'Customer Service' }]} />
         <h1 className="text-2xl font-bold text-[#0F1111] mb-6">Customer Service</h1>
 
         {/* Help Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-2 bg-[#eff6ff] rounded-lg">
+                <svg className="w-5 h-5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
               <h2 className="font-semibold text-[#0F1111]">Email Support</h2>
             </div>
             <p className="text-sm text-[#565959] mb-2">Get help with orders, products, or your account.</p>
-            <p className="text-sm text-[#007185]">support@zivara.com</p>
+            <p className="text-sm text-[#2563eb]">support@zivara.com</p>
             <p className="text-xs text-[#565959] mt-1">Response within 24 hours</p>
           </div>
 
@@ -53,7 +55,7 @@ export default function ContactPage() {
               <h2 className="font-semibold text-[#0F1111]">Partnerships</h2>
             </div>
             <p className="text-sm text-[#565959] mb-2">For business and partnership inquiries.</p>
-            <p className="text-sm text-[#007185]">partners@zivara.com</p>
+            <p className="text-sm text-[#2563eb]">partners@zivara.com</p>
           </div>
         </div>
 

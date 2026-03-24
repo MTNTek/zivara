@@ -22,9 +22,6 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Non-production scripts
     "scripts/**",
-    "seed-demo-data.ts",
-    "clear-users.ts",
-    "migrate-accounts.ts",
   ]),
 ]);
 

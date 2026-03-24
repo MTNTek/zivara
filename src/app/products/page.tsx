@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getProducts, getCategories } from '@/features/products/cached-queries';
-import { ProductGrid } from '@/components/product/product-grid';
+import { ProductViewWrapper } from '@/components/product/product-view-wrapper';
 import { ProductFilters } from '@/components/product/product-filters';
 import { Pagination } from '@/components/ui/pagination';
 import { MobileFilters } from '@/components/product/mobile-filters';
-import { SortDropdown } from '@/components/product/sort-dropdown';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { getWishlistProductIds } from '@/features/wishlist/actions';
+import { BackToTop } from '@/components/ui/back-to-top';
+import { ScrollRestore } from '@/components/ui/scroll-restore';
+import { recordSearchQuery } from '@/features/search/actions';
+import { ActiveFilters } from '@/components/product/active-filters';
 
 export const metadata: Metadata = {
   title: 'Products - Zivara',
@@ -62,6 +65,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     getWishlistProductIds(),
   ]);
 
+  // Record search query for analytics (fire-and-forget)
+  if (params.search) {
+    recordSearchQuery(params.search, total);
+  }
+
   const totalPages = Math.ceil(total / limit);
 
   const currentFilters = {
@@ -73,7 +81,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#EAEDED]">
       <div className="px-4 sm:px-6 lg:px-10 py-6">
         {/* Breadcrumbs */}
         <Breadcrumbs items={[{ label: 'Products' }]} />
@@ -83,7 +91,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           {params.search ? (
             <>
               <h1 className="text-xl font-bold text-[#0F1111]">
-                Results for &ldquo;<span className="text-[#c7511f]">{params.search}</span>&rdquo;
+                Results for &ldquo;<span className="text-[#1d4ed8]">{params.search}</span>&rdquo;
               </h1>
               <p className="text-sm text-[#565959] mt-1">{total} result{total !== 1 ? 's' : ''}</p>
             </>
@@ -113,24 +121,23 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
           {/* Products Grid */}
           <div className="flex-1">
-            {/* Results Header */}
-            <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-              <div className="flex items-center justify-between">
-                <p className="text-gray-600 text-sm">
-                  {params.search ? (
-                    <>{(page - 1) * limit + 1}-{Math.min(page * limit, total)} of {total} results</>
-                  ) : (
-                    <>Showing {products.length > 0 ? (page - 1) * limit + 1 : 0}-{Math.min(page * limit, total)} of {total} products</>
-                  )}
-                </p>
-                <SortDropdown currentSort={params.sortBy} />
-              </div>
-            </div>
+            {/* Active filter chips */}
+            <Suspense fallback={null}>
+              <ActiveFilters categories={categories} />
+            </Suspense>
 
-            {/* Products */}
+            {/* Products with view toggle */}
             {products.length > 0 ? (
               <>
-                <ProductGrid products={products} wishlistedIds={wishlistedIds} />
+                <ProductViewWrapper
+                  products={products}
+                  wishlistedIds={wishlistedIds}
+                  total={total}
+                  page={page}
+                  limit={limit}
+                  currentSort={params.sortBy}
+                  searchTerm={params.search}
+                />
                 {totalPages > 1 && (
                   <div className="mt-8">
                     <Pagination currentPage={page} totalPages={totalPages} />
@@ -139,30 +146,43 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               </>
             ) : (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <svg
-                  className="w-16 h-16 text-gray-400 mx-auto mb-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No products found
+                  {params.search ? `No results for "${params.search}"` : 'No products found'}
                 </h3>
-                <p className="text-gray-600">
-                  Try adjusting your filters or search terms
+                <p className="text-gray-600 mb-6">
+                  {params.search
+                    ? 'Check your spelling or try more general terms'
+                    : 'Try adjusting your filters or browse a different category'}
                 </p>
+                {params.search && (
+                  <div className="space-y-4">
+                    <p className="text-sm text-[#565959]">Suggestions:</p>
+                    <ul className="text-sm text-[#565959] space-y-1">
+                      <li>• Check for typos or misspellings</li>
+                      <li>• Use more general keywords</li>
+                      <li>• Try fewer filters</li>
+                    </ul>
+                    <div className="flex flex-wrap justify-center gap-2 mt-4 pt-4 border-t border-gray-200">
+                      {['Electronics', "Men's Fashion", "Women's Fashion", 'Home & Kitchen'].map((cat) => (
+                        <a
+                          key={cat}
+                          href={`/products?search=${encodeURIComponent(cat)}`}
+                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                        >
+                          {cat}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
+      <BackToTop />
+      <ScrollRestore />
     </div>
   );
 }

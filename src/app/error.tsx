@@ -11,33 +11,39 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to console in development
     console.error('Root error:', error);
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#EAEDED] px-4">
       <div className="max-w-md text-center">
-        <div className="mb-6 text-8xl">⚠️</div>
-        <h1 className="mb-3 text-3xl font-bold text-gray-900">
-          Something went wrong
-        </h1>
-        <p className="mb-8 text-lg text-gray-600">
-          We encountered an unexpected error. Please try refreshing the page.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <button
-            onClick={reset}
-            className="rounded-md bg-blue-800 px-6 py-3 text-white hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2"
-          >
-            Try again
-          </button>
-          <Link
-            href="/"
-            className="rounded-md border border-gray-300 bg-white px-6 py-3 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] focus:ring-offset-2"
-          >
-            Go to homepage
-          </Link>
+        <div className="bg-white rounded-lg shadow-sm p-8">
+          <div className="mb-4 text-6xl">⚠️</div>
+          <h1 className="mb-2 text-xl font-bold text-[#0F1111]">
+            Something went wrong
+          </h1>
+          <p className="mb-6 text-sm text-[#565959]">
+            We encountered an unexpected error. Please try refreshing the page.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <button
+              onClick={reset}
+              className="rounded-full bg-[#fbbf24] px-6 py-2.5 text-sm font-medium text-[#0F1111] hover:bg-[#f59e0b] transition-colors focus:outline-none focus:ring-2 focus:ring-[#fbbf24] focus:ring-offset-2"
+            >
+              Try Again
+            </button>
+            <Link
+              href="/"
+              className="rounded-full border border-[#D5D9D9] bg-white px-6 py-2.5 text-sm font-medium text-[#0F1111] hover:bg-[#F7FAFA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2"
+            >
+              Go to Homepage
+            </Link>
+          </div>
+        </div>
+        <div className="mt-4 flex justify-center gap-4 text-xs text-[#565959]">
+          <Link href="/products" className="hover:text-[#1d4ed8] hover:underline">Products</Link>
+          <Link href="/contact" className="hover:text-[#1d4ed8] hover:underline">Contact Us</Link>
+          <Link href="/faq" className="hover:text-[#1d4ed8] hover:underline">FAQ</Link>
         </div>
       </div>
     </div>
