@@ -14,7 +14,7 @@ export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // ── API rate limiting ──────────────────────────────────────────────
-  if (pathname.startsWith('/api/')) {
+  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/webhooks/')) {
     const ip = getClientIp(req);
     const sessionCookie =
       req.cookies.get('better-auth.session_token') ||

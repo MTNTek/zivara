@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { OrderDetailView } from '@/components/admin/order-detail-view';
 import { OrderStatusUpdater } from '@/components/admin/order-status-updater';
 import { OrderStatusHistoryView } from '@/components/admin/order-status-history';
+import { AdminReturnActions } from '@/components/admin/return-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,6 +58,9 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
 
             {/* Order Details */}
             <OrderDetailView order={order} />
+
+            {/* Return / Refund Actions */}
+            <AdminReturnActions orderId={order.id} orderStatus={order.status} orderTotal={order.total} />
           </div>
 
           {/* Sidebar */}

@@ -53,6 +53,11 @@ async function sendWithRetry(
   return { success: false, error: 'Max retries exceeded' };
 }
 
+// ── Generic email function ────────────────────────────────────────────
+export async function sendEmail(data: { to: string; subject: string; html: string }): Promise<EmailResult> {
+  return sendWithRetry(data.to, data.subject, data.html);
+}
+
 // ── Templated email functions ────────────────────────────────────────
 
 export async function sendWelcomeEmail(data: {

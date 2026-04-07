@@ -13,6 +13,9 @@ const STATUS_INDEX: Record<string, number> = {
   shipped: 2,
   delivered: 3,
   cancelled: -1,
+  return_requested: -2,
+  returned: -2,
+  refunded: -2,
 };
 
 function getEstimatedDate(orderDate: string | undefined, stepIndex: number): string {
@@ -31,6 +34,36 @@ interface OrderTimelineProps {
 }
 
 export function OrderTimeline({ status, orderDate }: OrderTimelineProps) {
+  if (status === 'return_requested') {
+    return (
+      <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-lg p-4">
+        <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+          <span className="text-lg">↩️</span>
+        </div>
+        <div>
+          <span className="font-semibold text-orange-700">Return Requested</span>
+          <p className="text-sm text-orange-600 mt-0.5">Your return request is being reviewed. We&apos;ll notify you once it&apos;s processed.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'returned' || status === 'refunded') {
+    return (
+      <div className="flex items-center gap-3 bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+          <span className="text-lg">💰</span>
+        </div>
+        <div>
+          <span className="font-semibold text-purple-700">{status === 'refunded' ? 'Refunded' : 'Returned'}</span>
+          <p className="text-sm text-purple-600 mt-0.5">
+            {status === 'refunded' ? 'Your refund has been processed. It may take 5-10 business days to appear.' : 'Your return has been approved and a refund is being processed.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (status === 'cancelled') {
     return (
       <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-lg p-4">

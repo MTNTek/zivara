@@ -115,7 +115,7 @@ export const orders = pgTable('orders', {
   orderNumber: varchar('order_number', { length: 50 }).notNull().unique(),
   userId: uuid('user_id').references(() => users.id),
   guestEmail: varchar('guest_email', { length: 255 }),
-  status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  status: varchar('status', { length: 50 }).notNull().default('pending'), // 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'return_requested' | 'returned' | 'refunded'
   subtotal: decimal('subtotal', { precision: 10, scale: 2 }).notNull(),
   tax: decimal('tax', { precision: 10, scale: 2 }).notNull(),
   shipping: decimal('shipping', { precision: 10, scale: 2 }).notNull(),

@@ -341,8 +341,11 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
       'pending': ['processing', 'cancelled'],
       'processing': ['shipped', 'cancelled'],
       'shipped': ['delivered'],
-      'delivered': [], // Cannot change from delivered
-      'cancelled': [], // Cannot change from cancelled
+      'delivered': ['return_requested'],
+      'return_requested': ['returned', 'delivered'], // returned = approved, delivered = rejected
+      'returned': ['refunded'],
+      'refunded': [],
+      'cancelled': [],
     };
 
     const allowedStatuses = validTransitions[order.status] || [];

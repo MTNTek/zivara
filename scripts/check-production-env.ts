@@ -65,6 +65,13 @@ check(
   'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY should be set for payment processing'
 );
 
+check(
+  'STRIPE_WEBHOOK_SECRET',
+  'warn',
+  !!process.env.STRIPE_WEBHOOK_SECRET && !process.env.STRIPE_WEBHOOK_SECRET.includes('whsec_...'),
+  'STRIPE_WEBHOOK_SECRET should be set for Stripe webhook verification (stripe listen --forward-to ...)'
+);
+
 // ── Email ────────────────────────────────────────────────────────────
 check(
   'RESEND_API_KEY',

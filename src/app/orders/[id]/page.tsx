@@ -10,6 +10,7 @@ import { PrintOrderButton } from '@/components/orders/print-order-button';
 import { CancelOrderButton } from '@/components/orders/cancel-order-button';
 import { ReorderButton } from '@/components/orders/reorder-button';
 import { CopyTrackingNumber } from '@/components/orders/copy-tracking-number';
+import { ReturnRequestButton } from '@/components/orders/return-request-button';
 
 interface OrderDetailPageProps {
   params: Promise<{
@@ -45,6 +46,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'return_requested':
+        return 'bg-orange-100 text-orange-800';
+      case 'returned':
+        return 'bg-purple-100 text-purple-800';
+      case 'refunded':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -275,6 +282,11 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
               {/* Cancel Order */}
               <CancelOrderButton orderId={order.id} orderStatus={order.status} />
+
+              {/* Return Request */}
+              <div className="mt-2">
+                <ReturnRequestButton orderId={order.id} orderStatus={order.status} updatedAt={order.updatedAt.toISOString()} />
+              </div>
 
               {/* Need Help */}
               <div className="border-t border-gray-200 pt-4 mt-4">
