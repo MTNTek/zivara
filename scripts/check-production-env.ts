@@ -1,10 +1,18 @@
 /**
- * Production environment validation script.
- * Run before deploying: npx tsx scripts/check-production-env.ts
+ * Environment validation script.
+ * 
+ * In development (default): only checks that essential vars exist (DATABASE_URL, AUTH_SECRET).
+ * In production mode:       enforces strong secrets, non-localhost URLs, etc.
+ *
+ * Usage:
+ *   npx tsx scripts/check-production-env.ts          # dev mode
+ *   NODE_ENV=production npx tsx scripts/check-production-env.ts  # production mode
  */
 
 import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env.local', override: true });
+
+const isProd = process.env.NODE_ENV === 'production';
 
 interface Check {
   name: string;
@@ -19,38 +27,43 @@ function check(name: string, severity: 'error' | 'warn', pass: boolean, message:
   checks.push({ name, severity, pass, message });
 }
 
-// ── Required env vars ────────────────────────────────────────────────
+// ── DATABASE ─────────────────────────────────────────────────────────
 check(
   'DATABASE_URL',
   'error',
-  !!process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('password@host'),
-  'DATABASE_URL must be set to a real PostgreSQL connection string'
+  !!process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgresql'),
+  'DATABASE_URL must be set to a PostgreSQL connection string'
 );
 
+// ── AUTH ──────────────────────────────────────────────────────────────
 check(
   'BETTER_AUTH_SECRET',
-  'error',
-  !!process.env.BETTER_AUTH_SECRET &&
-    process.env.BETTER_AUTH_SECRET !== 'dev-secret-key-change-in-production' &&
-    process.env.BETTER_AUTH_SECRET.length >= 32,
-  'BETTER_AUTH_SECRET must be a strong random string (min 32 chars). Generate with: openssl rand -base64 32'
+  isProd ? 'error' : 'warn',
+  !!process.env.BETTER_AUTH_SECRET && (
+    isProd
+      ? process.env.BETTER_AUTH_SECRET !== 'dev-secret-key-change-in-production' && process.env.BETTER_AUTH_SECRET.length >= 32
+      : true
+  ),
+  isProd
+    ? 'BETTER_AUTH_SECRET must be a strong random string (min 32 chars). Generate with: openssl rand -base64 32'
+    : 'BETTER_AUTH_SECRET is set (dev mode — strength not enforced)'
 );
 
 check(
   'BETTER_AUTH_URL',
-  'error',
-  !!process.env.BETTER_AUTH_URL && !process.env.BETTER_AUTH_URL.includes('localhost'),
-  'BETTER_AUTH_URL must be your production URL (not localhost)'
+  isProd ? 'error' : 'warn',
+  !!process.env.BETTER_AUTH_URL && (isProd ? !process.env.BETTER_AUTH_URL.includes('localhost') : true),
+  isProd ? 'BETTER_AUTH_URL must be your production URL (not localhost)' : 'BETTER_AUTH_URL is set'
 );
 
 check(
   'NEXT_PUBLIC_APP_URL',
-  'error',
-  !!process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost'),
-  'NEXT_PUBLIC_APP_URL must be your production URL (not localhost)'
+  isProd ? 'error' : 'warn',
+  !!process.env.NEXT_PUBLIC_APP_URL && (isProd ? !process.env.NEXT_PUBLIC_APP_URL.includes('localhost') : true),
+  isProd ? 'NEXT_PUBLIC_APP_URL must be your production URL (not localhost)' : 'NEXT_PUBLIC_APP_URL is set'
 );
 
-// ── Payment ──────────────────────────────────────────────────────────
+// ── PAYMENT ──────────────────────────────────────────────────────────
 check(
   'STRIPE_SECRET_KEY',
   'warn',
@@ -69,26 +82,27 @@ check(
   'STRIPE_WEBHOOK_SECRET',
   'warn',
   !!process.env.STRIPE_WEBHOOK_SECRET && !process.env.STRIPE_WEBHOOK_SECRET.includes('whsec_...'),
-  'STRIPE_WEBHOOK_SECRET should be set for Stripe webhook verification (stripe listen --forward-to ...)'
+  'STRIPE_WEBHOOK_SECRET should be set for Stripe webhook verification'
 );
 
-// ── Email ────────────────────────────────────────────────────────────
+// ── EMAIL ────────────────────────────────────────────────────────────
 check(
   'RESEND_API_KEY',
   'warn',
   !!process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.includes('your_key'),
-  'RESEND_API_KEY should be set for transactional emails (password reset, order confirmations)'
+  'RESEND_API_KEY should be set for transactional emails'
 );
 
 check(
   'RESEND_FROM_EMAIL',
   'warn',
   !!process.env.RESEND_FROM_EMAIL && !process.env.RESEND_FROM_EMAIL.includes('yourdomain'),
-  'RESEND_FROM_EMAIL should be set to your verified sender domain (e.g. noreply@zivara.com)'
+  'RESEND_FROM_EMAIL should be set to your verified sender domain'
 );
 
-// ── Output ───────────────────────────────────────────────────────────
-console.log('\n🔍 Zivara Production Environment Check\n');
+// ── OUTPUT ───────────────────────────────────────────────────────────
+const mode = isProd ? '🚀 PRODUCTION' : '🛠️  DEVELOPMENT';
+console.log(`\n🔍 Zivara Environment Check (${mode})\n`);
 console.log('─'.repeat(60));
 
 let hasErrors = false;
@@ -112,7 +126,7 @@ if (hasErrors) {
   if (warnings.length > 0) {
     console.log(`\n⚠️  PASSED with ${warnings.length} warning(s). Review above.\n`);
   } else {
-    console.log('\n✅ All checks passed. Ready to deploy.\n');
+    console.log('\n✅ All checks passed!\n');
   }
   process.exit(0);
 }
