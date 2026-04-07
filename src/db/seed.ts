@@ -1,3 +1,6 @@
+import { config } from 'dotenv';
+config({ path: '.env.local', override: true });
+
 import { db, client } from './index';
 import { sql } from 'drizzle-orm';
 import * as schema from './schema';

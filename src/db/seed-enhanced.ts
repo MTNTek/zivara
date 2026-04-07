@@ -4,7 +4,7 @@ import * as schema from './schema';
 import bcrypt from 'bcryptjs';
 
 // Load environment variables
-config();
+config({ path: '.env.local', override: true });
 
 /**
  * Enhanced Database Seed Script with Comprehensive Product Data
