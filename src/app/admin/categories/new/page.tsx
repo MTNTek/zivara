@@ -86,7 +86,7 @@ export default function NewCategoryPage() {
                 required
                 value={form.name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
               />
             </div>
 
@@ -100,7 +100,7 @@ export default function NewCategoryPage() {
                 required
                 value={form.slug}
                 onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
               />
             </div>
 
@@ -113,7 +113,7 @@ export default function NewCategoryPage() {
                 rows={3}
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
               />
             </div>
 
@@ -126,7 +126,7 @@ export default function NewCategoryPage() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
+                className="px-4 py-2 bg-blue-800 text-white rounded-md hover:bg-blue-900"
               >
                 Create Category
               </button>

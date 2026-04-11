@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { db } from './index';
-import { products, orders, reviews } from './schema';
 import { sql } from 'drizzle-orm';
 
 /**
@@ -20,7 +19,7 @@ describe('Database Optimization Tests', () => {
         AND schemaname = 'public'
       `);
 
-      const indexNames = result.map((row: any) => row.indexname);
+      const indexNames = result.map((row: unknown) => (row as Record<string, unknown>).indexname);
 
       // Verify all expected indexes exist
       expect(indexNames).toContain('products_name_idx');
@@ -42,7 +41,7 @@ describe('Database Optimization Tests', () => {
         AND schemaname = 'public'
       `);
 
-      const indexNames = result.map((row: any) => row.indexname);
+      const indexNames = result.map((row: unknown) => (row as Record<string, unknown>).indexname);
 
       // Verify all expected indexes exist
       expect(indexNames).toContain('orders_order_number_idx');
@@ -61,7 +60,7 @@ describe('Database Optimization Tests', () => {
         AND schemaname = 'public'
       `);
 
-      const indexNames = result.map((row: any) => row.indexname);
+      const indexNames = result.map((row: unknown) => (row as Record<string, unknown>).indexname);
 
       // Verify all expected indexes exist
       expect(indexNames).toContain('reviews_user_product_idx');

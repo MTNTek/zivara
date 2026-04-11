@@ -6,6 +6,7 @@ import { requestPasswordReset } from '@/features/auth/actions';
 import { passwordResetRequestSchema } from '@/features/auth/schemas';
 import { validateWithSchema } from '@/lib/form-validation';
 import { ButtonSpinner } from '@/components/ui/spinner';
+import { Logo } from '@/components/ui/logo';
 
 export default function ResetPasswordPage() {
   const [isPending, startTransition] = useTransition();
@@ -50,14 +51,14 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-teal-600">
-            Zivara
+          <Link href="/" className="inline-block">
+            <Logo variant="dark" size="lg" />
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Reset your password
           </h2>
           <p className="mt-2 text-gray-600">
-            Enter your email address and we'll send you a link to reset your password
+            Enter your email address and we&apos;ll send you a link to reset your password
           </p>
         </div>
 
@@ -69,7 +70,7 @@ export default function ResetPasswordPage() {
               </div>
               <Link
                 href="/login"
-                className="text-teal-600 hover:text-teal-700 font-medium"
+                className="text-black hover:text-blue-800 font-medium"
               >
                 Back to Sign In
               </Link>
@@ -85,7 +86,7 @@ export default function ResetPasswordPage() {
                   id="email"
                   value={email}
                   onChange={(e) => handleEmailChange(e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F52BA] ${
                     fieldError ? 'border-red-500' : 'border-gray-300'
                   }`}
                   required
@@ -104,14 +105,14 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                className="w-full bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors disabled:opacity-50 flex items-center justify-center"
               >
                 {isPending && <ButtonSpinner />}
                 {isPending ? 'Sending...' : 'Send Reset Link'}
               </button>
 
               <div className="text-center">
-                <Link href="/login" className="text-sm text-teal-600 hover:text-teal-700">
+                <Link href="/login" className="text-sm text-black hover:text-blue-800">
                   Back to Sign In
                 </Link>
               </div>

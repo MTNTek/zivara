@@ -5,6 +5,7 @@ import { cartItems, products } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { getCurrentUserId } from '@/lib/auth';
 import type { GuestCartItem } from './storage';
+import { logger } from '@/lib/logger';
 
 /**
  * Merge guest cart with authenticated user cart
@@ -93,10 +94,7 @@ export async function mergeGuestCart(
         }
       } catch (itemError) {
         // Log error but continue processing other items
-        console.error(
-          `Error merging cart item ${guestItem.productId}:`,
-          itemError
-        );
+        logger.error(`Error merging cart item ${guestItem.productId}`, { error: itemError instanceof Error ? itemError.message : String(itemError) });
       }
     }
 
@@ -105,7 +103,7 @@ export async function mergeGuestCart(
       mergedCount,
     };
   } catch (error) {
-    console.error('Error merging guest cart:', error);
+    logger.error('Error merging guest cart', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       mergedCount: 0,
@@ -140,7 +138,7 @@ export async function removeDeletedProductFromCarts(
       removedCount: result.length,
     };
   } catch (error) {
-    console.error('Error removing deleted product from carts:', error);
+    logger.error('Error removing deleted product from carts', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       removedCount: 0,
@@ -197,7 +195,7 @@ export async function updateCartItemPrices(
       updatedCount,
     };
   } catch (error) {
-    console.error('Error updating cart item prices:', error);
+    logger.error('Error updating cart item prices', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       updatedCount: 0,

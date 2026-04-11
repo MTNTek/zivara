@@ -72,7 +72,7 @@ describe('Admin Product Actions', () => {
     // Mock successful admin authentication
     vi.mocked(auth.requireAdmin).mockResolvedValue({
       user: { id: 'admin-user-id', email: 'admin@test.com', role: 'admin' },
-    } as any);
+    } as unknown);
   });
 
   afterEach(() => {

@@ -14,8 +14,8 @@ import { logRateLimitViolation as logRateLimit } from '@/lib/audit';
  * Next.js Server Actions have built-in CSRF protection via origin checking
  * This function provides additional validation for API routes
  */
-export async function verifyCsrfToken(request: Request): Promise<boolean> {
-  const headersList = headers();
+export async function verifyCsrfToken(_request: Request): Promise<boolean> {
+  const headersList = await headers();
   const origin = headersList.get('origin');
   const host = headersList.get('host');
   
@@ -31,12 +31,12 @@ export async function verifyCsrfToken(request: Request): Promise<boolean> {
 /**
  * Middleware helper to enforce CSRF protection on API routes
  */
-export function requireCsrfProtection(request: Request): void {
+export async function requireCsrfProtection(request: Request): Promise<void> {
   const method = request.method;
   
   // Only check state-changing methods
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-    const headersList = headers();
+    const headersList = await headers();
     const origin = headersList.get('origin');
     const host = headersList.get('host');
     
@@ -227,8 +227,8 @@ export async function checkApiRateLimitAuthenticated(userId: string): Promise<Ra
 /**
  * Get client IP address from request headers
  */
-export function getClientIp(): string {
-  const headersList = headers();
+export async function getClientIp(): Promise<string> {
+  const headersList = await headers();
   
   // Check various headers for IP address
   const forwardedFor = headersList.get('x-forwarded-for');

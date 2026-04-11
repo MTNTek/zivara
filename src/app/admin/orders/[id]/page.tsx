@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { OrderDetailView } from '@/components/admin/order-detail-view';
 import { OrderStatusUpdater } from '@/components/admin/order-status-updater';
 import { OrderStatusHistoryView } from '@/components/admin/order-status-history';
+import { AdminReturnActions } from '@/components/admin/return-actions';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -20,7 +21,8 @@ interface PageProps {
  */
 export default async function AdminOrderDetailPage({ params }: PageProps) {
   await requireAdmin();
-  const order = await getOrderById(params.id);
+  const { id } = await params;
+  const order = await getOrderById(id);
 
   if (!order) {
     notFound();
@@ -28,7 +30,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -56,6 +58,9 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
 
             {/* Order Details */}
             <OrderDetailView order={order} />
+
+            {/* Return / Refund Actions */}
+            <AdminReturnActions orderId={order.id} orderStatus={order.status} orderTotal={order.total} />
           </div>
 
           {/* Sidebar */}

@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/auth';
 import { userIdSchema } from './schemas';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 
 /**
  * Deactivate a user account
@@ -52,7 +53,7 @@ export async function deactivateUser(userId: string) {
       };
     }
     
-    console.error('Error deactivating user:', error);
+    logger.error('Error deactivating user', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to deactivate user',
@@ -103,7 +104,7 @@ export async function reactivateUser(userId: string) {
       };
     }
     
-    console.error('Error reactivating user:', error);
+    logger.error('Error reactivating user', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to reactivate user',
@@ -153,7 +154,7 @@ export async function generatePasswordResetToken(userId: string) {
       };
     }
     
-    console.error('Error generating password reset token:', error);
+    logger.error('Error generating password reset token', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to generate reset token',

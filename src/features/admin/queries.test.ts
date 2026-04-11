@@ -13,10 +13,10 @@ import { hash } from 'bcrypt';
 const isDatabaseAvailable = !!process.env.DATABASE_URL;
 
 describe.skipIf(!isDatabaseAvailable)('Admin Dashboard Query Functions (Unit Tests)', () => {
-  let testUserIds: string[] = [];
+  const testUserIds: string[] = [];
   let testCategoryId: string;
-  let testProductIds: string[] = [];
-  let testOrderIds: string[] = [];
+  const testProductIds: string[] = [];
+  const testOrderIds: string[] = [];
 
   beforeAll(async () => {
     if (!isDatabaseAvailable) {

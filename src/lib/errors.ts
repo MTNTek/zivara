@@ -16,7 +16,7 @@ export class AppError extends Error {
     public code: string,
     message: string,
     public statusCode: number = 500,
-    public details?: any
+    public details?: unknown
   ) {
     super(message);
     this.name = 'AppError';
@@ -30,7 +30,7 @@ export class AppError extends Error {
  * HTTP Status: 400 Bad Request
  */
 export class ValidationError extends AppError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('VALIDATION_ERROR', message, 400, details);
     this.name = 'ValidationError';
   }
@@ -85,7 +85,7 @@ export class ConflictError extends AppError {
  * HTTP Status: 500 Internal Server Error
  */
 export class DatabaseError extends AppError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('DATABASE_ERROR', message, 500, details);
     this.name = 'DatabaseError';
   }
@@ -96,7 +96,7 @@ export class DatabaseError extends AppError {
  * HTTP Status: 502 Bad Gateway
  */
 export class ExternalServiceError extends AppError {
-  constructor(service: string, message: string, details?: any) {
+  constructor(service: string, message: string, details?: unknown) {
     super('EXTERNAL_SERVICE_ERROR', `${service}: ${message}`, 502, details);
     this.name = 'ExternalServiceError';
   }

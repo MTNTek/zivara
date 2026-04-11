@@ -152,7 +152,7 @@ describe('Category Hierarchy Property Tests', () => {
     fc.assert(
       fc.property(
         fc.integer({ min: 1, max: 100 }),
-        (index) => {
+        (_index) => {
           const categoryMap = new Map<string, { parentId: string | null }>();
           
           // Create root category
@@ -217,7 +217,7 @@ describe('Category Hierarchy Property Tests', () => {
           let currentId = 'root-id';
           categoryMap.set(currentId, { parentId: null });
           
-          levels.forEach((_, index) => {
+          levels.forEach((_level, index) => {
             const newId = `category-${index}`;
             categoryMap.set(newId, { parentId: currentId });
             currentId = newId;

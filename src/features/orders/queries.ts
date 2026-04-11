@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { orders } from '@/db/schema';
-import { eq, desc, and, or, gte, lte, like, sql, asc } from 'drizzle-orm';
+import { eq, desc, and, gte, lte, like, sql, asc } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
 
 /**
  * Get all orders for a user with pagination
@@ -48,6 +49,16 @@ export async function getUserOrders(
       orderBy: [desc(orders.createdAt)],
       limit,
       offset,
+      with: {
+        items: {
+          with: {
+            product: {
+              columns: { id: true, name: true },
+              with: { images: { limit: 1, columns: { imageUrl: true } } },
+            },
+          },
+        },
+      },
     });
 
     // Get total count
@@ -66,7 +77,7 @@ export async function getUserOrders(
       },
     };
   } catch (error) {
-    console.error('Error fetching user orders:', error);
+    logger.error('Error fetching user orders', { error: error instanceof Error ? error.message : String(error) });
     return {
       orders: [],
       pagination: {
@@ -93,18 +104,22 @@ export async function getOrderById(orderId: string) {
       with: {
         items: {
           with: {
-            product: true,
+            product: {
+              with: {
+                images: true,
+              },
+            },
           },
         },
         statusHistory: {
-          orderBy: (statusHistory: any, { desc }: any) => [desc(statusHistory.createdAt)],
+          orderBy: (statusHistory, { desc }) => [desc(statusHistory.createdAt)],
         },
       },
     });
 
     return order || null;
   } catch (error) {
-    console.error('Error fetching order:', error);
+    logger.error('Error fetching order', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -127,14 +142,14 @@ export async function getOrderByNumber(orderNumber: string) {
           },
         },
         statusHistory: {
-          orderBy: (statusHistory: any, { desc }: any) => [desc(statusHistory.createdAt)],
+          orderBy: (statusHistory, { desc }) => [desc(statusHistory.createdAt)],
         },
       },
     });
 
     return order || null;
   } catch (error) {
-    console.error('Error fetching order by number:', error);
+    logger.error('Error fetching order by number', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -240,7 +255,7 @@ export async function getAllOrders(options?: {
       },
     };
   } catch (error) {
-    console.error('Error fetching all orders:', error);
+    logger.error('Error fetching all orders', { error: error instanceof Error ? error.message : String(error) });
     return {
       orders: [],
       pagination: {
@@ -279,7 +294,7 @@ export async function searchOrdersByNumber(orderNumber: string) {
 
     return matchingOrders;
   } catch (error) {
-    console.error('Error searching orders:', error);
+    logger.error('Error searching orders', { error: error instanceof Error ? error.message : String(error) });
     return [];
   }
 }

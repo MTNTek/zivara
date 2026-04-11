@@ -15,9 +15,11 @@ interface OrderStatusUpdaterProps {
  * Order status update dropdown for admin
  * Validates: Requirements 21.4, 21.5
  */
+type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
 export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdaterProps) {
   const router = useRouter();
-  const [status, setStatus] = useState(currentStatus);
+  const [status, setStatus] = useState<OrderStatus>(currentStatus as OrderStatus);
   const [notes, setNotes] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
         setSuccess(false);
       }, 3000);
     } else {
-      const errorMsg = result.error?.message || result.error || 'Failed to update order status';
+      const errorMsg = typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to update order status');
       setError(errorMsg);
       toast.error('Could not update status', errorMsg);
     }
@@ -117,8 +119,8 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
               <select
                 id="status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                onChange={(e) => setStatus(e.target.value as OrderStatus)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
               >
                 <option value={currentStatus}>Select new status...</option>
                 {validStatuses.map((validStatus) => (
@@ -140,7 +142,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder="Add any notes about this status change..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
               />
             </div>
 
@@ -162,7 +164,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
             <button
               onClick={handleUpdateStatus}
               disabled={isUpdating || status === currentStatus}
-              className="w-full px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full px-6 py-3 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isUpdating && <ButtonSpinner />}
               {isUpdating ? 'Updating...' : 'Update Status'}
@@ -171,7 +173,7 @@ export function OrderStatusUpdater({ orderId, currentStatus }: OrderStatusUpdate
         ) : (
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
             <p className="text-sm text-gray-600">
-              This order cannot be updated. Orders with status "{currentStatus}" are final.
+              This order cannot be updated. Orders with status &quot;{currentStatus}&quot; are final.
             </p>
           </div>
         )}

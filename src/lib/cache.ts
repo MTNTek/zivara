@@ -23,10 +23,10 @@ export const CACHE_TIMES = {
  * Invalidate product-related caches
  */
 export function invalidateProductCache(productId?: string) {
-  revalidateTag(CACHE_TAGS.PRODUCTS);
-  revalidateTag(CACHE_TAGS.PRODUCT_SEARCH);
+  revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  revalidateTag(CACHE_TAGS.PRODUCT_SEARCH, 'max');
   if (productId) {
-    revalidateTag(CACHE_TAGS.PRODUCT(productId));
+    revalidateTag(CACHE_TAGS.PRODUCT(productId), 'max');
   }
 }
 
@@ -34,19 +34,19 @@ export function invalidateProductCache(productId?: string) {
  * Invalidate category-related caches
  */
 export function invalidateCategoryCache(categoryId?: string) {
-  revalidateTag(CACHE_TAGS.CATEGORIES);
+  revalidateTag(CACHE_TAGS.CATEGORIES, 'max');
   // Categories affect product listings, so invalidate those too
-  revalidateTag(CACHE_TAGS.PRODUCTS);
-  revalidateTag(CACHE_TAGS.PRODUCT_SEARCH);
+  revalidateTag(CACHE_TAGS.PRODUCTS, 'max');
+  revalidateTag(CACHE_TAGS.PRODUCT_SEARCH, 'max');
   if (categoryId) {
-    revalidateTag(CACHE_TAGS.CATEGORY(categoryId));
+    revalidateTag(CACHE_TAGS.CATEGORY(categoryId), 'max');
   }
 }
 
 /**
  * Create a cached version of a function with tags
  */
-export function createCachedFunction<T extends (...args: any[]) => Promise<any>>(
+export function createCachedFunction<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   options: {
     tags: string[];

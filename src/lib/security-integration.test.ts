@@ -3,7 +3,7 @@
  * Tests the interaction between CSRF protection, rate limiting, and input sanitization
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   sanitizeInput,
   sanitizeHtml,

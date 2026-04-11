@@ -17,7 +17,7 @@ export function CategorySortSelect({ slug, currentSortBy }: CategorySortSelectPr
         }
         window.location.href = `/products/category/${slug}?${params.toString()}`;
       }}
-      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563eb]"
     >
       <option value="">Default</option>
       <option value="price-asc">Price: Low to High</option>

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
-import { updateProductPrice, updateProductDiscount, getProductPriceHistory } from './price-actions';
+import { updateProductPrice, updateProductDiscount } from './price-actions';
 
 // Mock auth
 vi.mock('@/lib/auth', () => ({

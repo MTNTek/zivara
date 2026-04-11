@@ -1,36 +1,66 @@
-import { Skeleton, TableSkeleton } from '@/components/ui/skeleton';
-
 export default function AdminDashboardLoading() {
+  const s = 'skeleton-shimmer';
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Skeleton */}
-        <div className="mb-8">
-          <Skeleton className="h-9 w-48 mb-2" />
-          <Skeleton className="h-5 w-64" />
-        </div>
-
-        {/* Stats Grid Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-lg shadow-sm p-6">
-              <Skeleton className="h-4 w-24 mb-2" />
-              <Skeleton className="h-8 w-32 mb-1" />
-              <Skeleton className="h-3 w-20" />
+    <div>
+      <div className="mb-6">
+        <div className={`h-4 w-56 ${s} rounded`} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className={`h-4 w-24 ${s} rounded mb-2`} />
+                <div className={`h-8 w-28 ${s} rounded`} />
+              </div>
+              <div className={`h-14 w-14 ${s} rounded-full`} />
             </div>
-          ))}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center space-x-4">
+              <div className={`h-12 w-12 ${s} rounded-lg`} />
+              <div>
+                <div className={`h-5 w-20 ${s} rounded mb-1`} />
+                <div className={`h-3 w-32 ${s} rounded`} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className={`h-6 w-32 ${s} rounded`} />
         </div>
-
-        {/* Revenue Chart Skeleton */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <Skeleton className="h-6 w-32 mb-4" />
-          <Skeleton className="h-64 w-full" />
-        </div>
-
-        {/* Recent Orders Skeleton */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <Skeleton className="h-6 w-32 mb-4" />
-          <TableSkeleton rows={5} cols={5} />
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                {['w-28', 'w-32', 'w-20', 'w-16', 'w-20'].map((w, i) => (
+                  <th key={i} className="px-6 py-3 text-left">
+                    <div className={`h-3 ${w} ${s} rounded`} />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {[...Array(5)].map((_, i) => (
+                <tr key={i}>
+                  <td className="px-6 py-4"><div className={`h-4 w-24 ${s} rounded`} /></td>
+                  <td className="px-6 py-4">
+                    <div className={`h-4 w-28 ${s} rounded mb-1`} />
+                    <div className={`h-3 w-36 ${s} rounded`} />
+                  </td>
+                  <td className="px-6 py-4"><div className={`h-5 w-20 ${s} rounded-full`} /></td>
+                  <td className="px-6 py-4"><div className={`h-4 w-16 ${s} rounded`} /></td>
+                  <td className="px-6 py-4"><div className={`h-4 w-20 ${s} rounded`} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

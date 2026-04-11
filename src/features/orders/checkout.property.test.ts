@@ -181,12 +181,6 @@ describe.skipIf(!isDatabaseAvailable)('Checkout Transaction Atomicity (Property-
             }
           }
 
-          // Get initial cart count
-          const initialCartItems = await db.query.cartItems.findMany({
-            where: eq(cartItems.userId, testUserId),
-          });
-          const initialCartCount = initialCartItems.length;
-
           // Perform checkout
           const checkoutResult = await createOrder({
             shippingAddress: {

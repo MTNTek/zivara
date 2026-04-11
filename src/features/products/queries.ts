@@ -1,7 +1,8 @@
 import { db } from '@/db';
-import { products, categories, productImages, inventory, searchQueries } from '@/db/schema';
-import { eq, and, gte, lte, like, or, desc, asc, sql, ilike, inArray } from 'drizzle-orm';
-import type { Product, ProductWithDetails, ProductWithImages, Category, ProductQueryParams } from '@/types';
+import { products, categories, searchQueries } from '@/db/schema';
+import { eq, and, gte, lte, or, desc, asc, sql, ilike, inArray } from 'drizzle-orm';
+import type { ProductWithDetails, ProductWithImages, Category, ProductQueryParams } from '@/types';
+import { logger } from '@/lib/logger';
 
 // Common stop words to filter out from search queries
 const STOP_WORDS = new Set([
@@ -92,7 +93,20 @@ export async function getProducts(params: ProductQueryParams = {}) {
   conditions.push(eq(products.isActive, true));
   
   if (categoryId) {
-    conditions.push(eq(products.categoryId, categoryId));
+    // If categoryId looks like a slug (not a UUID), resolve it
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(categoryId);
+    if (isUUID) {
+      conditions.push(eq(products.categoryId, categoryId));
+    } else {
+      // Treat as slug — look up the category
+      const category = await db.query.categories.findFirst({
+        where: eq(categories.slug, categoryId),
+        columns: { id: true },
+      });
+      if (category) {
+        conditions.push(eq(products.categoryId, category.id));
+      }
+    }
   }
   
   if (minPrice !== undefined) {
@@ -155,6 +169,7 @@ export async function getProducts(params: ProductQueryParams = {}) {
         orderBy: (images, { asc }) => [asc(images.displayOrder)],
       },
       category: true,
+      inventory: true,
     },
   });
 
@@ -217,7 +232,7 @@ export async function getProductBySlug(slug: string): Promise<ProductWithDetails
  */
 export async function getProductsByCategory(
   categoryId: string,
-  params: { page?: number; limit?: number; sortBy?: string; minPrice?: number; maxPrice?: number; minRating?: number; search?: string } = {}
+  params: { page?: number; limit?: number; sortBy?: string; minPrice?: number; maxPrice?: number; minRating?: number; search?: string; subcategorySlugs?: string[] } = {}
 ) {
   const { page = 1, limit = 24, sortBy = 'newest' } = params;
   
@@ -243,16 +258,37 @@ export async function getProductsByCategory(
     };
   }
 
-  // Collect all category IDs (current + children + grandchildren)
-  const categoryIds = [category.id];
-  category.children.forEach((child) => {
-    categoryIds.push(child.id);
-    if (child.children) {
-      child.children.forEach((grandchild) => {
-        categoryIds.push(grandchild.id);
-      });
+  // Collect category IDs to filter by
+  let categoryIds: string[];
+
+  if (params.subcategorySlugs && params.subcategorySlugs.length > 0) {
+    // Filter to only the selected grandchild slugs
+    const slugSet = new Set(params.subcategorySlugs);
+    categoryIds = [];
+    category.children.forEach((child) => {
+      if (child.children) {
+        child.children.forEach((grandchild) => {
+          if (slugSet.has(grandchild.slug)) {
+            categoryIds.push(grandchild.id);
+          }
+        });
+      }
+    });
+    if (categoryIds.length === 0) {
+      return { products: [], total: 0, page, limit, totalPages: 0 };
     }
-  });
+  } else {
+    // Default: current + all children + grandchildren
+    categoryIds = [category.id];
+    category.children.forEach((child) => {
+      categoryIds.push(child.id);
+      if (child.children) {
+        child.children.forEach((grandchild) => {
+          categoryIds.push(grandchild.id);
+        });
+      }
+    });
+  }
 
   const offset = (page - 1) * limit;
 
@@ -318,6 +354,7 @@ export async function getProductsByCategory(
         orderBy: (images, { asc }) => [asc(images.displayOrder)],
       },
       category: true,
+      inventory: true,
     },
   });
 
@@ -502,7 +539,7 @@ export async function logSearchQuery(
     });
   } catch (error) {
     // Don't fail the search if logging fails
-    console.error('Failed to log search query:', error);
+    logger.error('Failed to log search query', { error: error instanceof Error ? error.message : String(error) });
   }
 }
 

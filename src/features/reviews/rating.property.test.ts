@@ -3,7 +3,6 @@ import * as fc from 'fast-check';
 import { db } from '@/db';
 import { users, products, categories, reviews } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { createReview, deleteReview } from './actions';
 import { hash } from 'bcrypt';
 
 /**

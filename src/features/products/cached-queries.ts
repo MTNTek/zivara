@@ -75,6 +75,7 @@ export async function getProductsByCategory(
     maxPrice?: number;
     minRating?: number;
     search?: string;
+    subcategorySlugs?: string[];
   } = {}
 ) {
   const cacheKey = `products-category:${categoryId}:${JSON.stringify(params)}`;

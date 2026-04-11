@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { db } from '@/db';
 import { orders, orderItems, orderStatusHistory, cartItems, users } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 import { 
   checkoutSchema,
   updateOrderStatusSchema,
@@ -13,11 +13,11 @@ import {
   type CancelOrderInput
 } from './schemas';
 import { validateCartInventory } from '@/features/cart/actions';
+import { logger } from '@/lib/logger';
 import { adjustInventoryQuantity } from '@/features/inventory/actions';
 import { getCurrentUserId } from '@/lib/auth';
 import { 
   createPaymentIntent, 
-  getPaymentIntent, 
   handlePaymentWithTimeout,
   getCardLast4Digits 
 } from '@/lib/payment';
@@ -27,6 +27,7 @@ import {
   sendDeliveryConfirmationEmail,
 } from '@/lib/email';
 import { logAdminAction } from '@/lib/audit';
+import { validateCoupon, recordCouponUsage } from '@/features/coupons/actions';
 
 /**
  * Helper function to get user email by ID
@@ -77,21 +78,36 @@ export async function createOrder(input: CheckoutInput) {
       return {
         success: false,
         error: cartValidation.error,
-        outOfStockItems: cartValidation.outOfStockItems,
       };
     }
 
-    const cartItemsList = cartValidation.data!;
+    const cartItemsList = cartValidation.data as Array<{
+      productId: string;
+      quantity: number;
+      product: { name: string; price: string };
+    }>;
 
     // Calculate totals
-    const subtotal = cartItemsList.reduce((sum: number, item: any) => {
+    const subtotal = cartItemsList.reduce((sum, item) => {
       const price = parseFloat(item.product.price);
       return sum + (price * item.quantity);
     }, 0);
 
-    const tax = subtotal * 0.1; // 10% tax (simplified)
-    const shipping = 10.00; // Flat shipping (simplified)
-    const total = subtotal + tax + shipping;
+    // Validate and apply coupon discount
+    let couponId: string | undefined;
+    let discount = 0;
+    if (validated.couponId && validated.couponCode) {
+      const couponResult = await validateCoupon(validated.couponCode, subtotal);
+      if (couponResult.success && couponResult.coupon && couponResult.discount !== undefined) {
+        couponId = couponResult.coupon.id;
+        discount = couponResult.discount;
+      }
+      // If coupon is invalid at checkout time, proceed without discount (don't block order)
+    }
+
+    const tax = (subtotal - discount) * 0.1; // 10% tax on discounted subtotal
+    const shipping = subtotal >= 50 ? 0 : 5.00;
+    const total = subtotal - discount + tax + shipping;
 
     // Create or retrieve payment intent (Requirements 30.1, 30.2)
     let paymentIntentId = validated.paymentIntentId;
@@ -149,7 +165,7 @@ export async function createOrder(input: CheckoutInput) {
     }
 
     // Start transaction (Requirement 16.4)
-    const result = await db.transaction(async (tx: any) => {
+    const result = await db.transaction(async (tx) => {
       // Create order
       const [order] = await tx
         .insert(orders)
@@ -161,6 +177,8 @@ export async function createOrder(input: CheckoutInput) {
           subtotal: subtotal.toFixed(2),
           tax: tax.toFixed(2),
           shipping: shipping.toFixed(2),
+          discount: discount.toFixed(2),
+          couponId: couponId || undefined,
           total: total.toFixed(2),
           shippingAddressLine1: validated.shippingAddress.line1,
           shippingAddressLine2: validated.shippingAddress.line2,
@@ -217,6 +235,13 @@ export async function createOrder(input: CheckoutInput) {
       return order;
     });
 
+    // Record coupon usage if a coupon was applied
+    if (couponId && discount > 0) {
+      recordCouponUsage(couponId, result.id, discount).catch((err) => {
+        logger.error('Failed to record coupon usage', { orderId: result.id, couponId, error: String(err) });
+      });
+    }
+
     // Send order confirmation email (Requirements 28.2, 6.7)
     // Don't block order creation if email fails
     const customerEmail = result.guestEmail || (userId ? await getUserEmail(userId) : null);
@@ -227,7 +252,7 @@ export async function createOrder(input: CheckoutInput) {
 
       sendOrderConfirmationEmail({
         orderNumber: result.orderNumber,
-        customerName: customerEmail,
+        customerEmail: customerEmail,
         orderDate: new Date(result.createdAt).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
@@ -252,7 +277,7 @@ export async function createOrder(input: CheckoutInput) {
         },
         trackingUrl: `${process.env.BETTER_AUTH_URL || 'http://localhost:3000'}/track/${result.orderNumber}`,
       }).catch((error) => {
-        console.error('Failed to send order confirmation email:', error);
+        logger.error('Failed to send order confirmation email', { orderNumber: result.orderNumber, error: String(error) });
       });
     }
 
@@ -316,8 +341,11 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
       'pending': ['processing', 'cancelled'],
       'processing': ['shipped', 'cancelled'],
       'shipped': ['delivered'],
-      'delivered': [], // Cannot change from delivered
-      'cancelled': [], // Cannot change from cancelled
+      'delivered': ['return_requested'],
+      'return_requested': ['returned', 'delivered'], // returned = approved, delivered = rejected
+      'returned': ['refunded'],
+      'refunded': [],
+      'cancelled': [],
     };
 
     const allowedStatuses = validTransitions[order.status] || [];
@@ -329,7 +357,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
     }
 
     // Update order status in transaction (Requirement 7.2, 7.3)
-    await db.transaction(async (tx: any) => {
+    await db.transaction(async (tx) => {
       // Update order
       await tx
         .update(orders)
@@ -370,7 +398,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
         // Send shipping notification (Requirement 28.3)
         sendShippingNotificationEmail({
           orderNumber: order.orderNumber,
-          customerName: customerEmail,
+          customerEmail: customerEmail,
           trackingNumber: order.trackingNumber || undefined,
           carrierName: order.carrierName || undefined,
           estimatedDeliveryDate: order.estimatedDeliveryDate
@@ -382,13 +410,13 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
             : undefined,
           trackingUrl: `${process.env.BETTER_AUTH_URL || 'http://localhost:3000'}/track/${order.orderNumber}`,
         }).catch((error) => {
-          console.error('Failed to send shipping notification email:', error);
+          logger.error('Failed to send shipping notification email', { orderNumber: order.orderNumber, error: String(error) });
         });
       } else if (validated.status === 'delivered') {
         // Send delivery confirmation (Requirement 28.4)
         sendDeliveryConfirmationEmail({
           orderNumber: order.orderNumber,
-          customerName: customerEmail,
+          customerEmail: customerEmail,
           deliveryDate: new Date().toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -396,7 +424,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
           }),
           trackingUrl: `${process.env.BETTER_AUTH_URL || 'http://localhost:3000'}/track/${order.orderNumber}`,
         }).catch((error) => {
-          console.error('Failed to send delivery confirmation email:', error);
+          logger.error('Failed to send delivery confirmation email', { orderNumber: order.orderNumber, error: String(error) });
         });
       }
     }
@@ -472,7 +500,7 @@ export async function cancelOrder(input: CancelOrderInput) {
     }
 
     // Cancel order and restore inventory in transaction (Requirement 16.4)
-    await db.transaction(async (tx: any) => {
+    await db.transaction(async (tx) => {
       // Update order status
       await tx
         .update(orders)
@@ -541,16 +569,20 @@ export async function createCheckoutPaymentIntent() {
       };
     }
 
-    const cartItemsList = cartValidation.data!;
+    const cartItemsList = cartValidation.data as Array<{
+      productId: string;
+      quantity: number;
+      product: { name: string; price: string };
+    }>;
 
     // Calculate totals
-    const subtotal = cartItemsList.reduce((sum: number, item: any) => {
+    const subtotal = cartItemsList.reduce((sum, item) => {
       const price = parseFloat(item.product.price);
       return sum + (price * item.quantity);
     }, 0);
 
     const tax = subtotal * 0.1;
-    const shipping = 10.00;
+    const shipping = subtotal >= 50 ? 0 : 5.00;
     const total = subtotal + tax + shipping;
 
     // Create payment intent

@@ -21,11 +21,11 @@ export function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
           Something went wrong
         </h2>
         <p className="mb-6 text-gray-600">
-          We're sorry for the inconvenience. Please try again.
+          We&apos;re sorry for the inconvenience. Please try again.
         </p>
         <button
           onClick={reset}
-          className="rounded-md bg-teal-600 px-4 py-2 text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+          className="rounded-full bg-[#fbbf24] px-6 py-2.5 text-[#0F1111] font-medium hover:bg-[#f59e0b] focus:outline-none focus:ring-2 focus:ring-[#f59e0b] focus:ring-offset-2 transition-colors border border-[#FCD200]"
         >
           Try again
         </button>

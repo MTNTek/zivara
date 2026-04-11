@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { products, categories } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -71,7 +72,7 @@ export async function GET() {
 
     return NextResponse.json(grouped);
   } catch (error) {
-    console.error('Error fetching electronics subcategories:', error);
+    logger.error('Error fetching electronics subcategories', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json({}, { status: 500 });
   }
 }

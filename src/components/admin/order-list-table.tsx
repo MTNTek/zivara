@@ -2,6 +2,9 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useTransition } from 'react';
+import { updateOrderStatus } from '@/features/orders/actions';
+import { toast } from '@/lib/toast';
 
 interface Order {
   id: string;
@@ -47,6 +50,45 @@ export function OrderListTable({
 }: OrderListTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isPending, startTransition] = useTransition();
+
+  const allSelected = orders.length > 0 && selectedIds.size === orders.length;
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(orders.map(o => o.id)));
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkStatusUpdate = (newStatus: string) => {
+    if (selectedIds.size === 0) return;
+    startTransition(async () => {
+      let successCount = 0;
+      for (const orderId of selectedIds) {
+        try {
+          const result = await updateOrderStatus({ orderId, status: newStatus as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' });
+          if (result.success) successCount++;
+        } catch {
+          // skip failed ones
+        }
+      }
+      toast.success(`Updated ${successCount} order(s) to ${newStatus}`);
+      setSelectedIds(new Set());
+      router.refresh();
+    });
+  };
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -86,14 +128,14 @@ export function OrderListTable({
     
     if (sortOrder === 'asc') {
       return (
-        <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
         </svg>
       );
     }
     
     return (
-      <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
       </svg>
     );
@@ -118,9 +160,31 @@ export function OrderListTable({
     <div className="bg-white rounded-lg shadow">
       {/* Table Header */}
       <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Orders ({pagination.total})
-        </h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Orders ({pagination.total})
+          </h2>
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5">
+              <span className="text-sm text-blue-800 font-medium">{selectedIds.size} selected</span>
+              <select
+                onChange={(e) => { if (e.target.value) handleBulkStatusUpdate(e.target.value); e.target.value = ''; }}
+                disabled={isPending}
+                className="text-sm border border-blue-300 rounded px-2 py-1 bg-white text-blue-800 focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                defaultValue=""
+              >
+                <option value="" disabled>Update status...</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <button onClick={() => setSelectedIds(new Set())} className="text-xs text-blue-600 hover:text-blue-800">
+                Clear
+              </button>
+            </div>
+          )}
+        </div>
         
         {/* Page Size Selector */}
         <div className="flex items-center gap-2">
@@ -131,7 +195,7 @@ export function OrderListTable({
             id="pageSize"
             value={currentLimit}
             onChange={(e) => handleLimitChange(parseInt(e.target.value))}
-            className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#0F52BA] focus:border-transparent"
           >
             <option value="10">10</option>
             <option value="20">20</option>
@@ -146,6 +210,15 @@ export function OrderListTable({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-3 py-3 w-10">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  className="w-4 h-4 accent-blue-600 rounded"
+                  aria-label="Select all orders"
+                />
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('date')}
@@ -187,17 +260,26 @@ export function OrderListTable({
           <tbody className="bg-white divide-y divide-gray-200">
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                   No orders found
                 </td>
               </tr>
             ) : (
               orders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50">
+                <tr key={order.id} className={`hover:bg-gray-50 ${selectedIds.has(order.id) ? 'bg-blue-50/50' : ''} ${isPending ? 'opacity-60' : ''}`}>
+                  <td className="px-3 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(order.id)}
+                      onChange={() => toggleOne(order.id)}
+                      className="w-4 h-4 accent-blue-600 rounded"
+                      aria-label={`Select order ${order.orderNumber}`}
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="text-teal-600 hover:text-teal-800 font-medium"
+                      className="text-black hover:text-blue-800 font-medium"
                     >
                       {order.orderNumber}
                     </Link>
@@ -234,7 +316,7 @@ export function OrderListTable({
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="text-teal-600 hover:text-teal-800"
+                      className="text-black hover:text-blue-800"
                     >
                       View Details
                     </Link>
@@ -258,7 +340,7 @@ export function OrderListTable({
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -283,8 +365,8 @@ export function OrderListTable({
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-4 py-2 border rounded-lg text-sm font-medium ${
                       currentPage === pageNum
-                        ? 'bg-teal-600 text-white border-teal-600'
-                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                        ? 'bg-blue-800 text-white border-blue-800'
+                        : 'border-gray-300 text-black hover:bg-gray-50'
                     }`}
                   >
                     {pageNum}
@@ -296,7 +378,7 @@ export function OrderListTable({
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === pagination.totalPages}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>

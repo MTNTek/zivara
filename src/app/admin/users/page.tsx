@@ -9,6 +9,7 @@ interface SearchParams {
   page?: string;
   limit?: string;
   search?: string;
+  role?: string;
   sortBy?: 'name' | 'email' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
 }
@@ -20,26 +21,29 @@ interface SearchParams {
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   await requireAdmin();
-  const page = parseInt(searchParams.page || '1');
-  const limit = parseInt(searchParams.limit || '20');
-  const search = searchParams.search || '';
-  const sortBy = searchParams.sortBy || 'createdAt';
-  const sortOrder = searchParams.sortOrder || 'desc';
+  const resolvedParams = await searchParams;
+  const page = parseInt(resolvedParams.page || '1');
+  const limit = parseInt(resolvedParams.limit || '20');
+  const search = resolvedParams.search || '';
+  const role = resolvedParams.role || '';
+  const sortBy = resolvedParams.sortBy || 'createdAt';
+  const sortOrder = resolvedParams.sortOrder || 'desc';
 
   const { users, pagination } = await getUsers({
     page,
     limit,
     search,
+    role,
     sortBy,
     sortOrder,
   });
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -59,8 +63,32 @@ export default async function AdminUsersPage({
         </div>
 
         {/* Search */}
-        <div className="mb-6">
+        <div className="mb-4">
           <UserSearch initialSearch={search} />
+        </div>
+
+        {/* Role Filter Tabs */}
+        <div className="mb-6 flex gap-2">
+          {[
+            { label: 'All Users', value: '' },
+            { label: 'Admins', value: 'admin' },
+            { label: 'Customers', value: 'customer' },
+          ].map((tab) => (
+            <Link
+              key={tab.value}
+              href={`/admin/users?${new URLSearchParams({
+                ...(search ? { search } : {}),
+                ...(tab.value ? { role: tab.value } : {}),
+              }).toString()}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                role === tab.value
+                  ? 'bg-blue-800 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
         </div>
 
         {/* Users Table */}
@@ -135,7 +163,12 @@ export default async function AdminUsersPage({
                   users.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                            {user.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
+                          </div>
+                          <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{user.email}</div>
@@ -171,7 +204,7 @@ export default async function AdminUsersPage({
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           href={`/admin/users/${user.id}`}
-                          className="text-teal-600 hover:text-teal-900"
+                          className="text-black hover:text-blue-900"
                         >
                           View Details
                         </Link>
@@ -190,7 +223,7 @@ export default async function AdminUsersPage({
                 {page > 1 && (
                   <Link
                     href={`/admin/users?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-black bg-white hover:bg-gray-50"
                   >
                     Previous
                   </Link>
@@ -198,7 +231,7 @@ export default async function AdminUsersPage({
                 {page < pagination.totalPages && (
                   <Link
                     href={`/admin/users?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-black bg-white hover:bg-gray-50"
                   >
                     Next
                   </Link>
@@ -217,7 +250,7 @@ export default async function AdminUsersPage({
                     {page > 1 && (
                       <Link
                         href={`/admin/users?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-black hover:bg-gray-50"
                       >
                         <span className="sr-only">Previous</span>
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -248,8 +281,8 @@ export default async function AdminUsersPage({
                           href={`/admin/users?page=${pageNum}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                             page === pageNum
-                              ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              ? 'z-10 bg-blue-50 border-blue-800 text-black'
+                              : 'bg-white border-gray-300 text-black hover:bg-gray-50'
                           }`}
                         >
                           {pageNum}
@@ -260,7 +293,7 @@ export default async function AdminUsersPage({
                     {page < pagination.totalPages && (
                       <Link
                         href={`/admin/users?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-black hover:bg-gray-50"
                       >
                         <span className="sr-only">Next</span>
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">

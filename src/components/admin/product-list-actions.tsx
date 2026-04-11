@@ -45,11 +45,11 @@ export function ProductListActions({ products, categories }: ProductListActionsP
       const result = await bulkUpdateProducts(selectedProducts, { isActive: true });
       
       if (result.success) {
-        setSuccess(`Successfully activated ${result.data.updated} products`);
+        setSuccess(`Successfully activated ${result.data?.updated ?? 0} products`);
         setSelectedProducts([]);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Failed to activate products');
+        setError(typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to activate products'));
       }
     });
   };
@@ -65,11 +65,11 @@ export function ProductListActions({ products, categories }: ProductListActionsP
       const result = await bulkUpdateProducts(selectedProducts, { isActive: false });
       
       if (result.success) {
-        setSuccess(`Successfully deactivated ${result.data.updated} products`);
+        setSuccess(`Successfully deactivated ${result.data?.updated ?? 0} products`);
         setSelectedProducts([]);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Failed to deactivate products');
+        setError(typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to deactivate products'));
       }
     });
   };
@@ -85,12 +85,12 @@ export function ProductListActions({ products, categories }: ProductListActionsP
       const result = await bulkUpdateProducts(selectedProducts, { categoryId });
       
       if (result.success) {
-        setSuccess(`Successfully updated category for ${result.data.updated} products`);
+        setSuccess(`Successfully updated category for ${result.data?.updated ?? 0} products`);
         setSelectedProducts([]);
         setShowBulkActions(false);
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(result.error || 'Failed to update category');
+        setError(typeof result.error === 'string' ? result.error : ((result.error as unknown as Record<string, string>)?.message || 'Failed to update category'));
       }
     });
   };
@@ -98,16 +98,15 @@ export function ProductListActions({ products, categories }: ProductListActionsP
   // Set up event listeners for checkboxes
   if (typeof window !== 'undefined') {
     // Handle select all
-    const selectAllCheckbox = document.getElementById('select-all') as HTMLInputElement;
+    const selectAllCheckbox = document.getElementById('select-all') as HTMLInputElement | null;
     if (selectAllCheckbox) {
       selectAllCheckbox.checked = selectedProducts.length === products.length && products.length > 0;
       selectAllCheckbox.indeterminate = selectedProducts.length > 0 && selectedProducts.length < products.length;
-      selectAllCheckbox.onchange = handleSelectAll;
+      selectAllCheckbox.onchange = handleSelectAll as unknown as (this: GlobalEventHandlers, ev: Event) => void;
     }
 
     // Handle individual checkboxes
-    document.querySelectorAll('.product-checkbox').forEach((checkbox) => {
-      const input = checkbox as HTMLInputElement;
+    document.querySelectorAll<HTMLInputElement>('.product-checkbox').forEach((input) => {
       const productId = input.dataset.productId;
       if (productId) {
         input.checked = selectedProducts.includes(productId);
@@ -141,7 +140,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
               <button
                 onClick={handleBulkActivate}
                 disabled={isPending}
-                className="text-sm text-teal-600 hover:text-teal-800 font-medium disabled:opacity-50"
+                className="text-sm text-black hover:text-blue-800 font-medium disabled:opacity-50"
               >
                 Activate
               </button>
@@ -179,7 +178,7 @@ export function ProductListActions({ products, categories }: ProductListActionsP
                   id="bulk-category"
                   onChange={(e) => handleBulkAssignCategory(e.target.value)}
                   disabled={isPending}
-                  className="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm disabled:opacity-50"
+                  className="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-blue-800 focus:ring-[#0F52BA] sm:text-sm disabled:opacity-50"
                   defaultValue=""
                 >
                   <option value="">Choose a category...</option>

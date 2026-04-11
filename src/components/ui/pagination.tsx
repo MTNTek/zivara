@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 
 interface PaginationProps {
   currentPage: number;
@@ -10,43 +10,35 @@ interface PaginationProps {
 
 export function Pagination({ currentPage, totalPages }: PaginationProps) {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const createPageUrl = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    return `/products?${params.toString()}`;
+    return `${pathname}?${params.toString()}`;
   };
 
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
-    const showPages = 5; // Number of page buttons to show
+    const showPages = 5;
 
     if (totalPages <= showPages) {
-      // Show all pages if total is small
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always show first page
       pages.push(1);
-
       if (currentPage > 3) {
         pages.push('...');
       }
-
-      // Show pages around current page
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
-
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
-
       if (currentPage < totalPages - 2) {
         pages.push('...');
       }
-
-      // Always show last page
       pages.push(totalPages);
     }
 
@@ -61,7 +53,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
       {currentPage > 1 ? (
         <Link
           href={createPageUrl(currentPage - 1)}
-          className="px-4 py-3 min-h-[44px] min-w-[44px] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center"
+          className="px-4 py-3 min-h-[44px] min-w-[44px] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center text-black"
         >
           Previous
         </Link>
@@ -91,8 +83,8 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
               href={createPageUrl(pageNum)}
               className={`px-4 py-3 min-h-[44px] min-w-[44px] border rounded-md transition-colors flex items-center justify-center ${
                 isActive
-                  ? 'bg-teal-600 text-white border-teal-600'
-                  : 'border-gray-300 hover:bg-gray-50'
+                  ? 'bg-[#2563eb] text-white border-[#2563eb]'
+                  : 'border-gray-300 hover:bg-gray-50 text-black'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
@@ -106,7 +98,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
       {currentPage < totalPages ? (
         <Link
           href={createPageUrl(currentPage + 1)}
-          className="px-4 py-3 min-h-[44px] min-w-[44px] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center"
+          className="px-4 py-3 min-h-[44px] min-w-[44px] border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center text-black"
         >
           Next
         </Link>

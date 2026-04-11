@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
 
-interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
+type SkeletonProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
-      className={cn('animate-pulse rounded-md bg-gray-200', className)}
+      className={cn('skeleton-shimmer rounded-md', className)}
       {...props}
     />
   );
@@ -13,23 +13,19 @@ export function Skeleton({ className, ...props }: SkeletonProps) {
 
 export function ProductCardSkeleton() {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
-      <Skeleton className="w-full h-64" />
-      <div className="p-4 flex-1 flex flex-col space-y-3">
-        <Skeleton className="h-5 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-        <div className="flex items-center gap-2 mt-auto">
-          <Skeleton className="h-6 w-20" />
-          <Skeleton className="h-4 w-16" />
-        </div>
-      </div>
+    <div className="flex flex-col">
+      <Skeleton className="aspect-square w-full mb-2" />
+      <Skeleton className="h-4 w-full mb-1" />
+      <Skeleton className="h-4 w-3/4 mb-1" />
+      <Skeleton className="h-3 w-20 mb-1" />
+      <Skeleton className="h-6 w-16" />
     </div>
   );
 }
 
-export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
+export function ProductGridSkeleton({ count = 10 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-6">
       {Array.from({ length: count }).map((_, i) => (
         <ProductCardSkeleton key={i} />
       ))}
@@ -67,19 +63,16 @@ export function OrderListSkeleton({ count = 5 }: { count?: number }) {
 
 export function ProductDetailSkeleton() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="px-4 sm:px-6 lg:px-10 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Image Gallery Skeleton */}
         <div className="space-y-4">
-          <Skeleton className="w-full h-96 rounded-lg" />
+          <Skeleton className="w-full h-96" />
           <div className="grid grid-cols-4 gap-2">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="w-full h-20 rounded-lg" />
+              <Skeleton key={i} className="w-full h-20" />
             ))}
           </div>
         </div>
-
-        {/* Product Info Skeleton */}
         <div className="space-y-6">
           <Skeleton className="h-8 w-3/4" />
           <Skeleton className="h-6 w-1/4" />
@@ -90,7 +83,6 @@ export function ProductDetailSkeleton() {
             <Skeleton className="h-4 w-2/3" />
           </div>
           <Skeleton className="h-12 w-full rounded-lg" />
-          <Skeleton className="h-12 w-full rounded-lg" />
         </div>
       </div>
     </div>
@@ -100,13 +92,11 @@ export function ProductDetailSkeleton() {
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
     <div className="space-y-3">
-      {/* Header */}
       <div className="flex gap-4 pb-3 border-b">
         {Array.from({ length: cols }).map((_, i) => (
           <Skeleton key={i} className="h-4 flex-1" />
         ))}
       </div>
-      {/* Rows */}
       {Array.from({ length: rows }).map((_, rowIndex) => (
         <div key={rowIndex} className="flex gap-4 py-3">
           {Array.from({ length: cols }).map((_, colIndex) => (

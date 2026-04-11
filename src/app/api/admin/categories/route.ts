@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
       .returning();
 
     return NextResponse.json(category, { status: 201 });
-  } catch (error: any) {
-    if (error.code === '23505') {
+  } catch (error: unknown) {
+    if ((error as Record<string, string>)?.code === '23505') {
       return NextResponse.json({ error: 'A category with this slug already exists' }, { status: 409 });
     }
     return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });

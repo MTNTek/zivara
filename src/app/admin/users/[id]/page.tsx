@@ -7,9 +7,9 @@ import { UserActionsPanel } from '@/components/admin/user-actions-panel';
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 /**
@@ -18,7 +18,8 @@ interface PageProps {
  */
 export default async function AdminUserDetailPage({ params }: PageProps) {
   await requireAdmin();
-  const user = await getUserWithOrders(params.id);
+  const { id } = await params;
+  const user = await getUserWithOrders(id);
 
   if (!user) {
     notFound();
@@ -26,7 +27,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -189,7 +190,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <Link
                               href={`/admin/orders/${order.id}`}
-                              className="text-teal-600 hover:text-teal-900"
+                              className="text-black hover:text-gray-900"
                             >
                               View Order
                             </Link>

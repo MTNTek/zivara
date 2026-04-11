@@ -1,9 +1,11 @@
 'use server';
 
 import { db } from '@/db';
-import { cartItems, products, productImages } from '@/db/schema';
+import { cartItems } from '@/db/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { getCurrentUserId } from '@/lib/auth';
+import { readGuestSessionId } from '@/lib/guest-session';
+import { logger } from '@/lib/logger';
 
 /**
  * Cart item with product details
@@ -52,12 +54,13 @@ export interface CartSummary {
 export async function getCartItems(): Promise<CartItemWithProduct[]> {
   try {
     const userId = await getCurrentUserId();
-    if (!userId) {
-      return [];
-    }
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) return [];
+
+    const whereClause = userId ? eq(cartItems.userId, userId) : eq(cartItems.sessionId, sessionId!);
 
     const items = await db.query.cartItems.findMany({
-      where: eq(cartItems.userId, userId),
+      where: whereClause,
       with: {
         product: {
           with: {
@@ -72,7 +75,7 @@ export async function getCartItems(): Promise<CartItemWithProduct[]> {
 
     return items as CartItemWithProduct[];
   } catch (error) {
-    console.error('Error fetching cart items:', error);
+    logger.error('Error fetching cart items', { error: error instanceof Error ? error.message : String(error) });
     return [];
   }
 }
@@ -88,15 +91,13 @@ export async function getCartItemById(
 ): Promise<CartItemWithProduct | null> {
   try {
     const userId = await getCurrentUserId();
-    if (!userId) {
-      return null;
-    }
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) return null;
+
+    const ownerClause = userId ? eq(cartItems.userId, userId) : eq(cartItems.sessionId, sessionId!);
 
     const item = await db.query.cartItems.findFirst({
-      where: and(
-        eq(cartItems.id, cartItemId),
-        eq(cartItems.userId, userId)
-      ),
+      where: and(eq(cartItems.id, cartItemId), ownerClause),
       with: {
         product: {
           with: {
@@ -110,7 +111,7 @@ export async function getCartItemById(
 
     return item as CartItemWithProduct | null;
   } catch (error) {
-    console.error('Error fetching cart item:', error);
+    logger.error('Error fetching cart item', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -143,7 +144,7 @@ export async function getCartSummary(): Promise<CartSummary> {
       totalQuantity,
     };
   } catch (error) {
-    console.error('Error calculating cart summary:', error);
+    logger.error('Error calculating cart summary', { error: error instanceof Error ? error.message : String(error) });
     return {
       items: [],
       subtotal: 0,
@@ -195,7 +196,7 @@ export async function validateCartItems(): Promise<{
       unavailableItems,
     };
   } catch (error) {
-    console.error('Error validating cart items:', error);
+    logger.error('Error validating cart items', { error: error instanceof Error ? error.message : String(error) });
     return {
       valid: false,
       unavailableItems: [],
@@ -218,18 +219,16 @@ export async function checkPriceChange(cartItemId: string): Promise<{
 }> {
   try {
     const userId = await getCurrentUserId();
-    if (!userId) {
-      throw new Error('Authentication required');
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) {
+      throw new Error('No cart session found');
     }
 
+    const ownerClause = userId ? eq(cartItems.userId, userId) : eq(cartItems.sessionId, sessionId!);
+
     const item = await db.query.cartItems.findFirst({
-      where: and(
-        eq(cartItems.id, cartItemId),
-        eq(cartItems.userId, userId)
-      ),
-      with: {
-        product: true,
-      },
+      where: and(eq(cartItems.id, cartItemId), ownerClause),
+      with: { product: true },
     });
 
     if (!item || !item.product) {
@@ -252,7 +251,7 @@ export async function checkPriceChange(cartItemId: string): Promise<{
       withinHonorPeriod,
     };
   } catch (error) {
-    console.error('Error checking price change:', error);
+    logger.error('Error checking price change', { error: error instanceof Error ? error.message : String(error) });
     throw error;
   }
 }
@@ -265,17 +264,15 @@ export async function checkPriceChange(cartItemId: string): Promise<{
 export async function getCartItemCount(): Promise<number> {
   try {
     const userId = await getCurrentUserId();
-    if (!userId) {
-      return 0;
-    }
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) return 0;
 
-    const items = await db.query.cartItems.findMany({
-      where: eq(cartItems.userId, userId),
-    });
+    const whereClause = userId ? eq(cartItems.userId, userId) : eq(cartItems.sessionId, sessionId!);
 
+    const items = await db.query.cartItems.findMany({ where: whereClause });
     return items.reduce((total, item) => total + item.quantity, 0);
   } catch (error) {
-    console.error('Error getting cart item count:', error);
+    logger.error('Error getting cart item count', { error: error instanceof Error ? error.message : String(error) });
     return 0;
   }
 }
@@ -304,7 +301,7 @@ export async function cleanupOldCartItems(): Promise<{
       deletedCount: result.length,
     };
   } catch (error) {
-    console.error('Error cleaning up old cart items:', error);
+    logger.error('Error cleaning up old cart items', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       deletedCount: 0,

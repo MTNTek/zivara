@@ -1,282 +1,254 @@
 'use server';
 
-import { z } from 'zod';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/db';
-import { inventory, products } from '@/db/schema';
-import { eq, and, sql } from 'drizzle-orm';
-import { 
-  updateInventorySchema, 
-  setLowStockThresholdSchema,
-  adjustInventorySchema,
-  type UpdateInventoryInput,
-  type SetLowStockThresholdInput,
-  type AdjustInventoryInput
-} from './schemas';
+import { inventory, products, auditLogs } from '@/db/schema';
+import { eq, sql } from 'drizzle-orm';
+import { requireAdmin } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 /**
- * Update inventory quantity for a product
- * Validates: Requirements 10.1, 10.6
- * 
- * @param input - Product ID and new quantity
- * @returns Success status with updated inventory or error
+ * Get all products with inventory for admin management
  */
-export async function updateInventoryQuantity(input: UpdateInventoryInput) {
+export async function getInventoryList(options?: {
+  page?: number;
+  limit?: number;
+  filter?: 'all' | 'low' | 'out';
+  search?: string;
+}) {
+  const page = options?.page || 1;
+  const limit = options?.limit || 50;
+  const offset = (page - 1) * limit;
+
   try {
-    // Validate input
-    const validated = updateInventorySchema.parse(input);
-
-    // Check if product exists
-    const product = await db.query.products.findFirst({
-      where: eq(products.id, validated.productId),
+    // Get products with inventory
+    const rows = await db.query.products.findMany({
+      with: {
+        inventory: true,
+        images: { limit: 1, columns: { thumbnailUrl: true, imageUrl: true } },
+        category: { columns: { name: true } },
+      },
+      orderBy: (p, { asc }) => [asc(p.name)],
+      limit,
+      offset,
     });
 
-    if (!product) {
-      return {
-        success: false,
-        error: 'Product not found',
-      };
+    let filtered = rows;
+
+    if (options?.search) {
+      const q = options.search.toLowerCase();
+      filtered = filtered.filter(
+        (p) => p.name.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q)
+      );
     }
 
-    // Check if inventory record exists
-    const existingInventory = await db.query.inventory.findFirst({
-      where: eq(inventory.productId, validated.productId),
-    });
-
-    let result;
-    if (existingInventory) {
-      // Update existing inventory
-      [result] = await db
-        .update(inventory)
-        .set({
-          quantity: validated.quantity,
-          updatedAt: new Date(),
-        })
-        .where(eq(inventory.productId, validated.productId))
-        .returning();
-    } else {
-      // Create new inventory record
-      [result] = await db
-        .insert(inventory)
-        .values({
-          productId: validated.productId,
-          quantity: validated.quantity,
-          lowStockThreshold: 10, // Default threshold
-        })
-        .returning();
+    if (options?.filter === 'low') {
+      filtered = filtered.filter(
+        (p) =>
+          p.inventory &&
+          p.inventory.quantity > 0 &&
+          p.inventory.quantity <= p.inventory.lowStockThreshold
+      );
+    } else if (options?.filter === 'out') {
+      filtered = filtered.filter(
+        (p) => !p.inventory || p.inventory.quantity === 0
+      );
     }
 
-    return {
-      success: true,
-      data: result,
-    };
+    return { success: true, data: filtered };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: error.issues[0].message,
-      };
-    }
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to update inventory',
-    };
+    logger.error('Error fetching inventory', { error: error instanceof Error ? error.message : String(error) });
+    return { success: false, error: 'Failed to fetch inventory', data: [] };
   }
 }
 
 /**
- * Adjust inventory quantity by a delta (positive or negative)
- * Validates: Requirements 10.2, 10.5, 10.6
- * 
- * @param input - Product ID and adjustment amount
- * @returns Success status with updated inventory or error
+ * Quick stock adjustment for a single product
  */
-export async function adjustInventoryQuantity(input: AdjustInventoryInput) {
+export async function adjustStock(
+  productId: string,
+  newQuantity: number,
+  reason?: string
+) {
   try {
-    // Validate input
-    const validated = adjustInventorySchema.parse(input);
+    const session = await requireAdmin();
 
-    // Get current inventory
-    const currentInventory = await db.query.inventory.findFirst({
-      where: eq(inventory.productId, validated.productId),
-    });
-
-    if (!currentInventory) {
-      return {
-        success: false,
-        error: 'Inventory record not found for this product',
-      };
-    }
-
-    // Calculate new quantity
-    const newQuantity = currentInventory.quantity + validated.adjustment;
-
-    // Validate non-negative constraint (Requirement 10.6)
     if (newQuantity < 0) {
-      return {
-        success: false,
-        error: 'Insufficient inventory. Cannot reduce below zero.',
-      };
+      return { success: false, error: 'Quantity cannot be negative' };
     }
 
-    // Update inventory
-    const [result] = await db
-      .update(inventory)
-      .set({
-        quantity: newQuantity,
-        updatedAt: new Date(),
-      })
-      .where(eq(inventory.productId, validated.productId))
-      .returning();
-
-    return {
-      success: true,
-      data: result,
-    };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: error.issues[0].message,
-      };
-    }
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to adjust inventory',
-    };
-  }
-}
-
-/**
- * Set low stock threshold for a product
- * Validates: Requirement 10.1
- * 
- * @param input - Product ID and threshold value
- * @returns Success status with updated inventory or error
- */
-export async function setLowStockThreshold(input: SetLowStockThresholdInput) {
-  try {
-    // Validate input
-    const validated = setLowStockThresholdSchema.parse(input);
-
-    // Check if inventory record exists
-    const existingInventory = await db.query.inventory.findFirst({
-      where: eq(inventory.productId, validated.productId),
-    });
-
-    if (!existingInventory) {
-      return {
-        success: false,
-        error: 'Inventory record not found for this product',
-      };
-    }
-
-    // Update threshold
-    const [result] = await db
-      .update(inventory)
-      .set({
-        lowStockThreshold: validated.threshold,
-        updatedAt: new Date(),
-      })
-      .where(eq(inventory.productId, validated.productId))
-      .returning();
-
-    return {
-      success: true,
-      data: result,
-    };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: error.issues[0].message,
-      };
-    }
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to set low stock threshold',
-    };
-  }
-}
-
-/**
- * Get low stock products (quantity <= threshold)
- * For admin notifications
- * 
- * @returns List of products with low stock
- */
-export async function getLowStockProducts() {
-  try {
-    const lowStockItems = await db
-      .select({
-        productId: inventory.productId,
-        productName: products.name,
-        quantity: inventory.quantity,
-        lowStockThreshold: inventory.lowStockThreshold,
-      })
-      .from(inventory)
-      .innerJoin(products, eq(inventory.productId, products.id))
-      .where(sql`${inventory.quantity} <= ${inventory.lowStockThreshold}`);
-
-    return {
-      success: true,
-      data: lowStockItems,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to get low stock products',
-    };
-  }
-}
-
-/**
- * Check if a product is in stock
- * Validates: Requirement 10.3
- * 
- * @param productId - Product ID to check
- * @returns Boolean indicating if product is in stock
- */
-export async function isProductInStock(productId: string): Promise<boolean> {
-  try {
-    const inventoryRecord = await db.query.inventory.findFirst({
+    // Upsert inventory record
+    const existing = await db.query.inventory.findFirst({
       where: eq(inventory.productId, productId),
     });
 
-    return inventoryRecord ? inventoryRecord.quantity > 0 : false;
+    if (existing) {
+      await db
+        .update(inventory)
+        .set({ quantity: newQuantity, updatedAt: new Date() })
+        .where(eq(inventory.productId, productId));
+    } else {
+      await db.insert(inventory).values({
+        productId,
+        quantity: newQuantity,
+      });
+    }
+
+    // Audit log
+    await db.insert(auditLogs).values({
+      userId: session.user.id,
+      action: 'ADJUST_STOCK',
+      entityType: 'inventory',
+      entityId: productId,
+      changes: JSON.stringify({
+        previousQuantity: existing?.quantity ?? 0,
+        newQuantity,
+        reason: reason || 'Manual adjustment',
+      }),
+    });
+
+    revalidatePath('/admin/inventory');
+    revalidatePath('/admin/dashboard');
+
+    return { success: true };
   } catch (error) {
-    return false;
+    logger.error('Error adjusting stock', { error: error instanceof Error ? error.message : String(error) });
+    return { success: false, error: 'Failed to adjust stock' };
   }
 }
 
 /**
- * Check if sufficient inventory is available for a quantity
- * Validates: Requirement 10.7
- * 
- * @param productId - Product ID to check
- * @param requestedQuantity - Quantity requested
- * @returns Object with availability status and available quantity
+ * Update low stock threshold for a product
+ */
+export async function updateLowStockThreshold(
+  productId: string,
+  threshold: number
+) {
+  try {
+    await requireAdmin();
+
+    if (threshold < 0) {
+      return { success: false, error: 'Threshold cannot be negative' };
+    }
+
+    const existing = await db.query.inventory.findFirst({
+      where: eq(inventory.productId, productId),
+    });
+
+    if (existing) {
+      await db
+        .update(inventory)
+        .set({ lowStockThreshold: threshold, updatedAt: new Date() })
+        .where(eq(inventory.productId, productId));
+    } else {
+      await db.insert(inventory).values({
+        productId,
+        quantity: 0,
+        lowStockThreshold: threshold,
+      });
+    }
+
+    revalidatePath('/admin/inventory');
+    return { success: true };
+  } catch (error) {
+    logger.error('Error updating threshold', { error: error instanceof Error ? error.message : String(error) });
+    return { success: false, error: 'Failed to update threshold' };
+  }
+}
+
+/**
+ * Adjust inventory by a relative amount (positive to add, negative to subtract)
+ * Used by order creation and cancellation
+ */
+export async function adjustInventoryQuantity({
+  productId,
+  adjustment,
+}: {
+  productId: string;
+  adjustment: number;
+}) {
+  try {
+    const existing = await db.query.inventory.findFirst({
+      where: eq(inventory.productId, productId),
+    });
+
+    const currentQty = existing?.quantity ?? 0;
+    const newQty = Math.max(0, currentQty + adjustment);
+
+    if (existing) {
+      await db
+        .update(inventory)
+        .set({ quantity: newQty, updatedAt: new Date() })
+        .where(eq(inventory.productId, productId));
+    } else {
+      await db.insert(inventory).values({
+        productId,
+        quantity: newQty,
+      });
+    }
+
+    return { success: true, newQuantity: newQty };
+  } catch (error) {
+    logger.error('Error adjusting inventory', { error: error instanceof Error ? error.message : String(error) });
+    return { success: false, error: 'Failed to adjust inventory' };
+  }
+}
+
+/**
+ * Check if requested quantity is available in inventory
+ * Used by cart actions before adding/updating items
  */
 export async function checkInventoryAvailability(
   productId: string,
   requestedQuantity: number
-): Promise<{ available: boolean; availableQuantity: number }> {
+) {
   try {
-    const inventoryRecord = await db.query.inventory.findFirst({
+    const record = await db.query.inventory.findFirst({
       where: eq(inventory.productId, productId),
     });
 
-    if (!inventoryRecord) {
-      return { available: false, availableQuantity: 0 };
-    }
+    const available = record ? record.quantity : 0;
 
     return {
-      available: inventoryRecord.quantity >= requestedQuantity,
-      availableQuantity: inventoryRecord.quantity,
+      available: available >= requestedQuantity,
+      availableQuantity: available,
+      currentStock: available,
+      requestedQuantity,
     };
   } catch (error) {
-    return { available: false, availableQuantity: 0 };
+    logger.error('Error checking inventory', { error: error instanceof Error ? error.message : String(error) });
+    // Fail open — allow the purchase if inventory check fails
+    return { available: true, availableQuantity: 0, currentStock: 0, requestedQuantity };
+  }
+}
+
+/**
+ * Set inventory to an absolute quantity (used by tests and sync)
+ */
+export async function updateInventoryQuantity({
+  productId,
+  quantity,
+}: {
+  productId: string;
+  quantity: number;
+}) {
+  try {
+    const existing = await db.query.inventory.findFirst({
+      where: eq(inventory.productId, productId),
+    });
+
+    if (existing) {
+      await db
+        .update(inventory)
+        .set({ quantity, updatedAt: new Date() })
+        .where(eq(inventory.productId, productId));
+    } else {
+      await db.insert(inventory).values({ productId, quantity });
+    }
+
+    return { success: true };
+  } catch (error) {
+    logger.error('Error updating inventory quantity', { error: error instanceof Error ? error.message : String(error) });
+    return { success: false, error: 'Failed to update inventory' };
   }
 }

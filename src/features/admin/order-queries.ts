@@ -1,6 +1,7 @@
 import { db } from '@/db';
-import { orders, users } from '@/db/schema';
-import { sql, and, gte, lte, eq, desc } from 'drizzle-orm';
+import { orders } from '@/db/schema';
+import { sql, and, gte, lte, eq } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
 
 export interface OrderStatistics {
   totalRevenue: string;
@@ -63,7 +64,7 @@ export async function getOrderStatistics(filters?: {
       totalOrders: stats?.totalOrders ?? 0,
     };
   } catch (error) {
-    console.error('Error fetching order statistics:', error);
+    logger.error('Error fetching order statistics', { error: error instanceof Error ? error.message : String(error) });
     return {
       totalRevenue: '0',
       averageOrderValue: '0',

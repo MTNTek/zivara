@@ -27,7 +27,7 @@ describe('Cached Queries', () => {
   describe('Product Caching', () => {
     it('should use unstable_cache for getProducts', async () => {
       const { getProducts } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getProducts({ page: 1, limit: 24 });
       
@@ -36,7 +36,7 @@ describe('Cached Queries', () => {
 
     it('should use unstable_cache for getProductById', async () => {
       const { getProductById } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getProductById('test-id');
       
@@ -45,7 +45,7 @@ describe('Cached Queries', () => {
 
     it('should use unstable_cache for getProductBySlug', async () => {
       const { getProductBySlug } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getProductBySlug('test-slug');
       
@@ -54,7 +54,7 @@ describe('Cached Queries', () => {
 
     it('should use unstable_cache for getProductsByCategory', async () => {
       const { getProductsByCategory } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getProductsByCategory('category-id', { page: 1 });
       
@@ -65,7 +65,7 @@ describe('Cached Queries', () => {
   describe('Category Caching', () => {
     it('should use unstable_cache for getCategories', async () => {
       const { getCategories } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getCategories();
       
@@ -74,7 +74,7 @@ describe('Cached Queries', () => {
 
     it('should use unstable_cache for getCategoryById', async () => {
       const { getCategoryById } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getCategoryById('test-id');
       
@@ -83,7 +83,7 @@ describe('Cached Queries', () => {
 
     it('should use unstable_cache for getCategoryBySlug', async () => {
       const { getCategoryBySlug } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getCategoryBySlug('test-slug');
       
@@ -92,7 +92,7 @@ describe('Cached Queries', () => {
 
     it('should use unstable_cache for getCategoryHierarchy', async () => {
       const { getCategoryHierarchy } = await import('./cached-queries');
-      const mockUnstableCache = unstable_cache as any;
+      const mockUnstableCache = unstable_cache as unknown as ReturnType<typeof vi.fn>;
       
       await getCategoryHierarchy();
       

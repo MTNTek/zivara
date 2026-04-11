@@ -5,13 +5,14 @@
 
 import { db } from '@/db';
 import { auditLogs } from '@/db/schema';
+import { logger } from '@/lib/logger';
 
 export interface AuditLogData {
   userId?: string | null;
   action: string;
   entityType: string;
   entityId?: string | null;
-  changes?: any;
+  changes?: Record<string, unknown>;
   ipAddress?: string | null;
   userAgent?: string | null;
 }
@@ -33,7 +34,7 @@ export async function createAuditLog(data: AuditLogData): Promise<void> {
       createdAt: new Date(),
     });
   } catch (error) {
-    console.error('Failed to create audit log:', error);
+    logger.error('Failed to create audit log', { error: error instanceof Error ? error.message : String(error) });
     // Don't throw - audit logging failure shouldn't break the operation
   }
 }
@@ -69,7 +70,7 @@ export async function logAdminAction(
   action: string,
   entityType: string,
   entityId: string,
-  changes?: any,
+  changes?: Record<string, unknown>,
   ipAddress?: string,
   userAgent?: string
 ): Promise<void> {

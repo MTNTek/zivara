@@ -5,56 +5,97 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ProductSearch } from '@/components/admin/product-search';
 import { ProductListActions } from '@/components/admin/product-list-actions';
+import { ProductExportButton } from '@/components/admin/product-export-button';
+import { ProductCategoryFilter } from '@/components/admin/product-category-filter';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
-  };
+    category?: string;
+  }>;
 }
 
 export default async function AdminProductsPage({ searchParams }: PageProps) {
   await requireAdmin();
-  const page = parseInt(searchParams.page || '1', 10);
-  const search = searchParams.search || '';
+  const resolvedParams = await searchParams;
+  const page = parseInt(resolvedParams.page || '1', 10);
+  const search = resolvedParams.search || '';
+  const categoryFilter = resolvedParams.category || '';
 
   const { products, total, totalPages } = await getProducts({
     page,
     limit: 24,
     search: search || undefined,
+    categoryId: categoryFilter || undefined,
   });
 
   const categories = await getCategories();
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
               <p className="mt-2 text-gray-600">
-                Manage your product catalog ({total} products)
+                Manage your product catalog ({total} products{categoryFilter ? ` in selected category` : ''})
               </p>
             </div>
-            <Link
-              href="/admin/products/new"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add Product
-            </Link>
+            <div className="flex items-center gap-3">
+              <ProductExportButton products={products} />
+              <Link
+                href="/admin/products/new"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0F52BA]"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Product
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <p className="text-xs text-gray-500">Total Products</p>
+            <p className="text-xl font-bold text-gray-900">{total}</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <p className="text-xs text-gray-500">Active</p>
+            <p className="text-xl font-bold text-green-600">{products.filter(p => p.isActive).length}</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <p className="text-xs text-gray-500">On Sale</p>
+            <p className="text-xl font-bold text-orange-600">{products.filter(p => p.discountPrice).length}</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4">
+            <p className="text-xs text-gray-500">Low Stock</p>
+            <p className="text-xl font-bold text-red-600">
+              {products.filter(p => {
+                const qty = p.inventory?.quantity ?? 0;
+                const low = p.inventory?.lowStockThreshold ?? 10;
+                return qty > 0 && qty <= low;
+              }).length}
+            </p>
           </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="mb-6">
-          <ProductSearch initialSearch={search} />
+        <div className="mb-6 flex flex-col sm:flex-row gap-3">
+          <div className="flex-1">
+            <ProductSearch initialSearch={search} />
+          </div>
+          <Suspense fallback={null}>
+            <ProductCategoryFilter categories={categories} />
+          </Suspense>
         </div>
 
         {/* Bulk Actions */}
@@ -70,7 +111,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     <input
                       type="checkbox"
                       id="select-all"
-                      className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                      className="rounded border-gray-300 accent-blue-800 focus:ring-[#0F52BA]"
                     />
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -89,6 +130,9 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Stock
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Rating
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -99,7 +143,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
               <tbody className="bg-white divide-y divide-gray-200">
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center">
+                    <td colSpan={9} className="px-6 py-12 text-center">
                       <div className="text-gray-500">
                         <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -110,7 +154,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                         {!search && (
                           <Link
                             href="/admin/products/new"
-                            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
+                            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-800 hover:bg-blue-900"
                           >
                             Add your first product
                           </Link>
@@ -130,7 +174,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                           <input
                             type="checkbox"
                             data-product-id={product.id}
-                            className="product-checkbox rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                            className="product-checkbox rounded border-gray-300 accent-blue-800 focus:ring-[#0F52BA]"
                           />
                         </td>
                         <td className="px-6 py-4">
@@ -186,8 +230,17 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          {(() => {
+                            const qty = product.inventory?.quantity ?? 0;
+                            const low = product.inventory?.lowStockThreshold ?? 10;
+                            if (qty === 0) return <span className="text-xs font-medium text-red-600">Out of stock</span>;
+                            if (qty <= low) return <span className="text-xs font-medium text-orange-600">{qty} left</span>;
+                            return <span className="text-xs text-gray-600">{qty}</span>;
+                          })()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center text-sm">
-                            <svg className="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4 text-[#de7921] mr-1" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                             <span className="text-gray-900">
@@ -201,12 +254,12 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
                             href={`/admin/products/${product.id}/edit`}
-                            className="text-teal-600 hover:text-teal-900 mr-4"
+                            className="text-black hover:text-blue-900 mr-4"
                           >
                             Edit
                           </Link>
                           <Link
-                            href={`/products/${product.slug}`}
+                            href={`/products/${product.id}`}
                             target="_blank"
                             className="text-gray-600 hover:text-gray-900"
                           >
@@ -222,22 +275,24 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
+          {totalPages > 1 && (() => {
+            const buildHref = (p: number) => {
+              const params = new URLSearchParams();
+              params.set('page', String(p));
+              if (search) params.set('search', search);
+              if (categoryFilter) params.set('category', categoryFilter);
+              return `/admin/products?${params.toString()}`;
+            };
+            return (
             <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
               <div className="flex-1 flex justify-between sm:hidden">
                 {page > 1 && (
-                  <Link
-                    href={`/admin/products?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                  >
+                  <Link href={buildHref(page - 1)} className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-black bg-white hover:bg-gray-50">
                     Previous
                   </Link>
                 )}
                 {page < totalPages && (
-                  <Link
-                    href={`/admin/products?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                  >
+                  <Link href={buildHref(page + 1)} className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-black bg-white hover:bg-gray-50">
                     Next
                   </Link>
                 )}
@@ -253,49 +308,35 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                 <div>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                     {page > 1 && (
-                      <Link
-                        href={`/admin/products?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                      >
+                      <Link href={buildHref(page - 1)} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-black hover:bg-gray-50">
                         <span className="sr-only">Previous</span>
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </Link>
                     )}
-                    
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (page <= 3) {
-                        pageNum = i + 1;
-                      } else if (page >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-
+                      if (totalPages <= 5) pageNum = i + 1;
+                      else if (page <= 3) pageNum = i + 1;
+                      else if (page >= totalPages - 2) pageNum = totalPages - 4 + i;
+                      else pageNum = page - 2 + i;
                       return (
                         <Link
                           key={pageNum}
-                          href={`/admin/products?page=${pageNum}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
+                          href={buildHref(pageNum)}
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                             page === pageNum
-                              ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                              ? 'z-10 bg-blue-50 border-blue-800 text-black'
+                              : 'bg-white border-gray-300 text-black hover:bg-gray-50'
                           }`}
                         >
                           {pageNum}
                         </Link>
                       );
                     })}
-
                     {page < totalPages && (
-                      <Link
-                        href={`/admin/products?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ''}`}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                      >
+                      <Link href={buildHref(page + 1)} className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-black hover:bg-gray-50">
                         <span className="sr-only">Next</span>
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -306,7 +347,8 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
                 </div>
               </div>
             </div>
-          )}
+            );
+          })()}
         </div>
       </div>
     </div>

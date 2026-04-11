@@ -13,11 +13,11 @@ import { hash } from 'bcrypt';
 const isDatabaseAvailable = !!process.env.DATABASE_URL;
 
 describe.skipIf(!isDatabaseAvailable)('Order Export Functions (Unit Tests)', () => {
-  let testUserId: string;
+  const testUserId: string;
   let testCategoryId: string;
   let testProductId: string;
-  let testOrderIds: string[] = [];
-  let testOrderNumbers: string[] = [];
+  const testOrderIds: string[] = [];
+  const testOrderNumbers: string[] = [];
 
   beforeAll(async () => {
     if (!isDatabaseAvailable) {

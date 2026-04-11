@@ -1,78 +1,166 @@
 import Link from 'next/link';
-import { getProducts } from '@/features/products/cached-queries';
+import { getProducts, getCategories } from '@/features/products/cached-queries';
 import { ProductCard } from '@/components/product/ProductCard';
+import { getWishlistProductIds } from '@/features/wishlist/actions';
+import { RecentlyViewed } from '@/components/product/recently-viewed';
+import { HeroCarousel } from '@/components/home/hero-carousel';
+import { CategoryCardsGrid } from '@/components/home/category-cards';
+import { ProductRow } from '@/components/home/product-row';
+import { SignInCard } from '@/components/home/sign-in-card';
+import { CategoryStrip } from '@/components/home/category-strip';
+import { PromoBanner } from '@/components/home/promo-banner';
+import { BuyAgain } from '@/components/home/buy-again';
+import { TrendingTicker } from '@/components/home/trending-ticker';
+import { Suspense } from 'react';
+import { SocialProofBanner } from '@/components/home/social-proof-banner';
+import { ShopByLifestyle } from '@/components/home/shop-by-lifestyle';
+import { FeaturedCollections } from '@/components/home/featured-collections';
+import { NewsletterInline } from '@/components/home/newsletter-inline';
 
 export default async function HomePage() {
-  // Fetch featured products
-  const { products: featuredProducts } = await getProducts({
-    limit: 12,
-    sortBy: 'newest',
+  const [
+    { products: featuredProducts },
+    { products: allProducts },
+    categories,
+    wishlistedIds,
+  ] = await Promise.all([
+    getProducts({ limit: 20, sortBy: 'newest' }),
+    getProducts({ limit: 60 }),
+    getCategories(),
+    getWishlistProductIds(),
+  ]);
+
+  const dealProducts = allProducts
+    .filter((p) => p.discountPrice && Number(p.discountPrice) < Number(p.price))
+    .slice(0, 12);
+
+  const topRated = [...allProducts]
+    .sort((a, b) => Number(b.averageRating || 0) - Number(a.averageRating || 0))
+    .slice(0, 12);
+
+  const budgetPicks = allProducts
+    .filter((p) => Number(p.discountPrice || p.price) < 50)
+    .slice(0, 12);
+
+  const toRowItem = (p: typeof allProducts[number]) => ({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    discountPrice: p.discountPrice,
+    imageUrl: p.images?.[0]?.imageUrl,
+    averageRating: p.averageRating,
+    reviewCount: p.reviewCount || 0,
   });
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Banner */}
-      <section className="relative bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 h-[400px] overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-30"></div>
-        <div className="relative w-full px-4 h-full flex items-center">
-          <div className="max-w-2xl text-white">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">
-              Welcome to Zivara
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-100">
-              Discover amazing products at unbeatable prices
-            </p>
-            <Link
-              href="/products"
-              className="inline-block bg-[#032854] hover:bg-[#021d3d] text-white px-8 py-3 rounded font-bold transition-colors"
-            >
-              Shop Now
+    <div className="min-h-screen bg-[#EAEDED]">
+      {/* Organization JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Zivara',
+            url: process.env.NEXT_PUBLIC_APP_URL || 'https://zivara.com',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL || 'https://zivara.com'}/products?search={search_term_string}`,
+              },
+              'query-input': 'required name=search_term_string',
+            },
+          }),
+        }}
+      />
+
+      <HeroCarousel />
+
+      {/* Category Strip — overlaps hero */}
+      <div className="relative z-10 -mt-10 sm:-mt-16">
+        <CategoryStrip />
+      </div>
+
+      {/* Trending ticker */}
+      <TrendingTicker />
+
+      {/* Social proof banner */}
+      <SocialProofBanner />
+
+      {/* Category Cards — 4-col grid */}
+      <div className="px-4 sm:px-6 lg:px-10 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[14px]">
+          <CategoryCardsGrid categories={categories} />
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="px-4 sm:px-6 lg:px-10 mt-[14px] space-y-[14px] pb-8">
+        <div className="lg:hidden">
+          <SignInCard />
+        </div>
+
+        {/* Buy Again — personalized for logged-in users */}
+        <Suspense fallback={null}>
+          <BuyAgain />
+        </Suspense>
+
+        {/* Promo Banner 1 */}
+        <PromoBanner
+          href="/products/category/electronics"
+          imageUrl="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1600&h=400&fit=crop"
+          alt="Electronics Sale"
+          title="Top Electronics Deals"
+          subtitle="Up to 40% off on smartphones, laptops & more"
+          cta="Shop Now"
+        />
+
+        {/* Today's Deals */}
+        {dealProducts.length > 0 && (
+          <ProductRow title="Today&apos;s Deals" products={dealProducts.map(toRowItem)} seeMoreHref="/deals" />
+        )}
+
+        {/* Shop by Lifestyle */}
+        <ShopByLifestyle />
+
+        {/* Featured Collections */}
+        <FeaturedCollections />
+
+        <ProductRow title="Top Rated Products" products={topRated.map(toRowItem)} seeMoreHref="/bestsellers" />
+
+        {/* Promo Banner 2 */}
+        <PromoBanner
+          href="/products/category/home-kitchen"
+          imageUrl="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600&h=400&fit=crop"
+          alt="Home & Kitchen"
+          title="Refresh Your Home"
+          subtitle="New arrivals in furniture, kitchen & decor"
+          cta="Shop Home"
+        />
+
+        {budgetPicks.length > 0 && (
+          <ProductRow title="Under $50" products={budgetPicks.map(toRowItem)} seeMoreHref="/products?sortBy=price_asc" />
+        )}
+
+        {/* Newsletter CTA */}
+        <NewsletterInline />
+
+        {/* New Arrivals — featuredProducts are already sorted by newest */}
+        {featuredProducts.length > 0 && (
+          <ProductRow title="New Arrivals" products={featuredProducts.slice(0, 12).map(toRowItem)} seeMoreHref="/new-arrivals" />
+        )}
+
+        {/* Featured Products Grid */}
+        <div className="bg-white p-5">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-[21px] font-bold text-[#0f1111]">Featured Products</h2>
+            <Link href="/products" className="text-[13px] text-[#2563eb] hover:text-[#1d4ed8] hover:underline">
+              Shop all products
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Category Cards */}
-      <section className="w-full px-4 -mt-16 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: 'Electronics', icon: '💻', href: '/products/category/electronics' },
-            { name: 'Fashion', icon: '👕', href: '/products/category/mens-fashion' },
-            { name: 'Home & Kitchen', icon: '🏠', href: '/products/category/home-kitchen' },
-            { name: 'Books', icon: '📚', href: '/products/category/books' },
-          ].map((category) => (
-            <Link
-              key={category.name}
-              href={category.href}
-              className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow text-center"
-            >
-              <div className="text-4xl mb-2">{category.icon}</div>
-              <h3 className="font-bold text-gray-900">{category.name}</h3>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Today's Deals Banner */}
-      <section className="w-full px-4 mt-8">
-        <div className="bg-white rounded-lg p-6 shadow-md">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Today's Deals
-          </h2>
-          <p className="text-gray-600">
-            Don't miss out on our special offers
-          </p>
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="w-full px-4 py-8">
-        <div className="bg-white rounded-lg p-6 shadow-md">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Featured Products
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            {featuredProducts.map((product) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-5">
+            {featuredProducts.slice(0, 10).map((product, idx) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
@@ -82,47 +170,32 @@ export default async function HomePage() {
                 imageUrl={product.images?.[0]?.imageUrl}
                 averageRating={product.averageRating}
                 reviewCount={product.reviewCount || 0}
+                stock={product.inventory?.quantity ?? 0}
+                isWishlisted={wishlistedIds.includes(product.id)}
+                badge={
+                  idx < 3 ? 'new' :
+                  topRated.some(t => t.id === product.id) ? 'bestseller' :
+                  dealProducts.some(d => d.id === product.id) ? 'deal' :
+                  null
+                }
               />
             ))}
           </div>
-          
-          <div className="mt-6 text-center">
-            <Link
-              href="/products"
-              className="inline-block text-[#007185] hover:text-[#febd69] hover:underline font-medium"
-            >
-              See more products →
-            </Link>
-          </div>
         </div>
-      </section>
 
-      {/* Promotional Banners */}
-      <section className="w-full px-4 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-            <h3 className="text-xl font-bold mb-2">Free Shipping</h3>
-            <p className="mb-4">On orders over $50</p>
-            <Link href="/products" className="text-sm underline hover:no-underline">
-              Shop Now →
-            </Link>
-          </div>
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
-            <h3 className="text-xl font-bold mb-2">New Arrivals</h3>
-            <p className="mb-4">Check out the latest products</p>
-            <Link href="/products?sortBy=newest" className="text-sm underline hover:no-underline">
-              Explore →
-            </Link>
-          </div>
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-            <h3 className="text-xl font-bold mb-2">Best Sellers</h3>
-            <p className="mb-4">Most popular items</p>
-            <Link href="/products?sortBy=rating" className="text-sm underline hover:no-underline">
-              View All →
-            </Link>
-          </div>
+        {/* More category cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[14px]">
+          <CategoryCardsGrid
+            categories={categories.filter(
+              (c) => !['electronics', 'mens-fashion', 'womens-fashion', 'home-kitchen', 'beauty-health'].includes(c.slug)
+            )}
+          />
         </div>
-      </section>
+
+        <div className="bg-white p-5">
+          <RecentlyViewed />
+        </div>
+      </div>
     </div>
   );
 }

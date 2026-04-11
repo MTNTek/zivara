@@ -3,63 +3,80 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getOrderById } from '@/features/orders/queries';
 import { getCurrentUserId } from '@/lib/auth';
+import { OrderTimeline } from '@/components/orders/order-timeline';
+import { getOrderSubOrders } from '@/features/suppliers/queries';
+import { CopyOrderNumber } from '@/components/orders/copy-order-number';
+import { PrintOrderButton } from '@/components/orders/print-order-button';
+import { CancelOrderButton } from '@/components/orders/cancel-order-button';
+import { ReorderButton } from '@/components/orders/reorder-button';
+import { CopyTrackingNumber } from '@/components/orders/copy-tracking-number';
+import { ReturnRequestButton } from '@/components/orders/return-request-button';
 
 interface OrderDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
-  searchParams: {
-    success?: string;
-  };
+  }>;
 }
 
-export default async function OrderDetailPage({ params, searchParams }: OrderDetailPageProps) {
+export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
+  const { id } = await params;
   const userId = await getCurrentUserId();
-  
-  if (!userId) {
-    redirect('/login?redirect=/orders/' + params.id);
-  }
 
-  const order = await getOrderById(params.id);
+  const order = await getOrderById(id);
+  if (!order) notFound();
 
-  if (!order || order.userId !== userId) {
+  // Allow access if: logged-in user owns the order, OR it's a guest order
+  const isOwner = userId && order.userId === userId;
+  const isGuestOrder = !order.userId && order.guestEmail;
+  if (!isOwner && !isGuestOrder) {
+    if (!userId) redirect('/login?redirect=/orders/' + id);
     notFound();
   }
+
+  // Fetch sub-orders for supplier tracking
+  const subOrdersList = await getOrderSubOrders(id);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered':
         return 'bg-green-100 text-green-800';
       case 'shipped':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-[#eff6ff] text-[#2563eb]';
       case 'processing':
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'return_requested':
+        return 'bg-orange-100 text-orange-800';
+      case 'returned':
+        return 'bg-purple-100 text-purple-800';
+      case 'refunded':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
-        {/* Success Message */}
-        {searchParams.success === 'true' && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg mb-6">
-            <h3 className="font-semibold mb-1">Order placed successfully!</h3>
-            <p>Thank you for your order. We'll send you a confirmation email shortly.</p>
-          </div>
-        )}
+    <div className="min-h-screen bg-[#EAEDED]">
+      <div className="px-4 sm:px-6 lg:px-10 py-8">
+        {/* Order Status Timeline */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Progress</h2>
+          <OrderTimeline status={order.status} orderDate={order.createdAt.toISOString()} />
+        </div>
 
         {/* Header */}
         <div className="mb-8">
-          <Link href="/orders" className="text-teal-600 hover:text-teal-700 mb-4 inline-block">
+          <Link href="/orders" className="text-black hover:text-gray-700 mb-4 inline-block">
             ← Back to Orders
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Order #{order.orderNumber}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Order #{order.orderNumber}
+                <CopyOrderNumber orderNumber={order.orderNumber} />
+              </h1>
               <p className="text-gray-600 mt-1">
                 Placed on {new Date(order.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
@@ -68,9 +85,12 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
                 })}
               </p>
             </div>
-            <span className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-            </span>
+            <div className="flex items-center gap-3">
+              <PrintOrderButton />
+              <span className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -128,6 +148,77 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
                 {order.shippingCountry}
               </address>
             </div>
+
+            {/* Review prompt for delivered orders */}
+            {order.status === 'delivered' && order.items && order.items.length > 0 && (
+              <div className="bg-[#FFF8E1] border border-[#FFE082] rounded-lg p-5">
+                <h2 className="text-sm font-semibold text-[#0F1111] mb-2">How was your order?</h2>
+                <p className="text-xs text-[#565959] mb-3">Help other shoppers by reviewing the products you purchased.</p>
+                <div className="space-y-2">
+                  {order.items.slice(0, 3).map((item) => (
+                    <a
+                      key={item.id}
+                      href={`/products/${item.productId}/reviews`}
+                      className="flex items-center gap-2 text-sm text-[#2563eb] hover:text-[#1d4ed8] hover:underline"
+                    >
+                      <span className="text-[#de7921]">★</span>
+                      Review &quot;{item.productName}&quot;
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sub-order tracking */}
+            {subOrdersList.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipment Details</h2>
+                <div className="space-y-4">
+                  {subOrdersList.map((sub, idx) => (
+                    <div key={sub.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <span className="text-sm font-medium text-gray-900">
+                            Shipment {idx + 1}
+                          </span>
+                          <span className="text-xs text-[#565959] ml-2">
+                            Fulfilled by <span className="text-[#2563eb]">{sub.supplier?.displayLabel || sub.supplier?.name || 'Unknown'}</span>
+                          </span>
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(sub.status)}`}>
+                          {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+                        </span>
+                      </div>
+                      {sub.trackingNumber && (
+                        <div className="text-sm text-gray-600 mb-2">
+                          <span className="font-medium">Tracking:</span> {sub.trackingNumber}
+                          <CopyTrackingNumber trackingNumber={sub.trackingNumber} />
+                          {sub.carrierName && <span className="ml-2">({sub.carrierName})</span>}
+                        </div>
+                      )}
+                      {sub.estimatedDelivery && (
+                        <div className="text-sm text-gray-600 mb-2">
+                          <span className="font-medium">Est. delivery:</span>{' '}
+                          {new Date(sub.estimatedDelivery).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </div>
+                      )}
+                      {sub.items && sub.items.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-gray-100">
+                          <p className="text-xs text-gray-500 mb-1">Items in this shipment:</p>
+                          <ul className="text-sm text-gray-700 space-y-0.5">
+                            {sub.items.map((item) => (
+                              <li key={item.id}>
+                                {item.orderItem?.productName || 'Product'} × {item.quantity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Order Summary */}
@@ -139,13 +230,23 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
                   <span>Subtotal</span>
                   <span>${Number(order.subtotal).toFixed(2)}</span>
                 </div>
+                {order.discount && Number(order.discount) > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#007600]">Coupon discount</span>
+                    <span className="text-[#007600] font-medium">-${Number(order.discount).toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-600">
                   <span>Tax</span>
                   <span>${Number(order.tax).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span>${Number(order.shipping).toFixed(2)}</span>
+                  {Number(order.shipping) === 0 ? (
+                    <span className="text-[#007600] font-medium">FREE</span>
+                  ) : (
+                    <span>${Number(order.shipping).toFixed(2)}</span>
+                  )}
                 </div>
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-semibold text-gray-900">
@@ -164,9 +265,41 @@ export default async function OrderDetailPage({ params, searchParams }: OrderDet
                   </p>
                   <p className="text-sm text-gray-600">
                     Tracking #: {order.trackingNumber}
+                    <CopyTrackingNumber trackingNumber={order.trackingNumber} />
                   </p>
                 </div>
               )}
+
+              {/* Reorder */}
+              <ReorderButton
+                items={(order.items || []).map(item => ({
+                  productId: item.productId,
+                  productName: item.productName,
+                  quantity: item.quantity,
+                }))}
+                orderStatus={order.status}
+              />
+
+              {/* Cancel Order */}
+              <CancelOrderButton orderId={order.id} orderStatus={order.status} />
+
+              {/* Return Request */}
+              <div className="mt-2">
+                <ReturnRequestButton orderId={order.id} orderStatus={order.status} updatedAt={order.updatedAt.toISOString()} />
+              </div>
+
+              {/* Need Help */}
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <Link
+                  href="/contact"
+                  className="flex items-center gap-2 text-sm text-[#2563eb] hover:text-[#1d4ed8] hover:underline"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Need help with this order?
+                </Link>
+              </div>
             </div>
           </div>
         </div>

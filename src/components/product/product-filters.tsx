@@ -62,7 +62,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
       {hasFilters && (
         <button
           onClick={clearFilters}
-          className="w-full text-sm text-teal-600 hover:text-teal-700 font-medium py-3 min-h-[44px]"
+          className="w-full text-sm text-black hover:text-gray-700 font-medium py-3 min-h-[44px]"
           disabled={isPending}
         >
           Clear all filters
@@ -75,7 +75,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
         <select
           value={currentFilters.sortBy || ''}
           onChange={(e) => updateFilter('sortBy', e.target.value || null)}
-          className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
+          className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563eb] text-base"
           disabled={isPending}
         >
           <option value="">Default</option>
@@ -90,29 +90,30 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
       <div>
         <h3 className="font-semibold text-gray-900 mb-3">Category</h3>
         <div className="space-y-3">
-          <label className="flex items-center min-h-[44px]">
-            <input
-              type="radio"
-              name="category"
-              checked={!currentFilters.categoryId}
-              onChange={() => updateFilter('categoryId', null)}
-              className="w-5 h-5 text-teal-600 focus:ring-teal-500"
-              disabled={isPending}
-            />
+          <button
+            type="button"
+            onClick={() => updateFilter('categoryId', null)}
+            className="flex items-center min-h-[44px] w-full text-left"
+            disabled={isPending}
+          >
+            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.categoryId ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+              {!currentFilters.categoryId && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
+            </span>
             <span className="ml-3 text-sm text-gray-700">All Categories</span>
-          </label>
+          </button>
           {topCategories.map((category) => (
-            <label key={category.id} className="flex items-center min-h-[44px]">
-              <input
-                type="radio"
-                name="category"
-                checked={currentFilters.categoryId === category.id}
-                onChange={() => updateFilter('categoryId', category.id)}
-                className="w-5 h-5 text-teal-600 focus:ring-teal-500"
-                disabled={isPending}
-              />
+            <button
+              type="button"
+              key={category.id}
+              onClick={() => updateFilter('categoryId', category.id)}
+              className="flex items-center min-h-[44px] w-full text-left"
+              disabled={isPending}
+            >
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.categoryId === category.id ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+                {currentFilters.categoryId === category.id && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
+              </span>
               <span className="ml-3 text-sm text-gray-700">{category.name}</span>
-            </label>
+            </button>
           ))}
         </div>
       </div>
@@ -126,7 +127,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             placeholder="Min price"
             value={currentFilters.minPrice || ''}
             onChange={(e) => updateFilter('minPrice', e.target.value || null)}
-            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563eb] text-base"
             min="0"
             step="0.01"
             disabled={isPending}
@@ -136,7 +137,7 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
             placeholder="Max price"
             value={currentFilters.maxPrice || ''}
             onChange={(e) => updateFilter('maxPrice', e.target.value || null)}
-            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-base"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563eb] text-base"
             min="0"
             step="0.01"
             disabled={isPending}
@@ -149,34 +150,35 @@ export function ProductFilters({ categories, currentFilters }: ProductFiltersPro
         <h3 className="font-semibold text-gray-900 mb-3">Minimum Rating</h3>
         <div className="space-y-3">
           {[4, 3, 2, 1].map((rating) => (
-            <label key={rating} className="flex items-center min-h-[44px]">
-              <input
-                type="radio"
-                name="rating"
-                checked={currentFilters.minRating === rating}
-                onChange={() => updateFilter('minRating', rating.toString())}
-                className="w-5 h-5 text-teal-600 focus:ring-teal-500"
-                disabled={isPending}
-              />
+            <button
+              type="button"
+              key={rating}
+              onClick={() => updateFilter('minRating', rating.toString())}
+              className="flex items-center min-h-[44px] w-full text-left"
+              disabled={isPending}
+            >
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${currentFilters.minRating === rating ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+                {currentFilters.minRating === rating && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
+              </span>
               <span className="ml-3 text-sm text-gray-700 flex items-center">
                 {[...Array(rating)].map((_, i) => (
-                  <span key={i} className="text-yellow-400">★</span>
+                  <span key={i} className="text-[#de7921]">★</span>
                 ))}
                 <span className="ml-1">& up</span>
               </span>
-            </label>
+            </button>
           ))}
-          <label className="flex items-center min-h-[44px]">
-            <input
-              type="radio"
-              name="rating"
-              checked={!currentFilters.minRating}
-              onChange={() => updateFilter('minRating', null)}
-              className="w-5 h-5 text-teal-600 focus:ring-teal-500"
-              disabled={isPending}
-            />
+          <button
+            type="button"
+            onClick={() => updateFilter('minRating', null)}
+            className="flex items-center min-h-[44px] w-full text-left"
+            disabled={isPending}
+          >
+            <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${!currentFilters.minRating ? 'border-[#2563eb]' : 'border-gray-300'}`}>
+              {!currentFilters.minRating && <span className="w-2.5 h-2.5 rounded-full bg-[#2563eb]" />}
+            </span>
             <span className="ml-3 text-sm text-gray-700">All Ratings</span>
-          </label>
+          </button>
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ import {
 } from './schemas';
 import { checkInventoryAvailability } from '@/features/inventory/actions';
 import { getCurrentUserId } from '@/lib/auth';
+import { getGuestSessionId, readGuestSessionId } from '@/lib/guest-session';
 import { handleError, withDatabaseRetry, type ApiResponse } from '@/lib/error-handler';
 import { ValidationError, NotFoundError, AuthenticationError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
@@ -25,17 +26,14 @@ import { logger } from '@/lib/logger';
  * @param input - Product ID and quantity
  * @returns Success status with cart item or error
  */
-export async function addToCart(input: AddToCartInput): Promise<ApiResponse<any>> {
+export async function addToCart(input: AddToCartInput): Promise<ApiResponse<unknown>> {
   try {
     // Validate input
     const validated = addToCartSchema.parse(input);
 
-    // Get current user ID (or session ID for guests)
+    // Get current user ID or guest session ID
     const userId = await getCurrentUserId();
-    if (!userId) {
-      logger.warn('Add to cart attempted without authentication');
-      throw new AuthenticationError('Please sign in to add items to your cart');
-    }
+    const sessionId = userId ? null : await getGuestSessionId();
 
     // Check if product exists and is active
     const product = await withDatabaseRetry(() =>
@@ -67,49 +65,32 @@ export async function addToCart(input: AddToCartInput): Promise<ApiResponse<any>
 
     if (!inventoryCheck.available) {
       if (inventoryCheck.availableQuantity === 0) {
-        logger.info('Add to cart failed - out of stock', {
-          productId: validated.productId,
-          requestedQuantity: validated.quantity,
-        });
         throw new ValidationError('This item is currently out of stock');
       } else {
-        logger.info('Add to cart failed - insufficient stock', {
-          productId: validated.productId,
-          requestedQuantity: validated.quantity,
-          availableQuantity: inventoryCheck.availableQuantity,
-        });
         throw new ValidationError(
           `Only ${inventoryCheck.availableQuantity} item${inventoryCheck.availableQuantity === 1 ? '' : 's'} available`
         );
       }
     }
 
+    // Build the where clause for finding existing cart item
+    const whereClause = userId
+      ? and(eq(cartItems.userId, userId), eq(cartItems.productId, validated.productId))
+      : and(eq(cartItems.sessionId, sessionId!), eq(cartItems.productId, validated.productId));
+
     // Check if item already exists in cart
     const existingCartItem = await withDatabaseRetry(() =>
-      db.query.cartItems.findFirst({
-        where: and(
-          eq(cartItems.userId, userId),
-          eq(cartItems.productId, validated.productId)
-        ),
-      })
+      db.query.cartItems.findFirst({ where: whereClause })
     );
 
     let result;
     if (existingCartItem) {
-      // Update existing cart item
       const newQuantity = existingCartItem.quantity + validated.quantity;
 
-      // Check if new quantity exceeds max limit (Requirement 5.7)
       if (newQuantity > 99) {
-        logger.warn('Add to cart failed - max quantity exceeded', {
-          productId: validated.productId,
-          currentQuantity: existingCartItem.quantity,
-          attemptedAddition: validated.quantity,
-        });
         throw new ValidationError('Maximum 99 items per product. Please adjust your cart');
       }
 
-      // Check if new quantity exceeds available inventory
       const newInventoryCheck = await checkInventoryAvailability(
         validated.productId,
         newQuantity
@@ -124,52 +105,37 @@ export async function addToCart(input: AddToCartInput): Promise<ApiResponse<any>
       [result] = await withDatabaseRetry(() =>
         db
           .update(cartItems)
-          .set({
-            quantity: newQuantity,
-            updatedAt: new Date(),
-          })
+          .set({ quantity: newQuantity, updatedAt: new Date() })
           .where(eq(cartItems.id, existingCartItem.id))
           .returning()
       );
-
-      logger.info('Cart item quantity updated', {
-        userId,
-        productId: validated.productId,
-        newQuantity,
-      });
     } else {
-      // Create new cart item
       [result] = await withDatabaseRetry(() =>
         db
           .insert(cartItems)
           .values({
-            userId,
+            userId: userId || undefined,
+            sessionId: sessionId || undefined,
             productId: validated.productId,
             quantity: validated.quantity,
             priceAtAdd: product.price,
           })
           .returning()
       );
-
-      logger.info('Item added to cart', {
-        userId,
-        productId: validated.productId,
-        quantity: validated.quantity,
-      });
     }
 
-    return {
-      success: true,
-      data: result,
-    };
+    logger.info('Item added to cart', {
+      userId: userId || 'guest',
+      sessionId: sessionId || undefined,
+      productId: validated.productId,
+      quantity: validated.quantity,
+    });
+
+    return { success: true, data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      logger.warn('Add to cart validation error', {
-        errors: error.issues,
-      });
       throw new ValidationError(error.issues[0].message, error.issues);
     }
-
     return handleError(error);
   }
 }
@@ -181,65 +147,40 @@ export async function addToCart(input: AddToCartInput): Promise<ApiResponse<any>
  * @param input - Cart item ID and new quantity
  * @returns Success status with updated cart item or error
  */
-export async function updateCartItemQuantity(input: UpdateCartItemInput): Promise<ApiResponse<any>> {
+export async function updateCartItemQuantity(input: UpdateCartItemInput): Promise<ApiResponse<unknown>> {
   try {
-    // Validate input
     const validated = updateCartItemSchema.parse(input);
 
-    // Get current user ID
     const userId = await getCurrentUserId();
-    if (!userId) {
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) {
       throw new AuthenticationError();
     }
 
-    // Get cart item
+    const whereClause = userId
+      ? and(eq(cartItems.id, validated.cartItemId), eq(cartItems.userId, userId))
+      : and(eq(cartItems.id, validated.cartItemId), eq(cartItems.sessionId, sessionId!));
+
     const cartItem = await withDatabaseRetry(() =>
-      db.query.cartItems.findFirst({
-        where: and(
-          eq(cartItems.id, validated.cartItemId),
-          eq(cartItems.userId, userId)
-        ),
-      })
+      db.query.cartItems.findFirst({ where: whereClause })
     );
 
     if (!cartItem) {
       throw new NotFoundError('This item is no longer in your cart');
     }
 
-    // Check inventory availability for new quantity
-    const inventoryCheck = await checkInventoryAvailability(
-      cartItem.productId,
-      validated.quantity
-    );
-
+    const inventoryCheck = await checkInventoryAvailability(cartItem.productId, validated.quantity);
     if (!inventoryCheck.available) {
       throw new ValidationError(
         `Only ${inventoryCheck.availableQuantity} item${inventoryCheck.availableQuantity === 1 ? '' : 's'} available in stock`
       );
     }
 
-    // Update cart item
     const [result] = await withDatabaseRetry(() =>
-      db
-        .update(cartItems)
-        .set({
-          quantity: validated.quantity,
-          updatedAt: new Date(),
-        })
-        .where(eq(cartItems.id, validated.cartItemId))
-        .returning()
+      db.update(cartItems).set({ quantity: validated.quantity, updatedAt: new Date() }).where(eq(cartItems.id, validated.cartItemId)).returning()
     );
 
-    logger.info('Cart item quantity updated', {
-      userId,
-      cartItemId: validated.cartItemId,
-      newQuantity: validated.quantity,
-    });
-
-    return {
-      success: true,
-      data: result,
-    };
+    return { success: true, data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new ValidationError(error.issues[0].message, error.issues);
@@ -257,36 +198,21 @@ export async function updateCartItemQuantity(input: UpdateCartItemInput): Promis
  */
 export async function removeFromCart(input: RemoveFromCartInput): Promise<ApiResponse<void>> {
   try {
-    // Validate input
     const validated = removeFromCartSchema.parse(input);
 
-    // Get current user ID
     const userId = await getCurrentUserId();
-    if (!userId) {
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) {
       throw new AuthenticationError();
     }
 
-    // Delete cart item
-    await withDatabaseRetry(() =>
-      db
-        .delete(cartItems)
-        .where(
-          and(
-            eq(cartItems.id, validated.cartItemId),
-            eq(cartItems.userId, userId)
-          )
-        )
-    );
+    const whereClause = userId
+      ? and(eq(cartItems.id, validated.cartItemId), eq(cartItems.userId, userId))
+      : and(eq(cartItems.id, validated.cartItemId), eq(cartItems.sessionId, sessionId!));
 
-    logger.info('Item removed from cart', {
-      userId,
-      cartItemId: validated.cartItemId,
-    });
+    await withDatabaseRetry(() => db.delete(cartItems).where(whereClause));
 
-    return {
-      success: true,
-      data: undefined,
-    };
+    return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new ValidationError(error.issues[0].message, error.issues);
@@ -303,25 +229,16 @@ export async function removeFromCart(input: RemoveFromCartInput): Promise<ApiRes
  */
 export async function clearCart(): Promise<ApiResponse<void>> {
   try {
-    // Get current user ID
     const userId = await getCurrentUserId();
-    if (!userId) {
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) {
       throw new AuthenticationError();
     }
 
-    // Delete all cart items for user
-    await withDatabaseRetry(() =>
-      db
-        .delete(cartItems)
-        .where(eq(cartItems.userId, userId))
-    );
+    const whereClause = userId ? eq(cartItems.userId, userId) : eq(cartItems.sessionId, sessionId!);
+    await withDatabaseRetry(() => db.delete(cartItems).where(whereClause));
 
-    logger.info('Cart cleared', { userId });
-
-    return {
-      success: true,
-      data: undefined,
-    };
+    return { success: true, data: undefined };
   } catch (error) {
     return handleError(error);
   }
@@ -334,21 +251,19 @@ export async function clearCart(): Promise<ApiResponse<void>> {
  * 
  * @returns Validation result with any out-of-stock items
  */
-export async function validateCartInventory(): Promise<ApiResponse<any>> {
+export async function validateCartInventory(): Promise<ApiResponse<unknown>> {
   try {
-    // Get current user ID
     const userId = await getCurrentUserId();
-    if (!userId) {
+    const sessionId = userId ? null : await readGuestSessionId();
+    if (!userId && !sessionId) {
       throw new AuthenticationError();
     }
 
-    // Get all cart items for user
+    const whereClause = userId ? eq(cartItems.userId, userId) : eq(cartItems.sessionId, sessionId!);
     const userCartItems = await withDatabaseRetry(() =>
       db.query.cartItems.findMany({
-        where: eq(cartItems.userId, userId),
-        with: {
-          product: true,
-        },
+        where: whereClause,
+        with: { product: true },
       })
     );
 

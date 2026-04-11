@@ -9,16 +9,17 @@ import OrderTrackingView from '@/components/order/order-tracking-view';
 export default async function TrackOrderPage({
   params,
 }: {
-  params: { orderNumber: string };
+  params: Promise<{ orderNumber: string }>;
 }) {
-  const order = await getOrderByNumber(params.orderNumber);
+  const { orderNumber } = await params;
+  const order = await getOrderByNumber(orderNumber);
 
   if (!order) {
     notFound();
   }
 
   return (
-    <div className="min-h-screen bg-white py-8">
+    <div className="min-h-screen bg-[#EAEDED] py-8">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <OrderTrackingView order={order} />
       </div>

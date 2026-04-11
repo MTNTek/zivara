@@ -6,6 +6,7 @@ import { requireAuth } from '@/lib/auth';
 import { updateProfileSchema, addressSchema } from './schemas';
 import { eq, and, count } from 'drizzle-orm';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 export type ActionResult<T = void> = {
   success: boolean;
@@ -69,9 +70,9 @@ export async function updateProfile(
 
     // 11.3 - Send verification email on email change
     if (emailChanged) {
-      // TODO: Implement email verification in Task 15
-      // For now, just log it
-      console.log(`Email verification needed for: ${validatedData.email}`);
+      const { sendEmailVerification } = await import('@/lib/email');
+      const token = Buffer.from(`${userId}:${validatedData.email}:${Date.now()}`).toString('base64url');
+      sendEmailVerification(validatedData.email, token).catch(() => {});
     }
 
     return {
@@ -87,7 +88,7 @@ export async function updateProfile(
       };
     }
 
-    console.error('Profile update error:', error);
+    logger.error('Profile update error', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: 'Unable to update your profile. Please try again',
@@ -160,7 +161,7 @@ export async function addAddress(
       };
     }
 
-    console.error('Add address error:', error);
+    logger.error('Add address error', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: 'Unable to add address. Please try again',
@@ -238,7 +239,7 @@ export async function updateAddress(
       };
     }
 
-    console.error('Update address error:', error);
+    logger.error('Update address error', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: 'Unable to update address. Please try again',
@@ -282,7 +283,7 @@ export async function deleteAddress(
       success: true,
     };
   } catch (error) {
-    console.error('Delete address error:', error);
+    logger.error('Delete address error', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: 'Unable to delete address. Please try again',
@@ -333,7 +334,7 @@ export async function setDefaultAddress(
       success: true,
     };
   } catch (error) {
-    console.error('Set default address error:', error);
+    logger.error('Set default address error', { error: error instanceof Error ? error.message : String(error) });
     return {
       success: false,
       error: 'Unable to set default address. Please try again',

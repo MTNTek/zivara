@@ -74,7 +74,7 @@ export function OrderExportButton({ filters }: OrderExportButtonProps) {
       <button
         onClick={handleExport}
         disabled={isExporting}
-        className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center gap-2 px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg
           className="w-5 h-5"

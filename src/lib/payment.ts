@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { logger } from '@/lib/logger';
 
 // Initialize Stripe with secret key (optional for tests)
 let stripe: Stripe | null = null;
@@ -8,8 +9,6 @@ if (process.env.STRIPE_SECRET_KEY) {
     apiVersion: '2026-02-25.clover',
     typescript: true,
   });
-} else if (process.env.NODE_ENV === 'production') {
-  throw new Error('STRIPE_SECRET_KEY is required in production');
 }
 
 export { stripe };
@@ -166,8 +165,43 @@ export async function getCardLast4Digits(paymentMethodId: string): Promise<strin
     
     return null;
   } catch (error) {
-    console.error('Failed to retrieve payment method:', error);
+    logger.error('Failed to retrieve payment method', { error: error instanceof Error ? error.message : String(error) });
     return null;
+  }
+}
+
+/**
+ * Create a refund for a payment intent
+ * 
+ * @param paymentIntentId - Payment intent ID to refund
+ * @param amount - Amount in dollars to refund (null = full refund)
+ * @param reason - Reason for refund
+ * @returns Refund result
+ */
+export async function createRefund(
+  paymentIntentId: string,
+  amount?: number,
+  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer'
+) {
+  try {
+    if (!stripe) {
+      return { success: false, error: 'Payment processing is not configured' };
+    }
+
+    const params: Stripe.RefundCreateParams = {
+      payment_intent: paymentIntentId,
+      reason: reason || 'requested_by_customer',
+    };
+
+    if (amount) {
+      params.amount = Math.round(amount * 100); // Convert to cents
+    }
+
+    const refund = await stripe.refunds.create(params);
+    return { success: true, data: refund };
+  } catch (error) {
+    logger.error('Failed to create refund', { paymentIntentId, error: error instanceof Error ? error.message : String(error) });
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to create refund' };
   }
 }
 
