@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   // Strict powered-by header removal
   poweredByHeader: false,
 
+  // Allow local network access during development
+  allowedDevOrigins: ['http://192.168.1.61:3000'],
+
   images: {
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
