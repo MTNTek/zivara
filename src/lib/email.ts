@@ -14,7 +14,13 @@ import {
   emailVerificationHtml,
 } from '@/lib/email-templates';
 
-const resend = new Resend(process.env.RESEND_API_KEY || '');
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY || 'missing');
+  }
+  return _resend;
+}
 const FROM = process.env.RESEND_FROM_EMAIL || 'Zivara <noreply@zivara.com>';
 const MAX_RETRIES = 3;
 
@@ -36,7 +42,7 @@ async function sendWithRetry(
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      await resend.emails.send({ from: FROM, to, subject, html });
+      await getResend().emails.send({ from: FROM, to, subject, html });
       logger.info('Email sent', { to, subject });
       return { success: true };
     } catch (err) {
